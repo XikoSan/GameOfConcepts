@@ -1,0 +1,40 @@
+.game-status {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid;
+}
+
+.game-status.player-blue {
+  background-color: #e3f2fd;
+  border-left-color: #2196f3;
+}
+
+.game-status.player-orange {
+  background-color: #ffe8d6;
+  border-left-color: #ff9800;
+}
+
+.status-info {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.status-info p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.current-turn {
+  color: #1976d2;
+}
+
+.game-status.player-orange .current-turn {
+  color: #f57c00;
+}
+
+.placed-cards {
+  color: #555;
+}

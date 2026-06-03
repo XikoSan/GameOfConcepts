@@ -1,0 +1,44 @@
+.player-hand {
+  border: 2px solid #333;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.player-hand h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.player-hand.player-0 {
+  background-color: #e3f2fd;
+  border-color: #2196f3;
+}
+
+.player-hand.player-0 h3 {
+  color: #1976d2;
+}
+
+.player-hand.player-1 {
+  background-color: #ffe8d6;
+  border-color: #ff9800;
+}
+
+.player-hand.player-1 h3 {
+  color: #f57c00;
+}
+
+.cards-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.card-count {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}

@@ -1,0 +1,40 @@
+.card {
+  padding: 12px 8px;
+  border: 2px solid #333;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 80px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.card.player-blue {
+  background-color: #2196f3;
+  color: white;
+  border-color: #1976d2;
+}
+
+.card.player-blue:hover {
+  background-color: #1976d2;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.5);
+}
+
+.card.player-orange {
+  background-color: #ff9800;
+  color: white;
+  border-color: #f57c00;
+}
+
+.card.player-orange:hover {
+  background-color: #f57c00;
+  box-shadow: 0 2px 8px rgba(245, 124, 0, 0.5);
+}
+
+.card.selected {
+  box-shadow: 0 0 12px 2px rgba(76, 175, 80, 0.8);
+  transform: scale(1.05);
+}
