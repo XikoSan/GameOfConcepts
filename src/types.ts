@@ -22,7 +22,17 @@ export const CARD_NAMES = [
   'Игра',
 ];
 
-export type CardName = (typeof CARD_NAMES)[number];
+export const START_CARD_NAMES = [
+  'Человек',
+  'Общество',
+  'Мир',
+  'Система',
+  'Изменение',
+];
+
+export type RegularCardName = (typeof CARD_NAMES)[number];
+export type StartCardName = (typeof START_CARD_NAMES)[number];
+export type CardName = RegularCardName | StartCardName;
 export const CARDS = CARD_NAMES;
 
 // Координаты на бесконечном поле (целые числа)
@@ -36,14 +46,22 @@ export interface PlacedCard {
   id: string;
   cardName: CardName;
   coordinates: Coordinates;
-  playerId: number;
+  playerId: 0 | 1 | null;
+  status: 'confirmed' | 'pending';
   connections: string[];
+}
+
+export interface PendingMove {
+  cardId: string;
+  cardName: RegularCardName;
+  playerId: 0 | 1;
+  reviewerId: 0 | 1;
 }
 
 // Рука игрока
 export interface PlayerHand {
-  playerId: number;
-  cards: CardName[];
+  playerId: 0 | 1;
+  cards: RegularCardName[];
 }
 
 // Состояние игры
@@ -51,7 +69,12 @@ export interface GameState {
   board: Record<string, PlacedCard>;
   players: [PlayerHand, PlayerHand];
   currentPlayerIndex: 0 | 1;
-  deck: [CardName[], CardName[]];
+  deck: [RegularCardName[], RegularCardName[]];
+  startCard: PlacedCard;
+  lastPlacedCardId: string | null;
+  pendingMove: PendingMove | null;
+  scores: [number, number];
+  log: string[];
   gameOver: boolean;
 }
 

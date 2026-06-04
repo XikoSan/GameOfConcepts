@@ -1,12 +1,17 @@
 import { useState, useCallback } from 'react';
-import { initializeGame, placeCard } from '../game';
-import type { CardName, Coordinates, GameState } from '../game';
+import {
+  confirmPendingCard,
+  initializeGame,
+  placeCard,
+  returnPendingCard,
+} from '../game';
+import type { Coordinates, GameState, RegularCardName } from '../game';
 
 export function useGameState() {
   const [gameState, setGameState] = useState<GameState>(() => initializeGame());
 
   const handlePlaceCard = useCallback(
-    (cardName: CardName, coordinates: Coordinates) => {
+    (cardName: RegularCardName, coordinates: Coordinates) => {
       setGameState((prev) => placeCard(prev, cardName, coordinates));
     },
     []
@@ -16,9 +21,19 @@ export function useGameState() {
     setGameState(initializeGame());
   }, []);
 
+  const handleConfirmPendingCard = useCallback(() => {
+    setGameState((prev) => confirmPendingCard(prev));
+  }, []);
+
+  const handleReturnPendingCard = useCallback(() => {
+    setGameState((prev) => returnPendingCard(prev));
+  }, []);
+
   return {
     gameState,
     placeCard: handlePlaceCard,
+    confirmPendingCard: handleConfirmPendingCard,
+    returnPendingCard: handleReturnPendingCard,
     resetGame,
   };
 }
