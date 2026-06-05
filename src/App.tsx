@@ -182,12 +182,27 @@ function App() {
     setOnlineError(null);
 
     try {
+      console.log('[create room click]');
+      console.log('[create room playerId]', playerId);
+      console.log('[create room env check]', {
+        hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
+        hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
+      });
+      const initialGameState = initializeGame();
+      console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
-      const room = await createRoom(playerId, initializeGame());
+      const room = await createRoom(playerId, initialGameState);
       handleRoomConnected(room);
     } catch (error) {
+      console.error('[create room error]', error);
+      if (error instanceof Error) {
+        console.error('[create room error message]', error.message);
+        console.error('[create room error stack]', error.stack);
+      }
       setOnlineError(
-        error instanceof Error ? error.message : 'Не удалось создать комнату.'
+        error instanceof Error
+          ? `Не удалось создать комнату: ${error.message}`
+          : 'Не удалось создать комнату.'
       );
     } finally {
       setIsOnlineLoading(false);

@@ -46,8 +46,16 @@ export async function createRoom(
   playerId: string,
   initialGameState: GameState
 ): Promise<Room> {
+  console.log('[roomService createRoom input]', {
+    playerId,
+    hasInitialGameState: Boolean(initialGameState),
+  });
   const supabase = getSupabaseClient();
   const roomCode = generateRoomCode();
+  console.log('[roomService createRoom before insert]', {
+    code: roomCode,
+    status: 'waiting',
+  });
 
   // TODO(MVP): Сейчас весь gameState хранится в JSONB. Позже нужно разделить
   // публичное состояние и приватные данные игроков.
@@ -64,7 +72,10 @@ export async function createRoom(
     .select('*')
     .single<Room>();
 
+  console.log('[roomService createRoom result]', { data, error });
+
   if (error) {
+    console.error('[supabase createRoom error]', error);
     throw error;
   }
 
