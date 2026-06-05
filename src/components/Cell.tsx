@@ -10,6 +10,7 @@ interface CellProps {
   isHighlighted?: boolean;
   isPlayable?: boolean;
   isLastPlaced?: boolean;
+  showTooltip?: boolean;
 }
 
 const getFontSize = (cardName: string) => {
@@ -59,6 +60,7 @@ export const Cell: React.FC<CellProps> = ({
   isHighlighted,
   isPlayable,
   isLastPlaced,
+  showTooltip = true,
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
   const tooltipStyle = tooltipPosition
@@ -86,13 +88,20 @@ export const Cell: React.FC<CellProps> = ({
           className={`card-in-cell ${
             placedCard.playerId === null ? 'player-neutral' : `player-${placedCard.playerId}`
           } ${placedCard.status === 'pending' ? 'pending' : ''}`}
-          onMouseEnter={(event) => setTooltipPosition(getTooltipPosition(event))}
-          onMouseMove={(event) => setTooltipPosition(getTooltipPosition(event))}
+          onMouseEnter={(event) =>
+            showTooltip ? setTooltipPosition(getTooltipPosition(event)) : undefined
+          }
+          onMouseMove={(event) =>
+            showTooltip ? setTooltipPosition(getTooltipPosition(event)) : undefined
+          }
           onMouseLeave={() => setTooltipPosition(null)}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
-          <span className="card-title">{placedCard.cardName}</span>
-          {tooltipPosition &&
+          <span className="card-title" lang="ru">
+            {placedCard.cardName}
+          </span>
+          {showTooltip &&
+            tooltipPosition &&
             createPortal(
               <div
                 className={`card-tooltip ${getOwnerClassName(placedCard.playerId)}`}

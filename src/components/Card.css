@@ -3,8 +3,8 @@
   min-height: clamp(50px, 4vw, 88px);
   padding: clamp(5px, 0.55vw, 9px);
   box-sizing: border-box;
-  border: 2px solid rgba(255, 196, 98, 0.36);
-  border-radius: clamp(7px, 0.6vw, 10px);
+  border: 1px solid rgba(214, 174, 118, 0.34);
+  border-radius: clamp(6px, 0.5vw, 8px);
   text-align: center;
   font-size: clamp(12px, 0.9vw, 16px);
   font-weight: 800;
@@ -18,9 +18,9 @@
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 0 0 18px rgba(0, 0, 0, 0.24),
-    0 6px 14px rgba(0, 0, 0, 0.32);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 0 15px rgba(0, 0, 0, 0.24),
+    0 5px 12px rgba(0, 0, 0, 0.28);
 }
 
 .card .card-title {
@@ -66,14 +66,15 @@
 
 .card.player-blue {
   background:
-    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.15), transparent 28%),
-    linear-gradient(145deg, #1265c1, #07376d);
-  border-color: rgba(82, 168, 255, 0.85);
+    url('../assets/card-frame-blue.png') center / 100% 100% no-repeat,
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.12), transparent 28%),
+    linear-gradient(145deg, #1b5a90, #0d2d50);
+  border-color: rgba(93, 151, 198, 0.72);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 0 22px rgba(0, 0, 0, 0.28),
-    0 0 16px rgba(45, 139, 255, 0.24),
-    0 6px 14px rgba(0, 0, 0, 0.32);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(75, 137, 188, 0.14),
+    0 5px 12px rgba(0, 0, 0, 0.28);
 }
 
 .card.player-blue:hover {
@@ -82,14 +83,15 @@
 
 .card.player-orange {
   background:
-    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.18), transparent 28%),
-    linear-gradient(145deg, #c97300, #673300);
-  border-color: rgba(255, 154, 24, 0.9);
+    url('../assets/card-frame-orange.png') center / 100% 100% no-repeat,
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.14), transparent 28%),
+    linear-gradient(145deg, #965d18, #4d2b09);
+  border-color: rgba(210, 142, 59, 0.76);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 0 22px rgba(0, 0, 0, 0.28),
-    0 0 16px rgba(255, 154, 24, 0.24),
-    0 6px 14px rgba(0, 0, 0, 0.32);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(205, 129, 40, 0.14),
+    0 5px 12px rgba(0, 0, 0, 0.28);
 }
 
 .card.player-orange:hover {
@@ -97,10 +99,10 @@
 }
 
 .card.selected {
-  border-color: #f4d35e;
+  border-color: #d6ae76;
   box-shadow:
-    0 0 0 3px rgba(244, 211, 94, 0.55),
-    0 0 24px rgba(244, 211, 94, 0.42),
-    0 8px 18px rgba(0, 0, 0, 0.42);
-  transform: translateY(-6px);
+    0 0 0 2px rgba(214, 174, 118, 0.44),
+    0 0 14px rgba(214, 174, 118, 0.22),
+    0 7px 16px rgba(0, 0, 0, 0.38);
+  transform: translateY(-4px);
 }

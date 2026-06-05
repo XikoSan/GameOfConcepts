@@ -10,81 +10,105 @@
   justify-content: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 45% 42%, rgba(166, 105, 36, 0.2), transparent 34%),
-    radial-gradient(circle at 80% 12%, rgba(37, 93, 153, 0.16), transparent 28%),
-    linear-gradient(135deg, #090b0d 0%, #17110d 48%, #08090b 100%);
+    radial-gradient(circle at 50% 46%, rgba(121, 92, 54, 0.18), transparent 34%),
+    linear-gradient(135deg, #080a0b 0%, #12100d 48%, #070808 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
 }
 
 .game-table {
-  width: min(1800px, 96vw, calc(96vh * 16 / 9));
-  height: min(1000px, 96vh, calc(96vw * 9 / 16));
-  aspect-ratio: 16 / 9;
+  width: 98vw;
+  height: 98svh;
+  max-width: none;
   display: flex;
   min-height: 0;
   min-width: 0;
-  padding: clamp(8px, 0.8vw, 16px);
+  padding: clamp(7px, 0.65vw, 13px);
   box-sizing: border-box;
-  border: 1px solid rgba(255, 196, 98, 0.16);
-  border-radius: clamp(16px, 1.2vw, 24px);
+  border: 1px solid rgba(201, 157, 92, 0.22);
+  border-radius: clamp(12px, 0.9vw, 18px);
   background:
-    radial-gradient(circle at 50% 42%, rgba(255, 152, 0, 0.13), transparent 36%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 22%),
-    rgba(9, 11, 13, 0.72);
+    url('./assets/table-background.png') center / cover,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 22%),
+    rgba(8, 10, 11, 0.88);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.035),
-    inset 0 0 52px rgba(0, 0, 0, 0.55),
-    0 22px 70px rgba(0, 0, 0, 0.55);
+    inset 0 0 0 2px rgba(255, 255, 255, 0.025),
+    inset 0 0 42px rgba(0, 0, 0, 0.5),
+    0 18px 58px rgba(0, 0, 0, 0.54);
 }
 
 .play-area {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: clamp(6px, 0.65vw, 12px);
+  gap: clamp(5px, 0.52vw, 10px);
   min-height: 0;
   min-width: 0;
 }
 
 .board-section {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   flex: 1;
   min-height: 0;
   min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   overflow: hidden;
   container-type: size;
 }
 
 .table-middle {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   flex: 1;
   min-height: 0;
   min-width: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(320px, 22%, 440px);
-  gap: clamp(8px, 1vw, 18px);
+  grid-template-columns:
+    clamp(260px, 16vw, 320px)
+    minmax(0, 1fr)
+    clamp(260px, 16vw, 320px);
+  gap: clamp(7px, 0.75vw, 13px);
+  align-items: stretch;
+  overflow: hidden;
 }
 
 .side-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 196, 98, 0.18);
-  border-radius: clamp(10px, 0.9vw, 14px);
+  border: 1px solid rgba(189, 151, 96, 0.22);
+  border-radius: clamp(8px, 0.7vw, 12px);
   background:
-    linear-gradient(180deg, rgba(36, 38, 41, 0.94), rgba(11, 13, 16, 0.96)),
-    radial-gradient(circle at 18% 0%, rgba(255, 176, 71, 0.12), transparent 38%);
+    url('./assets/panel-texture.png') center / cover,
+    linear-gradient(180deg, rgba(24, 25, 25, 0.96), rgba(8, 10, 11, 0.98)),
+    radial-gradient(circle at 18% 0%, rgba(199, 156, 92, 0.08), transparent 34%);
   box-shadow:
-    inset 0 0 0 2px rgba(255, 255, 255, 0.04),
-    inset 0 0 36px rgba(0, 0, 0, 0.65),
-    0 18px 42px rgba(0, 0, 0, 0.55);
-  padding: clamp(10px, 1vw, 18px);
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 0 28px rgba(0, 0, 0, 0.58),
+    0 12px 30px rgba(0, 0, 0, 0.44);
+  padding: clamp(10px, 0.9vw, 16px);
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 0.85vw, 16px);
+  gap: clamp(7px, 0.7vw, 13px);
+}
+
+.control-panel {
+  justify-content: flex-start;
+}
+
+.control-title-section {
+  flex: 0 0 auto;
 }
 
 .side-panel h1,
@@ -101,7 +125,7 @@
 
 .side-panel h2 {
   font-size: clamp(13px, 0.95vw, 16px);
-  color: #f0b55b;
+  color: #d6ae76;
 }
 
 .panel-section {
@@ -123,9 +147,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #f0b55b;
-  border: 1px solid rgba(240, 181, 91, 0.45);
-  background: rgba(240, 181, 91, 0.08);
+  color: #d6ae76;
+  border: 1px solid rgba(214, 174, 118, 0.38);
+  background: rgba(214, 174, 118, 0.06);
 }
 
 .lobby-tag {
@@ -163,17 +187,17 @@
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  box-shadow: 0 0 12px currentColor;
+  box-shadow: 0 0 7px currentColor;
 }
 
 .player-score-blue span::before {
-  background: #2d8bff;
-  color: #2d8bff;
+  background: #3b82c4;
+  color: #3b82c4;
 }
 
 .player-score-orange span::before {
-  background: #ff9a18;
-  color: #ff9a18;
+  background: #d18832;
+  color: #d18832;
 }
 
 .score-row strong {
@@ -184,7 +208,7 @@
 
 .log-section {
   flex: 1;
-  min-height: clamp(120px, 16vh, 190px);
+  min-height: clamp(180px, 28vh, 360px);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -194,14 +218,14 @@
   flex: 1;
   min-height: 0;
   box-sizing: border-box;
-  border: 1px solid rgba(255, 255, 255, 0.13);
+  border: 1px solid rgba(214, 174, 118, 0.16);
   border-radius: clamp(7px, 0.7vw, 10px);
   padding: clamp(8px, 0.8vw, 14px);
   color: #b9b1a6;
   font-size: clamp(10px, 0.72vw, 12px);
   background:
-    radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.06), transparent 36%),
-    rgba(5, 7, 10, 0.42);
+    radial-gradient(circle at 50% 35%, rgba(214, 174, 118, 0.04), transparent 36%),
+    rgba(5, 7, 10, 0.46);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -221,7 +245,7 @@
 }
 
 .log-icon {
-  color: rgba(240, 181, 91, 0.72);
+  color: rgba(214, 174, 118, 0.62);
   font-size: clamp(24px, 2vw, 34px);
 }
 
@@ -243,11 +267,20 @@
   margin-top: 7px;
 }
 
+.match-log li {
+  white-space: pre-line;
+  padding: 7px 8px;
+  border: 1px solid rgba(214, 174, 118, 0.1);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
 .confirmation-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
   color: #e9e2d8;
+  flex: 0 0 auto;
 }
 
 .confirmation-section p {
@@ -286,13 +319,13 @@
 }
 
 .confirmation-actions button:first-child {
-  border-color: rgba(113, 211, 124, 0.62);
-  box-shadow: 0 0 16px rgba(113, 211, 124, 0.14);
+  border-color: rgba(117, 157, 103, 0.58);
+  box-shadow: 0 0 10px rgba(117, 157, 103, 0.1);
 }
 
 .confirmation-actions button:last-child {
-  border-color: rgba(255, 154, 24, 0.55);
-  box-shadow: 0 0 16px rgba(255, 154, 24, 0.12);
+  border-color: rgba(198, 141, 70, 0.5);
+  box-shadow: 0 0 10px rgba(198, 141, 70, 0.1);
 }
 
 .confirmation-actions button:hover {
@@ -303,7 +336,8 @@
   display: flex;
   flex-direction: column;
   gap: clamp(6px, 0.6vw, 10px);
-  padding-top: clamp(18px, 3vh, 34px);
+  padding-top: clamp(6px, 1vh, 14px);
+  margin-top: auto;
 }
 
 .panel-actions button {
@@ -311,6 +345,7 @@
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 7px;
   background:
+    url('./assets/button-texture.png') center / cover,
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
     #14191f;
   color: #f6efe2;
@@ -322,13 +357,14 @@
 }
 
 .panel-actions button:first-child {
-  border-color: rgba(255, 159, 29, 0.6);
+  border-color: rgba(199, 140, 55, 0.52);
   background:
-    linear-gradient(180deg, rgba(255, 159, 29, 0.35), rgba(110, 62, 7, 0.68)),
-    #4c2805;
+    url('./assets/button-texture.png') center / cover,
+    linear-gradient(180deg, rgba(181, 118, 41, 0.34), rgba(84, 50, 13, 0.64)),
+    #402707;
   box-shadow:
-    inset 0 0 18px rgba(255, 185, 65, 0.18),
-    0 0 18px rgba(255, 137, 14, 0.16);
+    inset 0 0 16px rgba(213, 164, 88, 0.14),
+    0 0 12px rgba(178, 113, 26, 0.1);
 }
 
 .panel-actions button:hover {
@@ -401,10 +437,13 @@
 
 @media (max-width: 1100px), (max-height: 720px) {
   .table-middle {
-    grid-template-columns: minmax(0, 1fr) clamp(270px, 24%, 340px);
+    grid-template-columns:
+      clamp(220px, 17vw, 260px)
+      minmax(0, 1fr)
+      clamp(220px, 17vw, 260px);
   }
 
   .log-section {
-    min-height: 90px;
+    min-height: 120px;
   }
 }

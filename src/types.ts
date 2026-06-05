@@ -48,6 +48,7 @@ export interface PlacedCard {
   coordinates: Coordinates;
   playerId: 0 | 1 | null;
   status: 'confirmed' | 'pending';
+  crossId?: string;
   connections: string[];
 }
 
@@ -56,6 +57,36 @@ export interface PendingMove {
   cardName: RegularCardName;
   playerId: 0 | 1;
   reviewerId: 0 | 1;
+}
+
+export interface Cross {
+  id: string;
+  centerX: number;
+  centerY: number;
+  playerId: 0 | 1;
+  cardNames: CardName[];
+  points: 5;
+}
+
+export interface PendingCross {
+  centerX: number;
+  centerY: number;
+  playerId: 0 | 1;
+  cardIds: string[];
+  cardNames: CardName[];
+  centerCardName: CardName;
+  points: 5;
+}
+
+export interface TurnScoreResult {
+  playerId: 0 | 1;
+  cardName: CardName;
+  basePoints: number;
+  adjacencyBonus: number;
+  chainBonus: number;
+  crossBonus: number;
+  totalGained: number;
+  newTotalScore: number;
 }
 
 // Рука игрока
@@ -73,6 +104,9 @@ export interface GameState {
   startCard: PlacedCard;
   lastPlacedCardId: string | null;
   pendingMove: PendingMove | null;
+  pendingCross: PendingCross | null;
+  pendingTurnScore: TurnScoreResult | null;
+  crosses: Cross[];
   scores: [number, number];
   log: string[];
   gameOver: boolean;

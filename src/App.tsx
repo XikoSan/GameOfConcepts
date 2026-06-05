@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { DragEvent } from 'react';
 import { GameBoard } from './components/GameBoard';
+import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
+import { RulesContent } from './components/RulesContent';
 import { useGameState } from './hooks/useGameState';
 import type { Coordinates, RegularCardName } from './game';
 import './App.css';
@@ -15,14 +17,35 @@ interface DragPreview {
   y: number;
 }
 
+type ActiveModal = 'new-game' | 'rules' | 'settings' | null;
+
+const defaultInterfaceSettings = {
+  showPlayableHighlights: true,
+  showCardTooltips: true,
+};
+
 function App() {
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
-  const { gameState, placeCard, confirmPendingCard, returnPendingCard } = useGameState();
-  const activeSelectedCard = gameState.pendingMove ? null : selectedCard;
+  const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+  const [resetCameraSignal, setResetCameraSignal] = useState(0);
+  const [interfaceSettings, setInterfaceSettings] = useState(
+    defaultInterfaceSettings
+  );
+  const {
+    gameState,
+    placeCard,
+    confirmPendingCard,
+    returnPendingCard,
+    approvePendingCross,
+    rejectPendingCross,
+    resetGame,
+  } = useGameState();
+  const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
+  const activeSelectedCard = hasPendingDecision ? null : selectedCard;
 
   const handlePlaceCard = (cardName: RegularCardName, coordinates: Coordinates) => {
-    if (!selectedCard || gameState.pendingMove) return;
+    if (!selectedCard || hasPendingDecision) return;
 
     placeCard(cardName, coordinates);
   };
@@ -32,7 +55,7 @@ function App() {
     playerColor: DragPreview['playerColor'],
     event: DragEvent<HTMLDivElement>
   ) => {
-    if (gameState.pendingMove) return;
+    if (hasPendingDecision) return;
 
     setSelectedCard(cardName);
     setDragPreview({
@@ -54,6 +77,22 @@ function App() {
   const handleCancelCardDrag = () => {
     setSelectedCard(null);
     setDragPreview(null);
+  };
+
+  const handleResetCamera = () => {
+    setResetCameraSignal((signal) => signal + 1);
+  };
+
+  const handleConfirmNewGame = () => {
+    resetGame();
+    setSelectedCard(null);
+    setDragPreview(null);
+    setResetCameraSignal((signal) => signal + 1);
+    setActiveModal(null);
+  };
+
+  const handleResetSettings = () => {
+    setInterfaceSettings(defaultInterfaceSettings);
   };
 
   useEffect(() => {
@@ -82,24 +121,14 @@ function App() {
             cards={gameState.players[1].cards}
             deckCount={gameState.deck[1].length}
             selectedCard={gameState.currentPlayerIndex === 1 ? activeSelectedCard : null}
-            isActive={gameState.currentPlayerIndex === 1 && !gameState.pendingMove}
+            isActive={gameState.currentPlayerIndex === 1 && !hasPendingDecision}
             onMoveCardDrag={handleMoveCardDrag}
             onStartCardDrag={handleStartCardDrag}
             onCancelCardDrag={handleCancelCardDrag}
           />
 
           <div className="table-middle">
-            <div className="board-section">
-              <GameBoard
-                key={gameState.startCard.id}
-                gameState={gameState}
-                selectedCard={activeSelectedCard}
-                onPlaceCard={handlePlaceCard}
-                onFinishDrag={handleCancelCardDrag}
-              />
-            </div>
-
-            <aside className="side-panel" aria-label="Панель лобби">
+            <aside className="side-panel party-panel" aria-label="Панель партии">
               <section className="panel-section lobby-section">
                 <div className="panel-title-row">
                   <span className="panel-icon" aria-hidden="true">◇</span>
@@ -117,6 +146,46 @@ function App() {
                 <div className="score-row player-score-orange">
                   <span>Игрок 2</span>
                   <strong>{gameState.scores[1]}</strong>
+                </div>
+              </section>
+
+              <section className="panel-section log-section">
+                <h2>Лог партии</h2>
+                <div className="log-placeholder">
+                  {gameState.log.length > 0 ? (
+                    <ol className="match-log">
+                      {gameState.log.map((event, index) => (
+                        <li key={`${event}-${index}`}>{event}</li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <>
+                      <span className="log-icon" aria-hidden="true">✧</span>
+                      <p>События партии появятся здесь.</p>
+                      <small>Заглушка под будущий журнал ходов.</small>
+                    </>
+                  )}
+                </div>
+              </section>
+            </aside>
+
+            <div className="board-section">
+              <GameBoard
+                key={`${gameState.startCard.id}-${resetCameraSignal}`}
+                gameState={gameState}
+                selectedCard={activeSelectedCard}
+                onPlaceCard={handlePlaceCard}
+                onFinishDrag={handleCancelCardDrag}
+                showPlayableHighlights={interfaceSettings.showPlayableHighlights}
+                showTooltips={interfaceSettings.showCardTooltips}
+              />
+            </div>
+
+            <aside className="side-panel control-panel" aria-label="Панель управления">
+              <section className="panel-section control-title-section">
+                <div className="panel-title-row">
+                  <span className="panel-icon" aria-hidden="true">◇</span>
+                  <h1>Управление</h1>
                 </div>
               </section>
 
@@ -141,30 +210,41 @@ function App() {
                 </section>
               )}
 
-              <section className="panel-section log-section">
-                <h2>Лог партии</h2>
-                <div className="log-placeholder">
-                  {gameState.log.length > 0 ? (
-                    <ol className="match-log">
-                      {gameState.log.map((event, index) => (
-                        <li key={`${event}-${index}`}>{event}</li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <>
-                      <span className="log-icon" aria-hidden="true">✧</span>
-                      <p>События партии появятся здесь.</p>
-                      <small>Заглушка под будущий журнал ходов.</small>
-                    </>
-                  )}
-                </div>
-              </section>
+              {gameState.pendingCross && (
+                <section className="panel-section confirmation-section">
+                  <h2>Крестовина</h2>
+                  <p>
+                    Образована крестовина вокруг карты{' '}
+                    <strong>{gameState.pendingCross.centerCardName}</strong>. Засчитать +5
+                    очков?
+                  </p>
+                  <small>
+                    Бонус получит {getPlayerLabel(gameState.pendingCross.playerId)}.
+                  </small>
+                  <div className="confirmation-actions">
+                    <button type="button" onClick={approvePendingCross}>
+                      Засчитать +5
+                    </button>
+                    <button type="button" onClick={rejectPendingCross}>
+                      Не засчитывать
+                    </button>
+                  </div>
+                </section>
+              )}
 
               <nav className="panel-actions" aria-label="Действия">
-                <button type="button">Новая игра</button>
-                <button type="button">Сброс камеры</button>
-                <button type="button">Правила</button>
-                <button type="button">Настройки</button>
+                <button type="button" onClick={() => setActiveModal('new-game')}>
+                  Новая игра
+                </button>
+                <button type="button" onClick={handleResetCamera}>
+                  Сброс позиции
+                </button>
+                <button type="button" onClick={() => setActiveModal('rules')}>
+                  Правила
+                </button>
+                <button type="button" onClick={() => setActiveModal('settings')}>
+                  Настройки
+                </button>
               </nav>
             </aside>
           </div>
@@ -174,7 +254,7 @@ function App() {
             cards={gameState.players[0].cards}
             deckCount={gameState.deck[0].length}
             selectedCard={gameState.currentPlayerIndex === 0 ? activeSelectedCard : null}
-            isActive={gameState.currentPlayerIndex === 0 && !gameState.pendingMove}
+            isActive={gameState.currentPlayerIndex === 0 && !hasPendingDecision}
             onMoveCardDrag={handleMoveCardDrag}
             onStartCardDrag={handleStartCardDrag}
             onCancelCardDrag={handleCancelCardDrag}
@@ -193,6 +273,75 @@ function App() {
             {dragPreview.cardName}
           </div>
         </div>
+      )}
+      {activeModal === 'new-game' && (
+        <Modal
+          closeOnOverlayClick={false}
+          onClose={() => setActiveModal(null)}
+          title="Новая игра"
+        >
+          <p>Начать новую игру? Текущая партия будет сброшена.</p>
+          <div className="modal-actions">
+            <button type="button" onClick={handleConfirmNewGame}>
+              Начать заново
+            </button>
+            <button type="button" onClick={() => setActiveModal(null)}>
+              Отмена
+            </button>
+          </div>
+        </Modal>
+      )}
+      {activeModal === 'rules' && (
+        <Modal onClose={() => setActiveModal(null)} title="Правила">
+          <RulesContent />
+          <div className="modal-actions">
+            <button type="button" onClick={() => setActiveModal(null)}>
+              Закрыть
+            </button>
+          </div>
+        </Modal>
+      )}
+      {activeModal === 'settings' && (
+        <Modal onClose={() => setActiveModal(null)} title="Настройки">
+          <div className="settings-row">
+            <label htmlFor="show-playable-highlights">
+              Показывать подсветку допустимых клеток
+            </label>
+            <input
+              checked={interfaceSettings.showPlayableHighlights}
+              id="show-playable-highlights"
+              onChange={(event) =>
+                setInterfaceSettings((settings) => ({
+                  ...settings,
+                  showPlayableHighlights: event.target.checked,
+                }))
+              }
+              type="checkbox"
+            />
+          </div>
+          <div className="settings-row">
+            <label htmlFor="show-card-tooltips">Показывать tooltip карт</label>
+            <input
+              checked={interfaceSettings.showCardTooltips}
+              id="show-card-tooltips"
+              onChange={(event) =>
+                setInterfaceSettings((settings) => ({
+                  ...settings,
+                  showCardTooltips: event.target.checked,
+                }))
+              }
+              type="checkbox"
+            />
+          </div>
+          <div className="modal-actions">
+            <button type="button" onClick={handleResetSettings}>
+              Сбросить настройки
+            </button>
+            <button type="button" onClick={() => setActiveModal(null)}>
+              Закрыть
+            </button>
+          </div>
+        </Modal>
       )}
     </div>
   );

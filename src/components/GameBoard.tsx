@@ -10,6 +10,8 @@ interface GameBoardProps {
   selectedCard: RegularCardName | null;
   onPlaceCard: (cardName: RegularCardName, coordinates: Coordinates) => void;
   onFinishDrag: () => void;
+  showPlayableHighlights: boolean;
+  showTooltips: boolean;
 }
 
 interface CameraState {
@@ -61,6 +63,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   selectedCard,
   onPlaceCard,
   onFinishDrag,
+  showPlayableHighlights,
+  showTooltips,
 }) => {
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
@@ -262,16 +266,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           const key = `${x},${y}`;
           const placedCard = gameState.board[key];
           const coordinates = { x, y };
-          const isPlayable = selectedCard !== null && canPlaceCard(gameState, coordinates);
+          const isPlayable =
+            showPlayableHighlights &&
+            selectedCard !== null &&
+            canPlaceCard(gameState, coordinates);
 
           return (
             <Cell
               key={`${x}-${y}`}
               placedCard={placedCard}
               onCellClick={() => handleCellClick(x, y)}
-              isHighlighted={selectedCard !== null}
+              isHighlighted={showPlayableHighlights && selectedCard !== null}
               isPlayable={isPlayable}
               isLastPlaced={placedCard?.id === gameState.lastPlacedCardId}
+              showTooltip={showTooltips}
             />
           );
         })}

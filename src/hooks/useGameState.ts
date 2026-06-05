@@ -1,8 +1,10 @@
 import { useState, useCallback } from 'react';
 import {
+  approvePendingCross,
   confirmPendingCard,
   initializeGame,
   placeCard,
+  rejectPendingCross,
   returnPendingCard,
 } from '../game';
 import type { Coordinates, GameState, RegularCardName } from '../game';
@@ -29,11 +31,21 @@ export function useGameState() {
     setGameState((prev) => returnPendingCard(prev));
   }, []);
 
+  const handleApprovePendingCross = useCallback(() => {
+    setGameState((prev) => approvePendingCross(prev));
+  }, []);
+
+  const handleRejectPendingCross = useCallback(() => {
+    setGameState((prev) => rejectPendingCross(prev));
+  }, []);
+
   return {
     gameState,
     placeCard: handlePlaceCard,
     confirmPendingCard: handleConfirmPendingCard,
     returnPendingCard: handleReturnPendingCard,
+    approvePendingCross: handleApprovePendingCross,
+    rejectPendingCross: handleRejectPendingCross,
     resetGame,
   };
 }
