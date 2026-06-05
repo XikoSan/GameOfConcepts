@@ -61,6 +61,31 @@
   justify-content: center;
 }
 
+.hidden-hand-card {
+  width: clamp(120px, 8vw, 170px);
+  height: clamp(56px, 4.2vw, 82px);
+  box-sizing: border-box;
+  border: 1px solid rgba(214, 174, 118, 0.28);
+  border-radius: clamp(6px, 0.55vw, 8px);
+  box-shadow:
+    inset 0 0 14px rgba(0, 0, 0, 0.34),
+    0 4px 12px rgba(0, 0, 0, 0.28);
+}
+
+.hidden-hand-card.player-0 {
+  background:
+    url('../assets/card-back-blue.png') center / cover,
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.17), transparent 28%),
+    #123f6f;
+}
+
+.hidden-hand-card.player-1 {
+  background:
+    url('../assets/card-back-orange.png') center / cover,
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 28%),
+    #754007;
+}
+
 .card-count {
   margin: 0;
   font-size: clamp(10px, 0.72vw, 12px);

@@ -9,6 +9,7 @@ interface PlayerHandProps {
   deckCount: number;
   selectedCard: RegularCardName | null;
   isActive: boolean;
+  hideCards?: boolean;
   onMoveCardDrag: (event: React.DragEvent<HTMLDivElement>) => void;
   onStartCardDrag: (
     cardName: RegularCardName,
@@ -29,6 +30,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   deckCount,
   selectedCard,
   isActive,
+  hideCards = false,
   onMoveCardDrag,
   onStartCardDrag,
   onCancelCardDrag,
@@ -46,22 +48,31 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
         </div>
 
         <div className="cards-container">
-          {cards.map((card) => (
-            <Card
-              key={card}
-              cardName={card}
-              playerColor={playerColors[playerNumber]}
-              isSelected={selectedCard === card}
-              draggable={isActive}
-              onDrag={isActive ? onMoveCardDrag : undefined}
-              onDragStart={
-                isActive
-                  ? (event) => onStartCardDrag(card, playerColors[playerNumber], event)
-                  : undefined
-              }
-              onDragEnd={isActive ? onCancelCardDrag : undefined}
-            />
-          ))}
+          {/* FIXME(MVP): Рука оппонента скрыта только в UI, но технически остаётся доступна в gameState. */}
+          {hideCards
+            ? cards.map((_, index) => (
+                <div
+                  aria-label="Скрытая карта оппонента"
+                  className={`hidden-hand-card player-${playerNumber}`}
+                  key={`hidden-${playerNumber}-${index}`}
+                />
+              ))
+            : cards.map((card, index) => (
+                <Card
+                  key={`${card}-${index}`}
+                  cardName={card}
+                  playerColor={playerColors[playerNumber]}
+                  isSelected={selectedCard === card}
+                  draggable={isActive}
+                  onDrag={isActive ? onMoveCardDrag : undefined}
+                  onDragStart={
+                    isActive
+                      ? (event) => onStartCardDrag(card, playerColors[playerNumber], event)
+                      : undefined
+                  }
+                  onDragEnd={isActive ? onCancelCardDrag : undefined}
+                />
+              ))}
         </div>
 
         <div className="player-plate">

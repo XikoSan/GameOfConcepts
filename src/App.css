@@ -140,6 +140,37 @@
   gap: 12px;
 }
 
+.room-mode-summary {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  color: #b8aa98;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.session-section {
+  padding-bottom: clamp(7px, 0.75vw, 12px);
+}
+
+.session-summary {
+  display: grid;
+  gap: 4px;
+  color: #b8aa98;
+  font-size: clamp(10px, 0.72vw, 12px);
+  line-height: 1.25;
+}
+
+.session-summary strong {
+  color: #f3eadf;
+  font-size: clamp(12px, 0.85vw, 14px);
+}
+
+.session-summary small {
+  color: #d6cec2;
+  font-size: inherit;
+}
+
 .panel-icon {
   width: clamp(22px, 1.6vw, 28px);
   height: clamp(22px, 1.6vw, 28px);

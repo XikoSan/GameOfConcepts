@@ -55,8 +55,10 @@ export interface PlacedCard {
 export interface PendingMove {
   cardId: string;
   cardName: RegularCardName;
-  playerId: 0 | 1;
-  reviewerId: 0 | 1;
+  playerIndex: 0 | 1;
+  reviewerIndex: 0 | 1;
+  playerId?: 0 | 1;
+  reviewerId?: 0 | 1;
 }
 
 export interface Cross {

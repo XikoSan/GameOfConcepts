@@ -106,6 +106,14 @@ function getPlayerLabel(playerId: 0 | 1): string {
   return playerId === 0 ? 'Игрок 1' : 'Игрок 2';
 }
 
+function getPendingMovePlayerIndex(pendingMove: PendingMove): 0 | 1 | null {
+  return pendingMove.playerIndex ?? pendingMove.playerId ?? null;
+}
+
+function getPendingMoveReviewerIndex(pendingMove: PendingMove): 0 | 1 | null {
+  return pendingMove.reviewerIndex ?? pendingMove.reviewerId ?? null;
+}
+
 function isPlacedAnchor(card: PlacedCard): boolean {
   return card.playerId === null || card.status === 'confirmed';
 }
@@ -432,7 +440,8 @@ export function placeCard(
     return player;
   }) as GameState['players'];
 
-  const reviewerId = gameState.currentPlayerIndex === 0 ? 1 : 0;
+  const playerIndex = gameState.currentPlayerIndex;
+  const reviewerIndex = playerIndex === 0 ? 1 : 0;
 
   return {
     ...gameState,
@@ -441,8 +450,10 @@ export function placeCard(
     pendingMove: {
       cardId: placedCard.id,
       cardName,
-      playerId: gameState.currentPlayerIndex,
-      reviewerId,
+      playerIndex,
+      reviewerIndex,
+      playerId: playerIndex,
+      reviewerId: reviewerIndex,
     },
     lastPlacedCardId: placedCard.id,
   };
@@ -451,8 +462,13 @@ export function placeCard(
 export function confirmPendingCard(gameState: GameState): GameState {
   if (!gameState.pendingMove) return gameState;
 
-  const { cardId, cardName, playerId, reviewerId } = gameState.pendingMove;
-  const scoreBefore = getScoreBreakdown(gameState.board, gameState.crosses, playerId);
+  const { cardId, cardName } = gameState.pendingMove;
+  const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
+  const reviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
+
+  if (playerIndex === null || reviewerIndex === null) return gameState;
+
+  const scoreBefore = getScoreBreakdown(gameState.board, gameState.crosses, playerIndex);
   const newBoard = Object.fromEntries(
     Object.entries(gameState.board).map(([key, card]) => [
       key,
@@ -460,7 +476,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
     ])
   );
   const newPlayers = gameState.players.map((player, index) => {
-    if (index !== playerId) return player;
+    if (index !== playerIndex) return player;
 
     return {
       ...player,
@@ -469,7 +485,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
   }) as GameState['players'];
   const newDeck = gameState.deck.map((deck, index) => {
     if (
-      index === playerId &&
+      index === playerIndex &&
       newPlayers[index].cards.length > gameState.players[index].cards.length
     ) {
       return deck.slice(0, -1);
@@ -480,8 +496,8 @@ export function confirmPendingCard(gameState: GameState): GameState {
   const pendingCross = confirmedPlacedCard
     ? findPendingCrossCandidate(newBoard, confirmedPlacedCard)
     : null;
-  const scoreAfter = getScoreBreakdown(newBoard, gameState.crosses, playerId);
-  const turnScore = createTurnScoreResult(playerId, cardName, scoreBefore, scoreAfter);
+  const scoreAfter = getScoreBreakdown(newBoard, gameState.crosses, playerIndex);
+  const turnScore = createTurnScoreResult(playerIndex, cardName, scoreBefore, scoreAfter);
 
   return {
     ...gameState,
@@ -492,7 +508,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
     pendingCross,
     pendingTurnScore: pendingCross ? turnScore : null,
     scores: calculateScores(newBoard, gameState.crosses),
-    currentPlayerIndex: reviewerId,
+    currentPlayerIndex: reviewerIndex,
     log: pendingCross
       ? gameState.log
       : [...gameState.log, formatTurnScoreLog(turnScore)],
@@ -502,7 +518,11 @@ export function confirmPendingCard(gameState: GameState): GameState {
 export function returnPendingCard(gameState: GameState): GameState {
   if (!gameState.pendingMove) return gameState;
 
-  const { cardId, cardName, playerId } = gameState.pendingMove;
+  const { cardId, cardName } = gameState.pendingMove;
+  const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
+
+  if (playerIndex === null) return gameState;
+
   const cardEntry = Object.entries(gameState.board).find(
     ([, card]) => card.id === cardId
   );
@@ -513,7 +533,7 @@ export function returnPendingCard(gameState: GameState): GameState {
   delete newBoard[cardKey];
 
   const newPlayers = gameState.players.map((player, index) => {
-    if (index !== playerId || player.cards.length >= HAND_SIZE) return player;
+    if (index !== playerIndex || player.cards.length >= HAND_SIZE) return player;
 
     return {
       ...player,
@@ -528,7 +548,7 @@ export function returnPendingCard(gameState: GameState): GameState {
     pendingMove: null,
     pendingTurnScore: null,
     scores: calculateScores(newBoard, gameState.crosses),
-    currentPlayerIndex: playerId,
+    currentPlayerIndex: playerIndex,
     lastPlacedCardId: gameState.startCard.id,
   };
 }

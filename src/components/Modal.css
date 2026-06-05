@@ -188,3 +188,121 @@
   height: 18px;
   accent-color: #d6ae76;
 }
+
+.online-room-modal,
+.new-game-modal {
+  display: grid;
+  gap: 10px;
+}
+
+.online-room-block,
+.online-room-state {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid rgba(214, 174, 118, 0.16);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.online-room-block h3 {
+  margin: 0;
+  color: #f2ddba;
+  font-size: clamp(14px, 1vw, 17px);
+  line-height: 1.2;
+}
+
+.online-room-block p,
+.online-room-state p {
+  margin: 0;
+}
+
+.online-room-block label,
+.online-room-state span {
+  color: #b8aa98;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.online-room-block input {
+  width: 100%;
+  min-height: 34px;
+  box-sizing: border-box;
+  border: 1px solid rgba(214, 174, 118, 0.22);
+  border-radius: 8px;
+  background: rgba(2, 4, 5, 0.36);
+  color: #f6efe2;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0;
+  padding: 0 12px;
+  text-transform: uppercase;
+}
+
+.online-room-block input:focus {
+  border-color: rgba(214, 174, 118, 0.52);
+  outline: none;
+}
+
+.inline-actions {
+  justify-content: flex-start;
+  margin-top: 0;
+}
+
+.online-join-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.online-join-row label {
+  grid-column: 1 / -1;
+}
+
+.online-join-row button {
+  min-height: 34px;
+  border: 1px solid rgba(199, 140, 55, 0.52);
+  border-radius: 7px;
+  background:
+    url('../assets/button-texture.png') center / cover,
+    linear-gradient(180deg, rgba(181, 118, 41, 0.34), rgba(84, 50, 13, 0.64)),
+    #402707;
+  color: #f6efe2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.modal-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.online-room-state div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.compact-room-state {
+  gap: 6px;
+}
+
+.online-room-state strong {
+  color: #f6efe2;
+  font-size: 14px;
+  text-align: right;
+}
+
+.online-room-error {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(220, 82, 82, 0.38);
+  border-radius: 8px;
+  background: rgba(120, 24, 24, 0.18);
+  color: #ffc9c0;
+}

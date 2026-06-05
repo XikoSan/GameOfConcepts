@@ -1,51 +1,48 @@
-import { useState, useCallback } from 'react';
-import {
-  approvePendingCross,
-  confirmPendingCard,
-  initializeGame,
-  placeCard,
-  rejectPendingCross,
-  returnPendingCard,
-} from '../game';
-import type { Coordinates, GameState, RegularCardName } from '../game';
+import { useEffect } from 'react';
+import { useLocalGameState } from './useLocalGameState';
+import { useMultiplayerGameState } from './useMultiplayerGameState';
+import type { Room } from '../types/room';
 
-export function useGameState() {
-  const [gameState, setGameState] = useState<GameState>(() => initializeGame());
+interface UseGameStateOptions {
+  room?: Room | null;
+  localPlayerId?: string | null;
+  onError?: (message: string) => void;
+  onRoomUpdate?: (room: Room) => void;
+}
 
-  const handlePlaceCard = useCallback(
-    (cardName: RegularCardName, coordinates: Coordinates) => {
-      setGameState((prev) => placeCard(prev, cardName, coordinates));
-    },
-    []
-  );
+export function useGameState({
+  room = null,
+  localPlayerId = null,
+  onError,
+  onRoomUpdate,
+}: UseGameStateOptions = {}) {
+  const localController = useLocalGameState();
+  const multiplayerController = useMultiplayerGameState({
+    room,
+    fallbackGameState: localController.gameState,
+    localPlayerId: localPlayerId ?? '',
+    onError,
+    onRoomUpdate,
+  });
+  const shouldUseMultiplayer = Boolean(room && localPlayerId);
 
-  const resetGame = useCallback(() => {
-    setGameState(initializeGame());
-  }, []);
+  useEffect(() => {
+    console.log('[useGameState room changed]', {
+      code: room?.code,
+      version: room?.version,
+      pendingMove: room?.game_state?.pendingMove,
+      board: room?.game_state?.board,
+    });
+  }, [room?.code, room?.game_state, room?.version]);
 
-  const handleConfirmPendingCard = useCallback(() => {
-    setGameState((prev) => confirmPendingCard(prev));
-  }, []);
-
-  const handleReturnPendingCard = useCallback(() => {
-    setGameState((prev) => returnPendingCard(prev));
-  }, []);
-
-  const handleApprovePendingCross = useCallback(() => {
-    setGameState((prev) => approvePendingCross(prev));
-  }, []);
-
-  const handleRejectPendingCross = useCallback(() => {
-    setGameState((prev) => rejectPendingCross(prev));
-  }, []);
+  // TODO(MVP): Сейчас фасад выбирает режим по наличию комнаты. Позже
+  // здесь появится полноценный выбор local/multiplayer и восстановление сессии.
+  if (!shouldUseMultiplayer || !room || !localPlayerId) {
+    return localController;
+  }
 
   return {
-    gameState,
-    placeCard: handlePlaceCard,
-    confirmPendingCard: handleConfirmPendingCard,
-    returnPendingCard: handleReturnPendingCard,
-    approvePendingCross: handleApprovePendingCross,
-    rejectPendingCross: handleRejectPendingCross,
-    resetGame,
+    ...multiplayerController,
+    startLocalGame: localController.resetGame,
   };
 }
