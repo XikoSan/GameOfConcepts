@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { DragEvent as ReactDragEvent, FormEvent } from 'react';
+import type { DragEvent as ReactDragEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { GameBoard } from './components/GameBoard';
 import { Modal } from './components/Modal';
@@ -88,7 +88,6 @@ function App() {
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [resetCameraSignal, setResetCameraSignal] = useState(0);
   const [onlineRoom, setOnlineRoom] = useState<Room | null>(null);
-  const [joinCode, setJoinCode] = useState('');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [isOnlineLoading, setIsOnlineLoading] = useState(false);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
@@ -315,33 +314,6 @@ function App() {
         error instanceof Error
           ? `Не удалось создать комнату: ${error.message}`
           : 'Не удалось создать комнату.'
-      );
-    } finally {
-      setIsOnlineLoading(false);
-    }
-  };
-
-  const handleJoinOnlineRoom = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const normalizedCode = joinCode.trim().toUpperCase();
-
-    if (!normalizedCode) {
-      setOnlineError('Введите код комнаты.');
-      return;
-    }
-
-    setIsOnlineLoading(true);
-    setOnlineError(null);
-
-    try {
-      // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
-      const room = await joinRoom(normalizedCode, playerId);
-      handleRoomConnected(room);
-      setJoinCode(normalizedCode);
-      void loadAvailableRooms();
-    } catch (error) {
-      setOnlineError(
-        error instanceof Error ? error.message : 'Не удалось войти в комнату.'
       );
     } finally {
       setIsOnlineLoading(false);
@@ -616,8 +588,11 @@ function App() {
               )}
 
               <nav className="panel-actions" aria-label="Действия">
+                <button type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
+                  Начать локально
+                </button>
                 <button type="button" onClick={handleOpenNewGameModal}>
-                  Новая игра
+                  Онлайн игра
                 </button>
                 <button type="button" onClick={handleResetCamera}>
                   Сброс позиции
@@ -672,40 +647,19 @@ function App() {
         </div>
       )}
       {activeModal === 'new-game' && (
-        <Modal onClose={() => setActiveModal(null)} title="Новая игра">
+        <Modal onClose={() => setActiveModal(null)} title="Онлайн игра">
           <div className="new-game-modal">
             <section className="online-room-block">
-              <h3>Локальная игра</h3>
-              <div className="modal-actions inline-actions">
-                <button type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
-                  Начать локально
-                </button>
-              </div>
-            </section>
-
-            <section className="online-room-block">
-              <h3>Онлайн</h3>
-              <form className="online-join-row compact-online-actions" onSubmit={handleJoinOnlineRoom}>
-                <label htmlFor="room-code">Код комнаты</label>
-                <input
-                  autoComplete="off"
-                  id="room-code"
-                  maxLength={8}
-                  onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
-                  placeholder="A7K2Q"
-                  value={joinCode}
-                />
-                <button disabled={isOnlineLoading} type="submit">
-                  Войти
-                </button>
+              <div className="online-create-row">
                 <button
                   disabled={isOnlineLoading}
                   type="button"
                   onClick={handleCreateOnlineRoom}
                 >
-                  Создать
+                  Создать комнату
                 </button>
-              </form>
+              </div>
+
               <div className="available-rooms-header">
                 <h3>Доступные комнаты</h3>
                 <button
@@ -737,7 +691,6 @@ function App() {
                         <div>
                           <strong>
                             {room.code}
-                            {isCurrentRoom && <em>Текущая</em>}
                           </strong>
                           <span>{room.status}</span>
                         </div>
@@ -761,7 +714,7 @@ function App() {
                             type="button"
                             onClick={() => void handleJoinListedRoom(room)}
                           >
-                            Войти
+                            Подключиться
                           </button>
                         )}
                       </div>

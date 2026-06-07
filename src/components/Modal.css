@@ -224,48 +224,17 @@
   line-height: 1.2;
 }
 
-.online-room-block input {
-  width: 100%;
-  min-height: 31px;
-  box-sizing: border-box;
-  border: 1px solid rgba(214, 174, 118, 0.22);
-  border-radius: 8px;
-  background: rgba(2, 4, 5, 0.36);
-  color: #f6efe2;
-  font: inherit;
-  font-size: 13px;
-  letter-spacing: 0;
-  padding: 0 12px;
-  text-transform: uppercase;
-}
-
-.online-room-block input:focus {
-  border-color: rgba(214, 174, 118, 0.52);
-  outline: none;
-}
-
 .inline-actions {
   justify-content: flex-start;
   margin-top: 0;
 }
 
-.online-join-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 6px;
-  align-items: end;
+.online-create-row {
+  display: flex;
+  justify-content: flex-start;
 }
 
-.compact-online-actions {
-  padding-bottom: 2px;
-  border-bottom: 1px solid rgba(214, 174, 118, 0.11);
-}
-
-.online-join-row label {
-  grid-column: 1 / -1;
-}
-
-.online-join-row button {
+.online-create-row button {
   min-height: 31px;
   border: 1px solid rgba(199, 140, 55, 0.52);
   border-radius: 7px;
@@ -278,7 +247,7 @@
   font: inherit;
   font-size: 12px;
   font-weight: 700;
-  padding: 0 10px;
+  padding: 0 12px;
 }
 
 .modal-actions button:disabled {
@@ -317,6 +286,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+  padding-top: 2px;
+  border-top: 1px solid rgba(214, 174, 118, 0.11);
 }
 
 .available-rooms-header h3 {
@@ -388,15 +359,6 @@
   font-size: 12px;
 }
 
-.available-room-row em {
-  border: 1px solid rgba(214, 174, 118, 0.28);
-  border-radius: 999px;
-  color: #d6ae76;
-  font-size: 9px;
-  font-style: normal;
-  font-weight: 700;
-  padding: 1px 5px;
-}
 
 .available-room-row span,
 .available-room-row small {
