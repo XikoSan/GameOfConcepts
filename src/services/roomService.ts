@@ -153,7 +153,8 @@ export async function updateRoomGameState(
 
 export function subscribeToRoom(
   roomId: string,
-  onRoomUpdate: (room: Room) => void
+  onRoomUpdate: (room: Room) => void,
+  onStatusProblem?: () => void
 ): RealtimeChannel {
   const supabase = getSupabaseClient();
 
@@ -175,5 +176,9 @@ export function subscribeToRoom(
     )
     .subscribe((status, error) => {
       console.log('[room realtime status]', { roomId, status, error });
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        console.warn('[room realtime status error]', { roomId, status, error });
+        onStatusProblem?.();
+      }
     });
 }

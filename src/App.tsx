@@ -7,7 +7,12 @@ import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
 import { useGameState } from './hooks/useGameState';
 import { usePlayerIdentity } from './hooks/usePlayerIdentity';
-import { createRoom, joinRoom, subscribeToRoom } from './services/roomService';
+import {
+  createRoom,
+  getRoomById,
+  joinRoom,
+  subscribeToRoom,
+} from './services/roomService';
 import { initializeGame } from './game';
 import type { Coordinates, PendingMove, RegularCardName } from './game';
 import type { Room } from './types/room';
@@ -58,6 +63,7 @@ function App() {
     defaultInterfaceSettings
   );
   const roomSubscriptionRef = useRef<RealtimeChannel | null>(null);
+  const onlineRoomRef = useRef<Room | null>(null);
   const {
     gameState,
     mode,
@@ -162,6 +168,49 @@ function App() {
     setInterfaceSettings(defaultInterfaceSettings);
   };
 
+  const syncOnlineRoom = async (reason: string) => {
+    const currentRoom = onlineRoomRef.current;
+    if (!currentRoom) return;
+
+    console.log('[online polling fetch]', {
+      reason,
+      roomId: currentRoom.id,
+      currentVersion: currentRoom.version,
+    });
+
+    try {
+      const fetchedRoom = await getRoomById(currentRoom.id);
+      console.log('[manual sync room]', { reason, room: fetchedRoom });
+
+      if (!fetchedRoom) {
+        console.warn('[online polling no changes]', {
+          reason,
+          currentVersion: currentRoom.version,
+          fetchedVersion: null,
+        });
+        return;
+      }
+
+      if (fetchedRoom.version > currentRoom.version) {
+        console.log('[online polling update applied]', {
+          reason,
+          previousVersion: currentRoom.version,
+          nextVersion: fetchedRoom.version,
+        });
+        setOnlineRoom(fetchedRoom);
+        return;
+      }
+
+      console.log('[online polling no changes]', {
+        reason,
+        currentVersion: currentRoom.version,
+        fetchedVersion: fetchedRoom.version,
+      });
+    } catch (error) {
+      console.error('[online polling fetch error]', { reason, error });
+    }
+  };
+
   const handleRoomConnected = (room: Room) => {
     roomSubscriptionRef.current?.unsubscribe();
     setOnlineRoom(room);
@@ -174,7 +223,13 @@ function App() {
         board: updatedRoom.game_state.board,
       });
       setOnlineRoom(updatedRoom);
+    }, () => {
+      void syncOnlineRoom('realtime status problem');
     });
+  };
+
+  const handleManualSyncRoom = () => {
+    void syncOnlineRoom('manual sync');
   };
 
   const handleCreateOnlineRoom = async () => {
@@ -263,10 +318,28 @@ function App() {
   }, []);
 
   useEffect(() => {
+    onlineRoomRef.current = onlineRoom;
+  }, [onlineRoom]);
+
+  useEffect(() => {
     return () => {
       roomSubscriptionRef.current?.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!onlineRoom) return;
+
+    // TEMP(MVP): Realtime остаётся основным каналом, polling нужен как страховка
+    // при сетевых сбоях WebSocket/QUIC.
+    const pollingId = window.setInterval(() => {
+      void syncOnlineRoom('polling');
+    }, 4000);
+
+    return () => {
+      window.clearInterval(pollingId);
+    };
+  }, [onlineRoom]);
 
   return (
     <div className="app-container">
@@ -452,6 +525,11 @@ function App() {
                 <button type="button" onClick={handleResetCamera}>
                   Сброс позиции
                 </button>
+                {onlineRoom && (
+                  <button type="button" onClick={handleManualSyncRoom}>
+                    Синхронизировать
+                  </button>
+                )}
                 <button type="button" onClick={() => setActiveModal('rules')}>
                   Правила
                 </button>
