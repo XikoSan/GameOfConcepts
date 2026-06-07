@@ -16,6 +16,13 @@ interface CellProps {
   onConfirmPendingMove?: () => void;
   onReturnPendingMove?: () => void;
   pendingOverlayRefreshKey?: string;
+  isCrossPending?: boolean;
+  isCrossPendingCenter?: boolean;
+  showPendingCrossActions?: boolean;
+  pendingCrossReviewerLabel?: string;
+  onApprovePendingCross?: () => void;
+  onRejectPendingCross?: () => void;
+  tooltipScopeKey?: string;
 }
 
 const getFontSize = (cardName: string) => {
@@ -79,15 +86,25 @@ export const Cell: React.FC<CellProps> = ({
   onConfirmPendingMove,
   onReturnPendingMove,
   pendingOverlayRefreshKey,
+  isCrossPending = false,
+  isCrossPendingCenter = false,
+  showPendingCrossActions = false,
+  pendingCrossReviewerLabel,
+  onApprovePendingCross,
+  onRejectPendingCross,
+  tooltipScopeKey = 'default',
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
   const [pendingOverlayPosition, setPendingOverlayPosition] =
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const shouldShowPendingOverlay =
+  const shouldShowPendingMoveOverlay =
     placedCard?.status === 'pending' && (showPendingActions || showPendingWaitBadge);
+  const shouldShowPendingCrossOverlay = Boolean(placedCard) && isCrossPendingCenter;
+  const shouldShowPendingOverlay =
+    shouldShowPendingMoveOverlay || shouldShowPendingCrossOverlay;
   const tooltipCardKey = placedCard
-    ? `${placedCard.id}:${placedCard.status}:${placedCard.cardName}:${placedCard.playerId}`
+    ? `${placedCard.id}:${placedCard.status}:${placedCard.crossId ?? 'none'}:${placedCard.cardName}:${placedCard.playerId}:${tooltipScopeKey}`
     : null;
   const shouldShowTooltip =
     showTooltip && tooltipPosition && tooltipPosition.cardKey === tooltipCardKey;
@@ -114,8 +131,18 @@ export const Cell: React.FC<CellProps> = ({
       const rect = cardRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const overlayWidth = showPendingActions ? 30 : 70;
-      const overlayHeight = showPendingActions ? 62 : 24;
+      const overlayWidth = shouldShowPendingCrossOverlay
+        ? 132
+        : showPendingActions
+          ? 30
+          : 70;
+      const overlayHeight = shouldShowPendingCrossOverlay
+        ? showPendingCrossActions
+          ? 92
+          : 72
+        : showPendingActions
+          ? 62
+          : 24;
       const gap = 6;
       const pagePadding = 8;
       const hasRoomOnRight = rect.right + gap + overlayWidth <= window.innerWidth - pagePadding;
@@ -155,7 +182,13 @@ export const Cell: React.FC<CellProps> = ({
     return () => {
       window.removeEventListener('resize', updatePendingOverlayPosition);
     };
-  }, [pendingOverlayRefreshKey, shouldShowPendingOverlay, showPendingActions]);
+  }, [
+    pendingOverlayRefreshKey,
+    shouldShowPendingCrossOverlay,
+    shouldShowPendingOverlay,
+    showPendingActions,
+    showPendingCrossActions,
+  ]);
 
   const handleConfirmPendingMove = () => {
     setTooltipPosition(null);
@@ -167,12 +200,26 @@ export const Cell: React.FC<CellProps> = ({
     onReturnPendingMove?.();
   };
 
+  const handleApprovePendingCross = () => {
+    setTooltipPosition(null);
+    onApprovePendingCross?.();
+  };
+
+  const handleRejectPendingCross = () => {
+    setTooltipPosition(null);
+    onRejectPendingCross?.();
+  };
+
   return (
     <div
       className={`cell ${isHighlighted ? 'highlighted' : ''} ${
         isPlayable ? 'playable' : ''
       } ${
         isLastPlaced ? 'last-placed' : ''
+      } ${
+        isCrossPending ? 'cross-pending-card' : ''
+      } ${
+        isCrossPendingCenter ? 'cross-pending-center' : ''
       } ${placedCard?.playerId === null ? 'neutral' : ''} ${
         placedCard?.status === 'pending' ? 'pending' : ''
       } ${
@@ -185,7 +232,9 @@ export const Cell: React.FC<CellProps> = ({
           ref={cardRef}
           className={`card-in-cell ${
             placedCard.playerId === null ? 'player-neutral' : `player-${placedCard.playerId}`
-          } ${placedCard.status === 'pending' ? 'pending' : ''}`}
+          } ${placedCard.status === 'pending' ? 'pending' : ''} ${
+            isCrossPending ? 'cross-pending-card' : ''
+          } ${isCrossPendingCenter ? 'cross-pending-center' : ''}`}
           onMouseEnter={(event) =>
             showTooltip && tooltipCardKey
               ? setTooltipPosition(getTooltipPosition(event, tooltipCardKey))
@@ -224,7 +273,38 @@ export const Cell: React.FC<CellProps> = ({
                 onClick={(event) => event.stopPropagation()}
                 onPointerDown={(event) => event.stopPropagation()}
               >
-                {showPendingActions ? (
+                {shouldShowPendingCrossOverlay ? (
+                  <div className="pending-cross-popover" aria-label="Решение по крестовине">
+                    <strong>Крестовина</strong>
+                    {showPendingCrossActions ? (
+                      <>
+                        <span>Одобрить бонус +5?</span>
+                        <div className="pending-cross-actions">
+                          <button
+                            className="pending-cross-action confirm"
+                            type="button"
+                            title="Одобрить крестовину"
+                            onClick={handleApprovePendingCross}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className="pending-cross-action return"
+                            type="button"
+                            title="Не засчитать крестовину"
+                            onClick={handleRejectPendingCross}
+                          >
+                            ↩
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <span>
+                        Ожидает решения {pendingCrossReviewerLabel ?? 'оппонента'}
+                      </span>
+                    )}
+                  </div>
+                ) : showPendingActions ? (
                   <div className="pending-card-actions" aria-label="Решение по карте">
                     <button
                       className="pending-card-action confirm"

@@ -16,6 +16,10 @@ interface GameBoardProps {
   showPendingWaitBadge: boolean;
   onConfirmPendingMove: () => void;
   onReturnPendingMove: () => void;
+  canReviewPendingCross: boolean;
+  pendingCrossReviewerLabel: string;
+  onApprovePendingCross: () => void;
+  onRejectPendingCross: () => void;
 }
 
 interface CameraState {
@@ -73,6 +77,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   showPendingWaitBadge,
   onConfirmPendingMove,
   onReturnPendingMove,
+  canReviewPendingCross,
+  pendingCrossReviewerLabel,
+  onApprovePendingCross,
+  onRejectPendingCross,
 }) => {
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
@@ -252,6 +260,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }px) scale(${camera.zoom})`,
   } as CSSProperties;
   const pendingOverlayRefreshKey = `${camera.offsetX}:${camera.offsetY}:${camera.zoom}:${viewport.width}:${viewport.height}`;
+  const pendingCrossCardIds = new Set(gameState.pendingCross?.cardIds ?? []);
+  const pendingCrossCenterKey = gameState.pendingCross
+    ? `${gameState.pendingCross.centerX},${gameState.pendingCross.centerY}`
+    : null;
+  const tooltipScopeKey = gameState.pendingCross
+    ? gameState.pendingCross.cardIds.join('|')
+    : 'no-pending-cross';
 
   return (
     <div
@@ -279,6 +294,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             showPlayableHighlights &&
             selectedCard !== null &&
             canPlaceCard(gameState, coordinates);
+          const isCrossPending =
+            Boolean(placedCard) && pendingCrossCardIds.has(placedCard.id);
+          const isCrossPendingCenter = key === pendingCrossCenterKey;
 
           return (
             <Cell
@@ -298,6 +316,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               onConfirmPendingMove={onConfirmPendingMove}
               onReturnPendingMove={onReturnPendingMove}
               pendingOverlayRefreshKey={pendingOverlayRefreshKey}
+              isCrossPending={isCrossPending}
+              isCrossPendingCenter={isCrossPendingCenter}
+              showPendingCrossActions={canReviewPendingCross}
+              pendingCrossReviewerLabel={pendingCrossReviewerLabel}
+              onApprovePendingCross={onApprovePendingCross}
+              onRejectPendingCross={onRejectPendingCross}
+              tooltipScopeKey={tooltipScopeKey}
             />
           );
         })}

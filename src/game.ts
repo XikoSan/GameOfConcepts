@@ -276,19 +276,6 @@ function createTurnScoreResult(
   };
 }
 
-function withCrossBonus(
-  turnScore: TurnScoreResult,
-  crossBonus: number,
-  newTotalScore: number
-): TurnScoreResult {
-  return {
-    ...turnScore,
-    crossBonus,
-    totalGained: turnScore.basePoints + turnScore.adjacencyBonus + turnScore.chainBonus + crossBonus,
-    newTotalScore,
-  };
-}
-
 function formatTurnScoreLog(
   turnScore: TurnScoreResult,
   options?: { crossRejected?: boolean }
@@ -557,6 +544,7 @@ export function approvePendingCross(gameState: GameState): GameState {
   if (!gameState.pendingCross) return gameState;
 
   const { cardIds, centerX, centerY, cardNames, playerId } = gameState.pendingCross;
+  const reviewerId = gameState.currentPlayerIndex;
   const cross: Cross = {
     id: `cross_${Date.now()}_${Math.random()}`,
     centerX,
@@ -574,9 +562,6 @@ export function approvePendingCross(gameState: GameState): GameState {
   ) as GameState['board'];
   const newCrosses = [...gameState.crosses, cross];
   const newScores = calculateScores(newBoard, newCrosses);
-  const turnScore = gameState.pendingTurnScore
-    ? withCrossBonus(gameState.pendingTurnScore, cross.points, newScores[playerId])
-    : null;
 
   return {
     ...gameState,
@@ -587,15 +572,15 @@ export function approvePendingCross(gameState: GameState): GameState {
     scores: newScores,
     log: [
       ...gameState.log,
-      turnScore
-        ? formatTurnScoreLog(turnScore)
-        : `Крестовина (${getPlayerLabel(playerId)}) + 5 очков.`,
+      `${getPlayerLabel(reviewerId)} одобрил крестовину ${getPlayerLabel(playerId)}: +5 очков`,
     ],
   };
 }
 
 export function rejectPendingCross(gameState: GameState): GameState {
   if (!gameState.pendingCross) return gameState;
+  const { playerId } = gameState.pendingCross;
+  const reviewerId = gameState.currentPlayerIndex;
 
   return {
     ...gameState,
@@ -604,9 +589,7 @@ export function rejectPendingCross(gameState: GameState): GameState {
     scores: calculateScores(gameState.board, gameState.crosses),
     log: [
       ...gameState.log,
-      gameState.pendingTurnScore
-        ? formatTurnScoreLog(gameState.pendingTurnScore, { crossRejected: true })
-        : `Крестовина не засчитана: ${gameState.pendingCross.centerCardName}.`,
+      `${getPlayerLabel(reviewerId)} не одобрил крестовину ${getPlayerLabel(playerId)}`,
     ],
   };
 }

@@ -493,6 +493,10 @@ function App() {
                 showPendingWaitBadge={showPendingWaitBadge}
                 onConfirmPendingMove={confirmCard}
                 onReturnPendingMove={returnCard}
+                canReviewPendingCross={canReviewPendingCross}
+                pendingCrossReviewerLabel={getPlayerLabel(gameState.currentPlayerIndex)}
+                onApprovePendingCross={approveCross}
+                onRejectPendingCross={rejectCross}
               />
             </div>
 
@@ -503,36 +507,6 @@ function App() {
                   <h1>Управление</h1>
                 </div>
               </section>
-
-              {gameState.pendingCross && (
-                <section className="panel-section confirmation-section">
-                  <h2>Крестовина</h2>
-                  <p>
-                    Образована крестовина вокруг карты{' '}
-                    <strong>{gameState.pendingCross.centerCardName}</strong>. Засчитать +5
-                    очков?
-                  </p>
-                  <small>
-                    Бонус получит {getPlayerLabel(gameState.pendingCross.playerId)}.
-                  </small>
-                  <div className="confirmation-actions">
-                    <button
-                      disabled={!canReviewPendingCross}
-                      type="button"
-                      onClick={approveCross}
-                    >
-                      Засчитать +5
-                    </button>
-                    <button
-                      disabled={!canReviewPendingCross}
-                      type="button"
-                      onClick={rejectCross}
-                    >
-                      Не засчитывать
-                    </button>
-                  </div>
-                </section>
-              )}
 
               <nav className="panel-actions" aria-label="Действия">
                 <section className="action-group action-group-primary" aria-label="Партия">
