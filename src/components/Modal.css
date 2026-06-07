@@ -192,16 +192,16 @@
 .online-room-modal,
 .new-game-modal {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .online-room-block,
 .online-room-state {
   display: grid;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: 7px;
+  padding: 8px 10px;
   border: 1px solid rgba(214, 174, 118, 0.16);
-  border-radius: 10px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.035);
 }
 
@@ -226,14 +226,14 @@
 
 .online-room-block input {
   width: 100%;
-  min-height: 34px;
+  min-height: 31px;
   box-sizing: border-box;
   border: 1px solid rgba(214, 174, 118, 0.22);
   border-radius: 8px;
   background: rgba(2, 4, 5, 0.36);
   color: #f6efe2;
   font: inherit;
-  font-size: 14px;
+  font-size: 13px;
   letter-spacing: 0;
   padding: 0 12px;
   text-transform: uppercase;
@@ -251,9 +251,14 @@
 
 .online-join-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 6px;
   align-items: end;
+}
+
+.compact-online-actions {
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(214, 174, 118, 0.11);
 }
 
 .online-join-row label {
@@ -261,7 +266,7 @@
 }
 
 .online-join-row button {
-  min-height: 34px;
+  min-height: 31px;
   border: 1px solid rgba(199, 140, 55, 0.52);
   border-radius: 7px;
   background:
@@ -271,9 +276,9 @@
   color: #f6efe2;
   cursor: pointer;
   font: inherit;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  padding: 0 14px;
+  padding: 0 10px;
 }
 
 .modal-actions button:disabled {
@@ -307,16 +312,11 @@
   color: #ffc9c0;
 }
 
-.available-rooms-section {
-  max-height: 210px;
-  overflow: hidden;
-}
-
 .available-rooms-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .available-rooms-header h3 {
@@ -325,7 +325,7 @@
 
 .available-rooms-header button,
 .available-room-row button {
-  min-height: 30px;
+  min-height: 28px;
   border: 1px solid rgba(255, 255, 255, 0.13);
   border-radius: 7px;
   background:
@@ -337,7 +337,7 @@
   font: inherit;
   font-size: 12px;
   font-weight: 700;
-  padding: 0 10px;
+  padding: 0 9px;
 }
 
 .available-rooms-header button:disabled,
@@ -353,21 +353,26 @@
 
 .available-rooms-list {
   display: grid;
-  gap: 6px;
-  max-height: 158px;
+  gap: 4px;
+  max-height: 176px;
   overflow: auto;
   padding-right: 2px;
 }
 
 .available-room-row {
   display: grid;
-  grid-template-columns: minmax(72px, 0.8fr) minmax(90px, 1fr) minmax(100px, 1fr) auto;
+  grid-template-columns: minmax(76px, 0.8fr) minmax(94px, 1fr) minmax(68px, 0.7fr) auto;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  gap: 7px;
+  padding: 6px 7px;
   border: 1px solid rgba(214, 174, 118, 0.12);
-  border-radius: 8px;
+  border-radius: 7px;
   background: rgba(0, 0, 0, 0.18);
+}
+
+.available-room-row.current-room {
+  border-color: rgba(214, 174, 118, 0.36);
+  background: rgba(214, 174, 118, 0.07);
 }
 
 .available-room-row div {
@@ -376,8 +381,21 @@
 }
 
 .available-room-row strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: #f6efe2;
-  font-size: 13px;
+  font-size: 12px;
+}
+
+.available-room-row em {
+  border: 1px solid rgba(214, 174, 118, 0.28);
+  border-radius: 999px;
+  color: #d6ae76;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+  padding: 1px 5px;
 }
 
 .available-room-row span,

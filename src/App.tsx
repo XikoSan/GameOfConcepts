@@ -49,6 +49,22 @@ const formatRoomUpdatedAt = (updatedAt: string) =>
     month: '2-digit',
   }).format(new Date(updatedAt));
 
+const getRoomList = (rooms: Room[], currentRoom: Room | null) => {
+  const roomsById = new Map<string, Room>();
+
+  if (currentRoom) {
+    roomsById.set(currentRoom.id, currentRoom);
+  }
+
+  rooms.forEach((room) => {
+    if (!roomsById.has(room.id)) {
+      roomsById.set(room.id, room);
+    }
+  });
+
+  return Array.from(roomsById.values());
+};
+
 interface DragPreview {
   cardName: RegularCardName;
   playerColor: 'blue' | 'orange';
@@ -111,6 +127,7 @@ function App() {
       getPendingMoveReviewerIndex(gameState.pendingMove) === localPlayerIndex);
   const pendingMovePlayerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
   const pendingMoveReviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
+  const roomList = getRoomList(availableRooms, onlineRoom);
   const canReviewPendingCross =
     mode === 'local' ||
     (localPlayerIndex !== null &&
@@ -668,7 +685,7 @@ function App() {
 
             <section className="online-room-block">
               <h3>Онлайн</h3>
-              <form className="online-join-row" onSubmit={handleJoinOnlineRoom}>
+              <form className="online-join-row compact-online-actions" onSubmit={handleJoinOnlineRoom}>
                 <label htmlFor="room-code">Код комнаты</label>
                 <input
                   autoComplete="off"
@@ -681,8 +698,6 @@ function App() {
                 <button disabled={isOnlineLoading} type="submit">
                   Войти
                 </button>
-              </form>
-              <div className="modal-actions inline-actions">
                 <button
                   disabled={isOnlineLoading}
                   type="button"
@@ -690,28 +705,7 @@ function App() {
                 >
                   Создать
                 </button>
-              </div>
-            </section>
-
-            {onlineRoom && (
-              <section className="online-room-state compact-room-state" aria-label="Состояние комнаты">
-                <h3>Текущая комната</h3>
-                <div>
-                  <span>Код</span>
-                  <strong>{onlineRoom.code}</strong>
-                </div>
-                <div>
-                  <span>Статус</span>
-                  <strong>{onlineRoom.status}</strong>
-                </div>
-                <div>
-                  <span>Роль</span>
-                  <strong>{getRoomRoleLabel(onlineRoom, playerId)}</strong>
-                </div>
-              </section>
-            )}
-
-            <section className="online-room-block available-rooms-section">
+              </form>
               <div className="available-rooms-header">
                 <h3>Доступные комнаты</h3>
                 <button
@@ -723,26 +717,37 @@ function App() {
                 </button>
               </div>
 
-              {availableRooms.length === 0 ? (
+              {roomList.length === 0 ? (
                 <p className="available-rooms-empty">
                   {isRoomListLoading ? 'Загрузка комнат...' : 'Нет доступных комнат.'}
                 </p>
               ) : (
                 <div className="available-rooms-list">
-                  {availableRooms.map((room) => {
+                  {roomList.map((room) => {
+                    const isCurrentRoom = onlineRoom?.id === room.id;
                     const isParticipant =
                       room.player_1_id === playerId || room.player_2_id === playerId;
                     const canJoinRoom = room.status === 'waiting' && !room.player_2_id;
 
                     return (
-                      <div className="available-room-row" key={room.id}>
+                      <div
+                        className={`available-room-row ${isCurrentRoom ? 'current-room' : ''}`}
+                        key={room.id}
+                      >
                         <div>
-                          <strong>{room.code}</strong>
+                          <strong>
+                            {room.code}
+                            {isCurrentRoom && <em>Текущая</em>}
+                          </strong>
                           <span>{room.status}</span>
                         </div>
                         <small>{getAvailableRoomRoleLabel(room, playerId)}</small>
-                        <small>Обновлена: {formatRoomUpdatedAt(room.updated_at)}</small>
-                        {isParticipant ? (
+                        <small>{formatRoomUpdatedAt(room.updated_at)}</small>
+                        {isCurrentRoom ? (
+                          <button disabled type="button">
+                            Открыта
+                          </button>
+                        ) : isParticipant ? (
                           <button
                             disabled={isOnlineLoading}
                             type="button"
