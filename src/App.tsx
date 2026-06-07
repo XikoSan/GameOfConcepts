@@ -21,13 +21,6 @@ import './App.css';
 
 const getPlayerLabel = (playerId: 0 | 1) => (playerId === 0 ? 'Игрок 1' : 'Игрок 2');
 
-const getRoomRoleLabel = (room: Room | null, playerId: string) => {
-  if (!room) return 'зритель/неизвестно';
-  if (room.player_1_id === playerId) return 'Игрок 1';
-  if (room.player_2_id === playerId) return 'Игрок 2';
-  return 'зритель/неизвестно';
-};
-
 const getPendingMovePlayerIndex = (pendingMove: PendingMove | null) =>
   pendingMove?.playerIndex ?? pendingMove?.playerId ?? null;
 
@@ -100,7 +93,6 @@ function App() {
   const {
     gameState,
     mode,
-    connectionStatus,
     localPlayerIndex,
     error: gameControllerError,
     placeCard,
@@ -126,7 +118,14 @@ function App() {
       getPendingMoveReviewerIndex(gameState.pendingMove) === localPlayerIndex);
   const pendingMovePlayerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
   const pendingMoveReviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
+  const showPendingWaitBadge =
+    Boolean(gameState.pendingMove) &&
+    !canReviewPendingMove &&
+    localPlayerIndex !== null &&
+    pendingMovePlayerIndex === localPlayerIndex;
   const roomList = getRoomList(availableRooms, onlineRoom);
+  const activeScoreIndex = pendingMoveReviewerIndex ?? gameState.currentPlayerIndex;
+  const scoreStateLabel = gameState.pendingMove ? 'решение' : 'ход';
   const canReviewPendingCross =
     mode === 'local' ||
     (localPlayerIndex !== null &&
@@ -439,40 +438,24 @@ function App() {
               <section className="panel-section lobby-section">
                 <div className="panel-title-row">
                   <span className="panel-icon" aria-hidden="true">◇</span>
-                  <h1>Лобби прототипа</h1>
-                  <span className="lobby-tag">#001</span>
+                  <h1>Лобби</h1>
                 </div>
-              </section>
-
-              <section className="panel-section session-section">
-                {mode === 'local' ? (
-                  <div className="session-summary">
-                    <span>Режим</span>
-                    <strong>локальная игра</strong>
-                  </div>
-                ) : (
-                  <div className="session-summary">
-                    <span>Онлайн</span>
-                    <strong>Код: {onlineRoom?.code ?? '-'}</strong>
-                    <small>Роль: {getRoomRoleLabel(onlineRoom, playerId)}</small>
-                    <small>
-                      Статус:{' '}
-                      {connectionStatus === 'connected'
-                        ? 'connected'
-                        : onlineRoom?.status ?? connectionStatus}
-                    </small>
-                  </div>
-                )}
               </section>
 
               <section className="panel-section players-score-section">
                 <h2>Игроки</h2>
-                <div className="score-row player-score-blue">
-                  <span>Игрок 1</span>
+                <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
+                  <span>
+                    Игрок 1
+                    {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
+                  </span>
                   <strong>{gameState.scores[0]}</strong>
                 </div>
-                <div className="score-row player-score-orange">
-                  <span>Игрок 2</span>
+                <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
+                  <span>
+                    Игрок 2
+                    {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
+                  </span>
                   <strong>{gameState.scores[1]}</strong>
                 </div>
               </section>
@@ -506,6 +489,10 @@ function App() {
                 onFinishDrag={handleCancelCardDrag}
                 showPlayableHighlights={interfaceSettings.showPlayableHighlights}
                 showTooltips={interfaceSettings.showCardTooltips}
+                canReviewPendingMove={canReviewPendingMove}
+                showPendingWaitBadge={showPendingWaitBadge}
+                onConfirmPendingMove={confirmCard}
+                onReturnPendingMove={returnCard}
               />
             </div>
 
@@ -516,46 +503,6 @@ function App() {
                   <h1>Управление</h1>
                 </div>
               </section>
-
-              {gameState.pendingMove && (
-                <section className="panel-section confirmation-section">
-                  <h2>Подтверждение</h2>
-                  {canReviewPendingMove ? (
-                    <>
-                      <p>
-                        {getPlayerLabel(pendingMovePlayerIndex ?? 0)} сыграл карту{' '}
-                        <strong>{gameState.pendingMove.cardName}</strong>. Подтвердить связь?
-                      </p>
-                      <small>
-                        Решение принимает{' '}
-                        {getPlayerLabel(pendingMoveReviewerIndex ?? 1)}.
-                      </small>
-                      <div className="confirmation-actions">
-                        <button type="button" onClick={confirmCard}>
-                          Подтвердить
-                        </button>
-                        <button type="button" onClick={returnCard}>
-                          Вернуть карту
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p>
-                        {getPlayerLabel(pendingMovePlayerIndex ?? 0)} сыграл карту{' '}
-                        <strong>{gameState.pendingMove.cardName}</strong>.
-                      </p>
-                      <small>
-                        Ожидание подтверждения от{' '}
-                        {pendingMoveReviewerIndex !== null
-                          ? getPlayerLabel(pendingMoveReviewerIndex)
-                          : 'оппонента'}
-                        .
-                      </small>
-                    </>
-                  )}
-                </section>
-              )}
 
               {gameState.pendingCross && (
                 <section className="panel-section confirmation-section">
@@ -588,26 +535,37 @@ function App() {
               )}
 
               <nav className="panel-actions" aria-label="Действия">
-                <button type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
-                  Начать локально
-                </button>
-                <button type="button" onClick={handleOpenNewGameModal}>
-                  Онлайн игра
-                </button>
-                <button type="button" onClick={handleResetCamera}>
-                  Сброс позиции
-                </button>
-                {onlineRoom && (
-                  <button type="button" onClick={handleManualSyncRoom}>
-                    Синхронизировать
+                <section className="action-group action-group-primary" aria-label="Партия">
+                  <h2>Партия</h2>
+                  <button className="action-button action-button-primary" type="button" onClick={handleOpenNewGameModal}>
+                    Онлайн игра
                   </button>
-                )}
-                <button type="button" onClick={() => setActiveModal('rules')}>
-                  Правила
-                </button>
-                <button type="button" onClick={() => setActiveModal('settings')}>
-                  Настройки
-                </button>
+                  <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
+                    Начать локально
+                  </button>
+                </section>
+
+                <section className="action-group" aria-label="Инструменты">
+                  <h2>Инструменты</h2>
+                  <button className="action-button action-button-subtle" type="button" onClick={handleResetCamera}>
+                    Сброс позиции
+                  </button>
+                  {onlineRoom && (
+                    <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
+                      Синхронизировать
+                    </button>
+                  )}
+                </section>
+
+                <section className="action-group" aria-label="Справка">
+                  <h2>Справка</h2>
+                  <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('rules')}>
+                    Правила
+                  </button>
+                  <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('settings')}>
+                    Настройки
+                  </button>
+                </section>
               </nav>
             </aside>
           </div>

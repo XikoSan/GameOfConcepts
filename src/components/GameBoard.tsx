@@ -12,6 +12,10 @@ interface GameBoardProps {
   onFinishDrag: () => void;
   showPlayableHighlights: boolean;
   showTooltips: boolean;
+  canReviewPendingMove: boolean;
+  showPendingWaitBadge: boolean;
+  onConfirmPendingMove: () => void;
+  onReturnPendingMove: () => void;
 }
 
 interface CameraState {
@@ -65,6 +69,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   onFinishDrag,
   showPlayableHighlights,
   showTooltips,
+  canReviewPendingMove,
+  showPendingWaitBadge,
+  onConfirmPendingMove,
+  onReturnPendingMove,
 }) => {
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
@@ -243,6 +251,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       viewport.height / 2 + camera.offsetY
     }px) scale(${camera.zoom})`,
   } as CSSProperties;
+  const pendingOverlayRefreshKey = `${camera.offsetX}:${camera.offsetY}:${camera.zoom}:${viewport.width}:${viewport.height}`;
 
   return (
     <div
@@ -280,6 +289,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               isPlayable={isPlayable}
               isLastPlaced={placedCard?.id === gameState.lastPlacedCardId}
               showTooltip={showTooltips}
+              showPendingActions={
+                placedCard?.status === 'pending' && canReviewPendingMove
+              }
+              showPendingWaitBadge={
+                placedCard?.status === 'pending' && showPendingWaitBadge
+              }
+              onConfirmPendingMove={onConfirmPendingMove}
+              onReturnPendingMove={onReturnPendingMove}
+              pendingOverlayRefreshKey={pendingOverlayRefreshKey}
             />
           );
         })}
