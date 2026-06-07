@@ -9,6 +9,7 @@ import { useGameState } from './hooks/useGameState';
 import { usePlayerIdentity } from './hooks/usePlayerIdentity';
 import {
   createRoom,
+  getAvailableRooms,
   getRoomById,
   joinRoom,
   subscribeToRoom,
@@ -32,6 +33,21 @@ const getPendingMovePlayerIndex = (pendingMove: PendingMove | null) =>
 
 const getPendingMoveReviewerIndex = (pendingMove: PendingMove | null) =>
   pendingMove?.reviewerIndex ?? pendingMove?.reviewerId ?? null;
+
+const getAvailableRoomRoleLabel = (room: Room, playerId: string) => {
+  if (room.player_1_id === playerId) return 'Вы Игрок 1';
+  if (room.player_2_id === playerId) return 'Вы Игрок 2';
+  if (!room.player_2_id) return 'Свободная комната';
+  return 'Недоступна';
+};
+
+const formatRoomUpdatedAt = (updatedAt: string) =>
+  new Intl.DateTimeFormat('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    day: '2-digit',
+    month: '2-digit',
+  }).format(new Date(updatedAt));
 
 interface DragPreview {
   cardName: RegularCardName;
@@ -59,6 +75,8 @@ function App() {
   const [joinCode, setJoinCode] = useState('');
   const [onlineError, setOnlineError] = useState<string | null>(null);
   const [isOnlineLoading, setIsOnlineLoading] = useState(false);
+  const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
+  const [isRoomListLoading, setIsRoomListLoading] = useState(false);
   const [interfaceSettings, setInterfaceSettings] = useState(
     defaultInterfaceSettings
   );
@@ -168,6 +186,27 @@ function App() {
     setInterfaceSettings(defaultInterfaceSettings);
   };
 
+  const loadAvailableRooms = async () => {
+    setIsRoomListLoading(true);
+    setOnlineError(null);
+
+    try {
+      const rooms = await getAvailableRooms(playerId);
+      setAvailableRooms(rooms);
+    } catch (error) {
+      setOnlineError(
+        error instanceof Error ? error.message : 'Не удалось загрузить комнаты.'
+      );
+    } finally {
+      setIsRoomListLoading(false);
+    }
+  };
+
+  const handleOpenNewGameModal = () => {
+    setActiveModal('new-game');
+    void loadAvailableRooms();
+  };
+
   const syncOnlineRoom = async (reason: string) => {
     const currentRoom = onlineRoomRef.current;
     if (!currentRoom) return;
@@ -248,6 +287,7 @@ function App() {
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
       const room = await createRoom(playerId, initialGameState);
       handleRoomConnected(room);
+      void loadAvailableRooms();
     } catch (error) {
       console.error('[create room error]', error);
       if (error instanceof Error) {
@@ -281,6 +321,46 @@ function App() {
       const room = await joinRoom(normalizedCode, playerId);
       handleRoomConnected(room);
       setJoinCode(normalizedCode);
+      void loadAvailableRooms();
+    } catch (error) {
+      setOnlineError(
+        error instanceof Error ? error.message : 'Не удалось войти в комнату.'
+      );
+    } finally {
+      setIsOnlineLoading(false);
+    }
+  };
+
+  const handleReturnToRoom = async (roomId: string) => {
+    setIsOnlineLoading(true);
+    setOnlineError(null);
+
+    try {
+      const room = await getRoomById(roomId);
+      if (!room) {
+        setOnlineError('Комната не найдена.');
+        return;
+      }
+
+      handleRoomConnected(room);
+      void loadAvailableRooms();
+    } catch (error) {
+      setOnlineError(
+        error instanceof Error ? error.message : 'Не удалось вернуться в комнату.'
+      );
+    } finally {
+      setIsOnlineLoading(false);
+    }
+  };
+
+  const handleJoinListedRoom = async (room: Room) => {
+    setIsOnlineLoading(true);
+    setOnlineError(null);
+
+    try {
+      const joinedRoom = await joinRoom(room.code, playerId);
+      handleRoomConnected(joinedRoom);
+      void loadAvailableRooms();
     } catch (error) {
       setOnlineError(
         error instanceof Error ? error.message : 'Не удалось войти в комнату.'
@@ -519,7 +599,7 @@ function App() {
               )}
 
               <nav className="panel-actions" aria-label="Действия">
-                <button type="button" onClick={() => setActiveModal('new-game')}>
+                <button type="button" onClick={handleOpenNewGameModal}>
                   Новая игра
                 </button>
                 <button type="button" onClick={handleResetCamera}>
@@ -630,6 +710,61 @@ function App() {
                 </div>
               </section>
             )}
+
+            <section className="online-room-block available-rooms-section">
+              <div className="available-rooms-header">
+                <h3>Доступные комнаты</h3>
+                <button
+                  disabled={isRoomListLoading}
+                  type="button"
+                  onClick={loadAvailableRooms}
+                >
+                  Обновить список
+                </button>
+              </div>
+
+              {availableRooms.length === 0 ? (
+                <p className="available-rooms-empty">
+                  {isRoomListLoading ? 'Загрузка комнат...' : 'Нет доступных комнат.'}
+                </p>
+              ) : (
+                <div className="available-rooms-list">
+                  {availableRooms.map((room) => {
+                    const isParticipant =
+                      room.player_1_id === playerId || room.player_2_id === playerId;
+                    const canJoinRoom = room.status === 'waiting' && !room.player_2_id;
+
+                    return (
+                      <div className="available-room-row" key={room.id}>
+                        <div>
+                          <strong>{room.code}</strong>
+                          <span>{room.status}</span>
+                        </div>
+                        <small>{getAvailableRoomRoleLabel(room, playerId)}</small>
+                        <small>Обновлена: {formatRoomUpdatedAt(room.updated_at)}</small>
+                        {isParticipant ? (
+                          <button
+                            disabled={isOnlineLoading}
+                            type="button"
+                            onClick={() => void handleReturnToRoom(room.id)}
+                          >
+                            Вернуться
+                          </button>
+                        ) : (
+                          <button
+                            disabled={isOnlineLoading || !canJoinRoom}
+                            type="button"
+                            onClick={() => void handleJoinListedRoom(room)}
+                          >
+                            Войти
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
 
             {(onlineError || gameControllerError) && (
               <p className="online-room-error">{onlineError ?? gameControllerError}</p>

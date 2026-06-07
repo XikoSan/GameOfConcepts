@@ -306,3 +306,83 @@
   background: rgba(120, 24, 24, 0.18);
   color: #ffc9c0;
 }
+
+.available-rooms-section {
+  max-height: 210px;
+  overflow: hidden;
+}
+
+.available-rooms-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.available-rooms-header h3 {
+  margin: 0;
+}
+
+.available-rooms-header button,
+.available-room-row button {
+  min-height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 7px;
+  background:
+    url('../assets/button-texture.png') center / cover,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    #14191f;
+  color: #f6efe2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 10px;
+}
+
+.available-rooms-header button:disabled,
+.available-room-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.available-rooms-empty {
+  margin: 0;
+  color: #b8aa98;
+}
+
+.available-rooms-list {
+  display: grid;
+  gap: 6px;
+  max-height: 158px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.available-room-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 0.8fr) minmax(90px, 1fr) minmax(100px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid rgba(214, 174, 118, 0.12);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.available-room-row div {
+  display: grid;
+  gap: 2px;
+}
+
+.available-room-row strong {
+  color: #f6efe2;
+  font-size: 13px;
+}
+
+.available-room-row span,
+.available-room-row small {
+  color: #b8aa98;
+  font-size: 11px;
+  line-height: 1.2;
+}

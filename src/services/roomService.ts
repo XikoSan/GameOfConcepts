@@ -42,6 +42,60 @@ export async function getRoomById(roomId: string): Promise<Room | null> {
   return data;
 }
 
+export async function getOpenRooms(): Promise<Room[]> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .eq('status', 'waiting')
+    .order('created_at', { ascending: false })
+    .limit(20)
+    .returns<Room[]>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function getPlayerRooms(playerId: string): Promise<Room[]> {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('rooms')
+    .select('*')
+    .in('status', ['waiting', 'playing'])
+    .or(`player_1_id.eq.${playerId},player_2_id.eq.${playerId}`)
+    .order('updated_at', { ascending: false })
+    .limit(20)
+    .returns<Room[]>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+export async function getAvailableRooms(playerId: string): Promise<Room[]> {
+  // TEMP(MVP): Список доступных комнат основан на localStorage playerId, без авторизации.
+  // FIXME(MVP): waiting-комнаты публичны для всех пользователей с доступом к приложению.
+  const [playerRooms, openRooms] = await Promise.all([
+    getPlayerRooms(playerId),
+    getOpenRooms(),
+  ]);
+  const roomsById = new Map<string, Room>();
+
+  [...playerRooms, ...openRooms].forEach((room) => {
+    roomsById.set(room.id, room);
+  });
+
+  return Array.from(roomsById.values()).sort(
+    (roomA, roomB) =>
+      new Date(roomB.updated_at).getTime() - new Date(roomA.updated_at).getTime()
+  );
+}
+
 export async function createRoom(
   playerId: string,
   initialGameState: GameState
