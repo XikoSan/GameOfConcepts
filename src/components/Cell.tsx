@@ -39,6 +39,7 @@ const getOwnerClassName = (playerId: PlacedCard['playerId']) => {
 interface TooltipPosition {
   left: number;
   top: number;
+  cardKey: string;
 }
 
 interface PendingOverlayPosition {
@@ -48,7 +49,8 @@ interface PendingOverlayPosition {
 }
 
 const getTooltipPosition = (
-  event: React.MouseEvent<HTMLDivElement>
+  event: React.MouseEvent<HTMLDivElement>,
+  cardKey: string
 ): TooltipPosition => {
   const tooltipWidth = Math.min(240, window.innerWidth - 24);
   const tooltipHeight = Math.min(170, window.innerHeight - 24);
@@ -62,7 +64,7 @@ const getTooltipPosition = (
     Math.max(12, event.clientY + offset)
   );
 
-  return { left, top };
+  return { left, top, cardKey };
 };
 
 export const Cell: React.FC<CellProps> = ({
@@ -84,6 +86,11 @@ export const Cell: React.FC<CellProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const shouldShowPendingOverlay =
     placedCard?.status === 'pending' && (showPendingActions || showPendingWaitBadge);
+  const tooltipCardKey = placedCard
+    ? `${placedCard.id}:${placedCard.status}:${placedCard.cardName}:${placedCard.playerId}`
+    : null;
+  const shouldShowTooltip =
+    showTooltip && tooltipPosition && tooltipPosition.cardKey === tooltipCardKey;
   const tooltipStyle = tooltipPosition
     ? ({
         left: `${tooltipPosition.left}px`,
@@ -150,6 +157,16 @@ export const Cell: React.FC<CellProps> = ({
     };
   }, [pendingOverlayRefreshKey, shouldShowPendingOverlay, showPendingActions]);
 
+  const handleConfirmPendingMove = () => {
+    setTooltipPosition(null);
+    onConfirmPendingMove?.();
+  };
+
+  const handleReturnPendingMove = () => {
+    setTooltipPosition(null);
+    onReturnPendingMove?.();
+  };
+
   return (
     <div
       className={`cell ${isHighlighted ? 'highlighted' : ''} ${
@@ -170,10 +187,14 @@ export const Cell: React.FC<CellProps> = ({
             placedCard.playerId === null ? 'player-neutral' : `player-${placedCard.playerId}`
           } ${placedCard.status === 'pending' ? 'pending' : ''}`}
           onMouseEnter={(event) =>
-            showTooltip ? setTooltipPosition(getTooltipPosition(event)) : undefined
+            showTooltip && tooltipCardKey
+              ? setTooltipPosition(getTooltipPosition(event, tooltipCardKey))
+              : undefined
           }
           onMouseMove={(event) =>
-            showTooltip ? setTooltipPosition(getTooltipPosition(event)) : undefined
+            showTooltip && tooltipCardKey
+              ? setTooltipPosition(getTooltipPosition(event, tooltipCardKey))
+              : undefined
           }
           onMouseLeave={() => setTooltipPosition(null)}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
@@ -181,8 +202,7 @@ export const Cell: React.FC<CellProps> = ({
           <span className="card-title" lang="ru">
             {placedCard.cardName}
           </span>
-          {showTooltip &&
-            tooltipPosition &&
+          {shouldShowTooltip &&
             createPortal(
               <div
                 className={`card-tooltip ${getOwnerClassName(placedCard.playerId)}`}
@@ -210,7 +230,7 @@ export const Cell: React.FC<CellProps> = ({
                       className="pending-card-action confirm"
                       type="button"
                       title="Подтвердить связь"
-                      onClick={onConfirmPendingMove}
+                      onClick={handleConfirmPendingMove}
                     >
                       ✓
                     </button>
@@ -218,7 +238,7 @@ export const Cell: React.FC<CellProps> = ({
                       className="pending-card-action return"
                       type="button"
                       title="Вернуть карту"
-                      onClick={onReturnPendingMove}
+                      onClick={handleReturnPendingMove}
                     >
                       ↩
                     </button>
