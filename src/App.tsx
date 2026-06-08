@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { DictionaryModal } from './components/DictionaryModal';
 import { GameBoard } from './components/GameBoard';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
@@ -85,6 +86,8 @@ function App() {
   const [isOnlineLoading, setIsOnlineLoading] = useState(false);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [isRoomListLoading, setIsRoomListLoading] = useState(false);
+  const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
+  const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
   const [interfaceSettings, setInterfaceSettings] = useState(
     defaultInterfaceSettings
   );
@@ -136,6 +139,11 @@ function App() {
     if (!selectedCard || hasPendingDecision) return;
 
     placeCard(cardName, coordinates);
+  };
+
+  const handleOpenDictionary = (term: string) => {
+    setDictionaryTerm(term);
+    setIsDictionaryOpen(true);
   };
 
   const handleStartCardDrag = (
@@ -431,6 +439,7 @@ function App() {
             onMoveCardDrag={handleMoveCardDrag}
             onStartCardDrag={handleStartCardDrag}
             onCancelCardDrag={handleCancelCardDrag}
+            onOpenDictionary={handleOpenDictionary}
           />
 
           <div className="table-middle">
@@ -497,6 +506,7 @@ function App() {
                 pendingCrossReviewerLabel={getPlayerLabel(gameState.currentPlayerIndex)}
                 onApprovePendingCross={approveCross}
                 onRejectPendingCross={rejectCross}
+                onOpenDictionary={handleOpenDictionary}
               />
             </div>
 
@@ -562,6 +572,7 @@ function App() {
             onMoveCardDrag={handleMoveCardDrag}
             onStartCardDrag={handleStartCardDrag}
             onCancelCardDrag={handleCancelCardDrag}
+            onOpenDictionary={handleOpenDictionary}
           />
         </section>
       </main>
@@ -670,11 +681,6 @@ function App() {
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">
           <RulesContent />
-          <div className="modal-actions">
-            <button type="button" onClick={() => setActiveModal(null)}>
-              Закрыть
-            </button>
-          </div>
         </Modal>
       )}
       {activeModal === 'settings' && (
@@ -718,6 +724,13 @@ function App() {
             </button>
           </div>
         </Modal>
+      )}
+      {isDictionaryOpen && dictionaryTerm && (
+        <DictionaryModal
+          initialTerm={dictionaryTerm}
+          key={dictionaryTerm}
+          onClose={() => setIsDictionaryOpen(false)}
+        />
       )}
     </div>
   );

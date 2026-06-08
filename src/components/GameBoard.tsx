@@ -20,6 +20,7 @@ interface GameBoardProps {
   pendingCrossReviewerLabel: string;
   onApprovePendingCross: () => void;
   onRejectPendingCross: () => void;
+  onOpenDictionary: (term: string) => void;
 }
 
 interface CameraState {
@@ -81,6 +82,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   pendingCrossReviewerLabel,
   onApprovePendingCross,
   onRejectPendingCross,
+  onOpenDictionary,
 }) => {
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
@@ -323,6 +325,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               onApprovePendingCross={onApprovePendingCross}
               onRejectPendingCross={onRejectPendingCross}
               tooltipScopeKey={tooltipScopeKey}
+              onOpenDictionary={onOpenDictionary}
             />
           );
         })}

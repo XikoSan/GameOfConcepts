@@ -28,7 +28,7 @@ export type {
 
 const BOARD_CENTER: Coordinates = { x: 7, y: 7 };
 const HAND_SIZE = 5;
-const ADJACENCY_BONUS_BY_NEIGHBOR_COUNT = [0, 1, 4, 6, 8] as const;
+const ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR = 2;
 
 export function initializeGame(): GameState {
   const shuffle = (arr: RegularCardName[]): RegularCardName[] => {
@@ -137,11 +137,11 @@ function getAdjacencyBonus(
   card: PlacedCard,
   playerId: 0 | 1
 ): number {
-  const otherColorNeighborCount = getAdjacentCoordinates(card.coordinates).filter(
+  const enemyNeighborCount = getAdjacentCoordinates(card.coordinates).filter(
     (coordinates) => isConfirmedOtherColorCard(board[getBoardKey(coordinates)], playerId)
   ).length;
 
-  return ADJACENCY_BONUS_BY_NEIGHBOR_COUNT[otherColorNeighborCount];
+  return enemyNeighborCount * ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR;
 }
 
 function getChainBonusForLineLength(lineLength: number): number {

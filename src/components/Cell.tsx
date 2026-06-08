@@ -1,7 +1,8 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
 import type { PlacedCard } from '../game';
+import { getShortConceptDescription } from '../services/conceptDescriptionService';
 import './Cell.css';
 
 interface CellProps {
@@ -23,6 +24,7 @@ interface CellProps {
   onApprovePendingCross?: () => void;
   onRejectPendingCross?: () => void;
   tooltipScopeKey?: string;
+  onOpenDictionary?: (term: string) => void;
 }
 
 const getFontSize = (cardName: string) => {
@@ -49,26 +51,42 @@ interface TooltipPosition {
   cardKey: string;
 }
 
+interface TooltipDescriptionState {
+  cardKey: string;
+  status: 'loading' | 'ready' | 'empty';
+  text: string | null;
+}
+
 interface PendingOverlayPosition {
   left: number;
   top: number;
   placeActionsOnLeft: boolean;
 }
 
-const getTooltipPosition = (
-  event: React.MouseEvent<HTMLDivElement>,
-  cardKey: string
-): TooltipPosition => {
+interface CardPointerStart {
+  x: number;
+  y: number;
+}
+
+interface LastCardClick {
+  cardId: string;
+  time: number;
+  x: number;
+  y: number;
+}
+
+const getTooltipPosition = (element: HTMLElement, cardKey: string): TooltipPosition => {
+  const rect = element.getBoundingClientRect();
   const tooltipWidth = Math.min(240, window.innerWidth - 24);
   const tooltipHeight = Math.min(170, window.innerHeight - 24);
-  const offset = 18;
+  const offset = 12;
   const left = Math.min(
     window.innerWidth - tooltipWidth - 12,
-    Math.max(12, event.clientX + offset)
+    Math.max(12, rect.right + offset)
   );
   const top = Math.min(
     window.innerHeight - tooltipHeight - 12,
-    Math.max(12, event.clientY + offset)
+    Math.max(12, rect.top)
   );
 
   return { left, top, cardKey };
@@ -93,11 +111,20 @@ export const Cell: React.FC<CellProps> = ({
   onApprovePendingCross,
   onRejectPendingCross,
   tooltipScopeKey = 'default',
+  onOpenDictionary,
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
+  const [tooltipDescription, setTooltipDescription] =
+    useState<TooltipDescriptionState | null>(null);
   const [pendingOverlayPosition, setPendingOverlayPosition] =
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const tooltipCloseTimeoutRef = useRef<number | null>(null);
+  const tooltipOpenTimeoutRef = useRef<number | null>(null);
+  const tooltipRequestIdRef = useRef(0);
+  const cardPointerStartRef = useRef<CardPointerStart | null>(null);
+  const lastCardClickRef = useRef<LastCardClick | null>(null);
+  const suppressNextCardClickRef = useRef(false);
   const shouldShowPendingMoveOverlay =
     placedCard?.status === 'pending' && (showPendingActions || showPendingWaitBadge);
   const shouldShowPendingCrossOverlay = Boolean(placedCard) && isCrossPendingCenter;
@@ -120,6 +147,80 @@ export const Cell: React.FC<CellProps> = ({
         top: `${pendingOverlayPosition.top}px`,
       } satisfies CSSProperties)
     : undefined;
+
+  const clearTooltipCloseTimeout = () => {
+    if (tooltipCloseTimeoutRef.current !== null) {
+      window.clearTimeout(tooltipCloseTimeoutRef.current);
+      tooltipCloseTimeoutRef.current = null;
+    }
+  };
+
+  const clearTooltipOpenTimeout = () => {
+    if (tooltipOpenTimeoutRef.current !== null) {
+      window.clearTimeout(tooltipOpenTimeoutRef.current);
+      tooltipOpenTimeoutRef.current = null;
+    }
+  };
+
+  const closeTooltip = () => {
+    clearTooltipOpenTimeout();
+    clearTooltipCloseTimeout();
+    tooltipRequestIdRef.current += 1;
+    setTooltipPosition(null);
+  };
+
+  const scheduleTooltipClose = () => {
+    clearTooltipOpenTimeout();
+    clearTooltipCloseTimeout();
+    tooltipRequestIdRef.current += 1;
+    tooltipCloseTimeoutRef.current = window.setTimeout(() => {
+      setTooltipPosition(null);
+      tooltipCloseTimeoutRef.current = null;
+    }, 140);
+  };
+
+  const scheduleTooltipOpen = () => {
+    clearTooltipOpenTimeout();
+    clearTooltipCloseTimeout();
+
+    if (!showTooltip || !tooltipCardKey || !placedCard || !cardRef.current) return;
+
+    const nextCardKey = tooltipCardKey;
+    const nextCardName = placedCard.cardName;
+    const nextRequestId = tooltipRequestIdRef.current + 1;
+    tooltipRequestIdRef.current = nextRequestId;
+
+    tooltipOpenTimeoutRef.current = window.setTimeout(() => {
+      if (!cardRef.current) return;
+
+      setTooltipPosition(getTooltipPosition(cardRef.current, nextCardKey));
+      setTooltipDescription({
+        cardKey: nextCardKey,
+        status: 'loading',
+        text: null,
+      });
+
+      void getShortConceptDescription(nextCardName)
+        .then((description) => {
+          if (tooltipRequestIdRef.current !== nextRequestId) return;
+
+          setTooltipDescription({
+            cardKey: nextCardKey,
+            status: description ? 'ready' : 'empty',
+            text: description,
+          });
+        })
+        .catch(() => {
+          if (tooltipRequestIdRef.current !== nextRequestId) return;
+
+          setTooltipDescription({
+            cardKey: nextCardKey,
+            status: 'empty',
+            text: null,
+          });
+        });
+    }, 250);
+  };
 
   useLayoutEffect(() => {
     if (!shouldShowPendingOverlay || !cardRef.current) {
@@ -191,24 +292,93 @@ export const Cell: React.FC<CellProps> = ({
   ]);
 
   const handleConfirmPendingMove = () => {
-    setTooltipPosition(null);
+    closeTooltip();
     onConfirmPendingMove?.();
   };
 
   const handleReturnPendingMove = () => {
-    setTooltipPosition(null);
+    closeTooltip();
     onReturnPendingMove?.();
   };
 
   const handleApprovePendingCross = () => {
-    setTooltipPosition(null);
+    closeTooltip();
     onApprovePendingCross?.();
   };
 
   const handleRejectPendingCross = () => {
-    setTooltipPosition(null);
+    closeTooltip();
     onRejectPendingCross?.();
   };
+
+  const handleOpenDictionary = () => {
+    if (!placedCard) return;
+
+    closeTooltip();
+    onOpenDictionary?.(placedCard.cardName);
+  };
+
+  const handleCardPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+
+    cardPointerStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+    };
+  };
+
+  const handleCardPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+
+    const start = cardPointerStartRef.current;
+    cardPointerStartRef.current = null;
+    if (!placedCard || !start) return;
+
+    const moveDistance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+    if (moveDistance > 8) return;
+
+    const now = Date.now();
+    const lastClick = lastCardClickRef.current;
+    const isDoubleClick =
+      lastClick !== null &&
+      lastClick.cardId === placedCard.id &&
+      now - lastClick.time < 300 &&
+      Math.hypot(event.clientX - lastClick.x, event.clientY - lastClick.y) <= 8;
+
+    if (event.altKey || isDoubleClick) {
+      event.preventDefault();
+      event.stopPropagation();
+      suppressNextCardClickRef.current = true;
+      lastCardClickRef.current = null;
+      handleOpenDictionary();
+      return;
+    }
+
+    lastCardClickRef.current = {
+      cardId: placedCard.id,
+      time: now,
+      x: event.clientX,
+      y: event.clientY,
+    };
+  };
+
+  const tooltipDescriptionText =
+    tooltipDescription?.cardKey === tooltipCardKey
+      ? tooltipDescription.status === 'loading'
+        ? 'Загрузка описания...'
+        : tooltipDescription.status === 'ready'
+          ? tooltipDescription.text
+          : 'Описание не найдено.'
+      : 'Загрузка описания...';
+
+  useEffect(
+    () => () => {
+      clearTooltipOpenTimeout();
+      clearTooltipCloseTimeout();
+      tooltipRequestIdRef.current += 1;
+    },
+    []
+  );
 
   return (
     <div
@@ -235,17 +405,17 @@ export const Cell: React.FC<CellProps> = ({
           } ${placedCard.status === 'pending' ? 'pending' : ''} ${
             isCrossPending ? 'cross-pending-card' : ''
           } ${isCrossPendingCenter ? 'cross-pending-center' : ''}`}
-          onMouseEnter={(event) =>
-            showTooltip && tooltipCardKey
-              ? setTooltipPosition(getTooltipPosition(event, tooltipCardKey))
-              : undefined
-          }
-          onMouseMove={(event) =>
-            showTooltip && tooltipCardKey
-              ? setTooltipPosition(getTooltipPosition(event, tooltipCardKey))
-              : undefined
-          }
-          onMouseLeave={() => setTooltipPosition(null)}
+          onClick={(event) => {
+            if (suppressNextCardClickRef.current) {
+              event.preventDefault();
+              event.stopPropagation();
+              suppressNextCardClickRef.current = false;
+            }
+          }}
+          onMouseEnter={scheduleTooltipOpen}
+          onMouseLeave={scheduleTooltipClose}
+          onPointerDown={handleCardPointerDown}
+          onPointerUp={handleCardPointerUp}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
           <span className="card-title" lang="ru">
@@ -259,6 +429,10 @@ export const Cell: React.FC<CellProps> = ({
               >
                 <strong>{placedCard.cardName}</strong>
                 <span>Владелец: {getOwnerLabel(placedCard.playerId)}</span>
+                <p>{tooltipDescriptionText}</p>
+                <span className="card-tooltip-hint">
+                  Двойной клик или Alt+клик — справка
+                </span>
               </div>,
               document.body
             )}

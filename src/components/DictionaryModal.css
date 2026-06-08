@@ -1,0 +1,138 @@
+.dictionary-modal {
+  width: min(720px, 100%);
+  display: grid;
+  gap: 12px;
+}
+
+.dictionary-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.dictionary-search input {
+  min-width: 0;
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 1px solid rgba(214, 174, 118, 0.22);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.22);
+  color: #f6efe2;
+  font: inherit;
+  padding: 0 11px;
+}
+
+.dictionary-search button {
+  min-height: 36px;
+  border: 1px solid rgba(199, 140, 55, 0.52);
+  border-radius: 8px;
+  background:
+    url('../assets/button-texture.png') center / cover,
+    linear-gradient(180deg, rgba(181, 118, 41, 0.34), rgba(84, 50, 13, 0.64)),
+    #402707;
+  color: #f6efe2;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.dictionary-search button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.dictionary-state,
+.dictionary-error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #d8d0c4;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.dictionary-error {
+  border: 1px solid rgba(215, 118, 82, 0.3);
+  color: #f0b49c;
+}
+
+.dictionary-state.compact {
+  padding: 9px 10px;
+  font-size: 13px;
+}
+
+.dictionary-result-grid {
+  display: grid;
+  gap: 10px;
+  max-height: min(500px, 52vh);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.dictionary-entry {
+  display: grid;
+  gap: 8px;
+}
+
+.dictionary-source-card {
+  padding: 12px;
+  border: 1px solid rgba(214, 174, 118, 0.16);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(214, 174, 118, 0.075), transparent 34%),
+    rgba(0, 0, 0, 0.16);
+}
+
+.dictionary-source-label {
+  color: #d6ae76;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dictionary-entry h3 {
+  margin: 0;
+  color: #f7ead5;
+  font-size: clamp(18px, 1.3vw, 23px);
+  line-height: 1.15;
+}
+
+.dictionary-extract {
+  max-height: min(220px, 30vh);
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid rgba(214, 174, 118, 0.16);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(214, 174, 118, 0.08), transparent 34%),
+    rgba(0, 0, 0, 0.2);
+}
+
+.dictionary-extract p {
+  margin: 0;
+  color: #d8d0c4;
+  font-size: clamp(12px, 0.88vw, 15px);
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+.dictionary-note {
+  margin: 0;
+  color: #d8d0c4;
+  font-size: clamp(12px, 0.88vw, 15px);
+  line-height: 1.45;
+}
+
+.dictionary-entry a {
+  justify-self: start;
+  color: #e7bd77;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dictionary-entry a:hover {
+  text-decoration: underline;
+}

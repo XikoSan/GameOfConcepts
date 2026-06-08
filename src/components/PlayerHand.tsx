@@ -17,6 +17,7 @@ interface PlayerHandProps {
     event: React.DragEvent<HTMLDivElement>
   ) => void;
   onCancelCardDrag: () => void;
+  onOpenDictionary: (term: string) => void;
 }
 
 const playerColors = {
@@ -34,6 +35,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   onMoveCardDrag,
   onStartCardDrag,
   onCancelCardDrag,
+  onOpenDictionary,
 }) => {
   const playerLabel = playerNumber === 0 ? 'Игрок 1 (Синий)' : 'Игрок 2 (Оранжевый)';
 
@@ -71,6 +73,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                       : undefined
                   }
                   onDragEnd={isActive ? onCancelCardDrag : undefined}
+                  onOpenDictionary={onOpenDictionary}
                 />
               ))}
         </div>
