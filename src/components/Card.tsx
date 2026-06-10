@@ -27,6 +27,7 @@ export const Card: React.FC<CardProps> = ({
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    window.dispatchEvent(new CustomEvent('card-info-close'));
     didDragRecentlyRef.current = true;
     if (dragResetTimeoutRef.current !== null) {
       window.clearTimeout(dragResetTimeoutRef.current);

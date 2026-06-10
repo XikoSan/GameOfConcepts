@@ -115,6 +115,10 @@ function App() {
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
   const canControlPlayer = (playerIndex: 0 | 1) =>
     mode === 'local' || localPlayerIndex === playerIndex;
+  const isOnlineTable = Boolean(onlineRoom);
+  const bottomTablePlayerIndex: 0 | 1 | null = isOnlineTable
+    ? localPlayerIndex
+    : 0;
   const canReviewPendingMove =
     mode === 'local' ||
     (localPlayerIndex !== null &&
@@ -417,163 +421,229 @@ function App() {
     };
   }, [onlineRoom]);
 
+  const renderPartyPanel = () => (
+    <aside className="side-panel party-panel" aria-label="Панель партии">
+      <section className="panel-section lobby-section">
+        <div className="panel-title-row">
+          <span className="panel-icon" aria-hidden="true">◇</span>
+          <h1>Лобби</h1>
+        </div>
+      </section>
+
+      <section className="panel-section players-score-section">
+        <h2>Игроки</h2>
+        <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
+          <span>
+            Игрок 1
+            {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
+          </span>
+          <strong>{gameState.scores[0]}</strong>
+        </div>
+        <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
+          <span>
+            Игрок 2
+            {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
+          </span>
+          <strong>{gameState.scores[1]}</strong>
+        </div>
+      </section>
+
+      <section className="panel-section log-section">
+        <h2>Лог партии</h2>
+        <div className="log-placeholder">
+          {gameState.log.length > 0 ? (
+            <ol className="match-log">
+              {gameState.log.map((event, index) => (
+                <li key={`${event}-${index}`}>{event}</li>
+              ))}
+            </ol>
+          ) : (
+            <>
+              <span className="log-icon" aria-hidden="true">✧</span>
+              <p>События партии появятся здесь.</p>
+              <small>Заглушка под будущий журнал ходов.</small>
+            </>
+          )}
+        </div>
+      </section>
+    </aside>
+  );
+
+  const renderOnlinePlayerStrip = () => (
+    <div className="online-player-strip" aria-label="Игроки за столом">
+      {([0, 1] as const).map((playerIndex) => {
+        const isActiveScore = activeScoreIndex === playerIndex;
+        const isLocalPlayer = localPlayerIndex === playerIndex;
+
+        return (
+          <div
+            className={`online-player-chip online-player-chip-${playerIndex} ${isActiveScore ? 'active' : ''}`}
+            key={playerIndex}
+          >
+            <span className="online-player-dot" aria-hidden="true" />
+            <span className="online-player-name">
+              {getPlayerLabel(playerIndex)}
+              {isLocalPlayer && <small>вы</small>}
+            </span>
+            <strong>{gameState.scores[playerIndex]}</strong>
+            {isActiveScore && (
+              <span className="online-player-status">
+                {scoreStateLabel}
+              </span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderBoard = () => (
+    <GameBoard
+      key={`${gameState.startCard.id}-${resetCameraSignal}`}
+      gameState={gameState}
+      selectedCard={activeSelectedCard}
+      onPlaceCard={handlePlaceCard}
+      onFinishDrag={handleCancelCardDrag}
+      showPlayableHighlights={interfaceSettings.showPlayableHighlights}
+      showTooltips={interfaceSettings.showCardTooltips}
+      canReviewPendingMove={canReviewPendingMove}
+      showPendingWaitBadge={showPendingWaitBadge}
+      onConfirmPendingMove={confirmCard}
+      onReturnPendingMove={returnCard}
+      canReviewPendingCross={canReviewPendingCross}
+      pendingCrossReviewerLabel={getPlayerLabel(gameState.currentPlayerIndex)}
+      onApprovePendingCross={approveCross}
+      onRejectPendingCross={rejectCross}
+    />
+  );
+
+  const renderControlPanel = (showScoreHint = false) => (
+    <aside className="side-panel control-panel" aria-label="Панель управления">
+      <section className="panel-section control-title-section">
+        <div className="panel-title-row">
+          <span className="panel-icon" aria-hidden="true">◇</span>
+          <h1>Управление</h1>
+        </div>
+      </section>
+
+      <nav className="panel-actions" aria-label="Действия">
+        <section className="action-group action-group-primary" aria-label="Партия">
+          <h2>Партия</h2>
+          <button className="action-button action-button-primary" type="button" onClick={handleOpenNewGameModal}>
+            Онлайн игра
+          </button>
+          <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
+            Начать локально
+          </button>
+        </section>
+
+        <section className="action-group" aria-label="Инструменты">
+          <h2>Инструменты</h2>
+          <button className="action-button action-button-subtle" type="button" onClick={handleResetCamera}>
+            Сброс позиции
+          </button>
+          {onlineRoom && (
+            <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
+              Синхронизировать
+            </button>
+          )}
+        </section>
+
+        <section className="action-group" aria-label="Справка">
+          <h2>Справка</h2>
+          <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('rules')}>
+            Правила
+          </button>
+          <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('settings')}>
+            Настройки
+          </button>
+        </section>
+      </nav>
+
+      {showScoreHint && (
+        <section className="control-hint-card" aria-label="Памятка по очкам">
+          <h3>Памятка</h3>
+          <div className="control-hint-group">
+            <strong>Очки</strong>
+            <p>Карта: +1 ПО</p>
+            <p>Соседство: +2 / +4 / +6 / +8</p>
+            <p>Цепочки: 3/5/7/9 = +1/+2/+3/+4</p>
+            <p>Крестовина: +5 ПО</p>
+          </div>
+          <div className="control-hint-group">
+            <strong>База</strong>
+            <p>Одинаковые слова рядом — нельзя</p>
+            <p>Связь объясняется устно</p>
+            <p>Голосование: ✓ принять / ↩ вернуть</p>
+          </div>
+        </section>
+      )}
+    </aside>
+  );
+
+  const renderPlayerHand = (playerIndex: 0 | 1, className?: string) => (
+    <PlayerHand
+      playerNumber={playerIndex}
+      cards={gameState.players[playerIndex].cards}
+      deckCount={gameState.deck[playerIndex].length}
+      selectedCard={
+        gameState.currentPlayerIndex === playerIndex && canControlPlayer(playerIndex)
+          ? activeSelectedCard
+          : null
+      }
+      isActive={
+        gameState.currentPlayerIndex === playerIndex &&
+        !hasPendingDecision &&
+        canControlPlayer(playerIndex)
+      }
+      className={className}
+      onMoveCardDrag={handleMoveCardDrag}
+      onStartCardDrag={handleStartCardDrag}
+      onCancelCardDrag={handleCancelCardDrag}
+      onOpenDictionary={handleOpenDictionary}
+    />
+  );
+
   return (
     <div className="app-container">
       <main className="game-table">
-        <section className="play-area" aria-label="Игровой стол">
-          <PlayerHand
-            playerNumber={1}
-            cards={gameState.players[1].cards}
-            deckCount={gameState.deck[1].length}
-            hideCards={mode === 'multiplayer' && localPlayerIndex !== 1}
-            selectedCard={
-              gameState.currentPlayerIndex === 1 && canControlPlayer(1)
-                ? activeSelectedCard
-                : null
-            }
-            isActive={
-              gameState.currentPlayerIndex === 1 &&
-              !hasPendingDecision &&
-              canControlPlayer(1)
-            }
-            onMoveCardDrag={handleMoveCardDrag}
-            onStartCardDrag={handleStartCardDrag}
-            onCancelCardDrag={handleCancelCardDrag}
-            onOpenDictionary={handleOpenDictionary}
-          />
+        <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
+          {isOnlineTable ? (
+            <div className="online-game-shell">
+              <header className="online-game-header">
+                <h1>Цепочка размышлений</h1>
+              </header>
 
-          <div className="table-middle">
-            <aside className="side-panel party-panel" aria-label="Панель партии">
-              <section className="panel-section lobby-section">
-                <div className="panel-title-row">
-                  <span className="panel-icon" aria-hidden="true">◇</span>
-                  <h1>Лобби</h1>
-                </div>
-              </section>
+              <div className="online-game-layout">
+                {renderPartyPanel()}
 
-              <section className="panel-section players-score-section">
-                <h2>Игроки</h2>
-                <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
-                  <span>
-                    Игрок 1
-                    {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
-                  </span>
-                  <strong>{gameState.scores[0]}</strong>
+                <div className="online-center-table">
+                  {renderOnlinePlayerStrip()}
+                  <div className="board-section board-section-online">
+                    {renderBoard()}
+                  </div>
+                  {bottomTablePlayerIndex !== null &&
+                    renderPlayerHand(bottomTablePlayerIndex, 'local-player-hand')}
                 </div>
-                <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
-                  <span>
-                    Игрок 2
-                    {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
-                  </span>
-                  <strong>{gameState.scores[1]}</strong>
-                </div>
-              </section>
 
-              <section className="panel-section log-section">
-                <h2>Лог партии</h2>
-                <div className="log-placeholder">
-                  {gameState.log.length > 0 ? (
-                    <ol className="match-log">
-                      {gameState.log.map((event, index) => (
-                        <li key={`${event}-${index}`}>{event}</li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <>
-                      <span className="log-icon" aria-hidden="true">✧</span>
-                      <p>События партии появятся здесь.</p>
-                      <small>Заглушка под будущий журнал ходов.</small>
-                    </>
-                  )}
-                </div>
-              </section>
-            </aside>
-
-            <div className="board-section">
-              <GameBoard
-                key={`${gameState.startCard.id}-${resetCameraSignal}`}
-                gameState={gameState}
-                selectedCard={activeSelectedCard}
-                onPlaceCard={handlePlaceCard}
-                onFinishDrag={handleCancelCardDrag}
-                showPlayableHighlights={interfaceSettings.showPlayableHighlights}
-                showTooltips={interfaceSettings.showCardTooltips}
-                canReviewPendingMove={canReviewPendingMove}
-                showPendingWaitBadge={showPendingWaitBadge}
-                onConfirmPendingMove={confirmCard}
-                onReturnPendingMove={returnCard}
-                canReviewPendingCross={canReviewPendingCross}
-                pendingCrossReviewerLabel={getPlayerLabel(gameState.currentPlayerIndex)}
-                onApprovePendingCross={approveCross}
-                onRejectPendingCross={rejectCross}
-                onOpenDictionary={handleOpenDictionary}
-              />
+                {renderControlPanel(true)}
+              </div>
             </div>
+          ) : (
+            <>
+              {renderPlayerHand(1)}
 
-            <aside className="side-panel control-panel" aria-label="Панель управления">
-              <section className="panel-section control-title-section">
-                <div className="panel-title-row">
-                  <span className="panel-icon" aria-hidden="true">◇</span>
-                  <h1>Управление</h1>
+              <div className="table-middle">
+                {renderPartyPanel()}
+                <div className="board-section">
+                  {renderBoard()}
                 </div>
-              </section>
+                {renderControlPanel()}
+              </div>
 
-              <nav className="panel-actions" aria-label="Действия">
-                <section className="action-group action-group-primary" aria-label="Партия">
-                  <h2>Партия</h2>
-                  <button className="action-button action-button-primary" type="button" onClick={handleOpenNewGameModal}>
-                    Онлайн игра
-                  </button>
-                  <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
-                    Начать локально
-                  </button>
-                </section>
-
-                <section className="action-group" aria-label="Инструменты">
-                  <h2>Инструменты</h2>
-                  <button className="action-button action-button-subtle" type="button" onClick={handleResetCamera}>
-                    Сброс позиции
-                  </button>
-                  {onlineRoom && (
-                    <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
-                      Синхронизировать
-                    </button>
-                  )}
-                </section>
-
-                <section className="action-group" aria-label="Справка">
-                  <h2>Справка</h2>
-                  <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('rules')}>
-                    Правила
-                  </button>
-                  <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('settings')}>
-                    Настройки
-                  </button>
-                </section>
-              </nav>
-            </aside>
-          </div>
-
-          <PlayerHand
-            playerNumber={0}
-            cards={gameState.players[0].cards}
-            deckCount={gameState.deck[0].length}
-            hideCards={mode === 'multiplayer' && localPlayerIndex !== 0}
-            selectedCard={
-              gameState.currentPlayerIndex === 0 && canControlPlayer(0)
-                ? activeSelectedCard
-                : null
-            }
-            isActive={
-              gameState.currentPlayerIndex === 0 &&
-              !hasPendingDecision &&
-              canControlPlayer(0)
-            }
-            onMoveCardDrag={handleMoveCardDrag}
-            onStartCardDrag={handleStartCardDrag}
-            onCancelCardDrag={handleCancelCardDrag}
-            onOpenDictionary={handleOpenDictionary}
-          />
+              {renderPlayerHand(0)}
+            </>
+          )}
         </section>
       </main>
       {dragPreview && (

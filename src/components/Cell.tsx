@@ -1,9 +1,20 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
 import type { PlacedCard } from '../game';
-import { getShortConceptDescription } from '../services/conceptDescriptionService';
+import {
+  getConceptSummary,
+  type ConceptSummary,
+} from '../services/conceptDescriptionService';
+import { getWiktionarySearchUrl } from '../services/dictionaryService';
+import {
+  CardInfoPopover,
+  type CardInfoPopoverMode,
+  type CardInfoStatus,
+} from './CardInfoPopover';
 import './Cell.css';
+
+type PopoverStateMode = 'hidden' | 'tooltip' | 'pinning' | 'pinned';
 
 interface CellProps {
   placedCard?: PlacedCard;
@@ -24,7 +35,6 @@ interface CellProps {
   onApprovePendingCross?: () => void;
   onRejectPendingCross?: () => void;
   tooltipScopeKey?: string;
-  onOpenDictionary?: (term: string) => void;
 }
 
 const getFontSize = (cardName: string) => {
@@ -45,16 +55,16 @@ const getOwnerClassName = (playerId: PlacedCard['playerId']) => {
   return 'player-neutral';
 };
 
-interface TooltipPosition {
+interface PopoverPosition {
   left: number;
   top: number;
   cardKey: string;
 }
 
-interface TooltipDescriptionState {
+interface PopoverSummaryState {
   cardKey: string;
-  status: 'loading' | 'ready' | 'empty';
-  text: string | null;
+  status: CardInfoStatus;
+  summary: ConceptSummary | null;
 }
 
 interface PendingOverlayPosition {
@@ -63,29 +73,27 @@ interface PendingOverlayPosition {
   placeActionsOnLeft: boolean;
 }
 
-interface CardPointerStart {
-  x: number;
-  y: number;
-}
-
-interface LastCardClick {
-  cardId: string;
-  time: number;
-  x: number;
-  y: number;
-}
-
-const getTooltipPosition = (element: HTMLElement, cardKey: string): TooltipPosition => {
+const getPopoverPosition = (
+  element: HTMLElement,
+  cardKey: string,
+  mode: CardInfoPopoverMode,
+  isExpanded = false
+): PopoverPosition => {
   const rect = element.getBoundingClientRect();
-  const tooltipWidth = Math.min(240, window.innerWidth - 24);
-  const tooltipHeight = Math.min(170, window.innerHeight - 24);
+  const popoverWidth =
+    mode === 'pinned' ? (isExpanded ? 640 : 340) : 300;
+  const popoverHeight =
+    mode === 'pinned' ? (isExpanded ? 620 : 460) : 210;
+  const width = Math.min(popoverWidth, window.innerWidth - 24);
+  const height = Math.min(popoverHeight, window.innerHeight - 24);
   const offset = 12;
-  const left = Math.min(
-    window.innerWidth - tooltipWidth - 12,
-    Math.max(12, rect.right + offset)
-  );
+  const hasRoomOnRight = rect.right + offset + width <= window.innerWidth - 12;
+  const preferredLeft = hasRoomOnRight
+    ? rect.right + offset
+    : rect.left - width - offset;
+  const left = Math.min(window.innerWidth - width - 12, Math.max(12, preferredLeft));
   const top = Math.min(
-    window.innerHeight - tooltipHeight - 12,
+    window.innerHeight - height - 12,
     Math.max(12, rect.top)
   );
 
@@ -111,20 +119,25 @@ export const Cell: React.FC<CellProps> = ({
   onApprovePendingCross,
   onRejectPendingCross,
   tooltipScopeKey = 'default',
-  onOpenDictionary,
 }) => {
-  const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
-  const [tooltipDescription, setTooltipDescription] =
-    useState<TooltipDescriptionState | null>(null);
+  const [popoverMode, setPopoverMode] = useState<PopoverStateMode>('hidden');
+  const [popoverPosition, setPopoverPosition] = useState<PopoverPosition | null>(null);
+  const [popoverSummary, setPopoverSummary] =
+    useState<PopoverSummaryState | null>(null);
+  const [isPopoverExpanded, setIsPopoverExpanded] = useState(false);
   const [pendingOverlayPosition, setPendingOverlayPosition] =
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const tooltipCloseTimeoutRef = useRef<number | null>(null);
-  const tooltipOpenTimeoutRef = useRef<number | null>(null);
-  const tooltipRequestIdRef = useRef(0);
-  const cardPointerStartRef = useRef<CardPointerStart | null>(null);
-  const lastCardClickRef = useRef<LastCardClick | null>(null);
-  const suppressNextCardClickRef = useRef(false);
+  const popoverOpenTimeoutRef = useRef<number | null>(null);
+  const popoverCloseTimeoutRef = useRef<number | null>(null);
+  const popoverRequestIdRef = useRef(0);
+  const popoverStateRef = useRef<{
+    mode: PopoverStateMode;
+    cardKey: string | null;
+  }>({
+    mode: 'hidden',
+    cardKey: null,
+  });
   const shouldShowPendingMoveOverlay =
     placedCard?.status === 'pending' && (showPendingActions || showPendingWaitBadge);
   const shouldShowPendingCrossOverlay = Boolean(placedCard) && isCrossPendingCenter;
@@ -133,14 +146,14 @@ export const Cell: React.FC<CellProps> = ({
   const tooltipCardKey = placedCard
     ? `${placedCard.id}:${placedCard.status}:${placedCard.crossId ?? 'none'}:${placedCard.cardName}:${placedCard.playerId}:${tooltipScopeKey}`
     : null;
+  const activePopoverMode =
+    popoverMode === 'hidden' ? null : popoverMode === 'pinning' ? 'pinned' : popoverMode;
   const shouldShowTooltip =
-    showTooltip && tooltipPosition && tooltipPosition.cardKey === tooltipCardKey;
-  const tooltipStyle = tooltipPosition
-    ? ({
-        left: `${tooltipPosition.left}px`,
-        top: `${tooltipPosition.top}px`,
-      } satisfies CSSProperties)
-    : undefined;
+    showTooltip &&
+    activePopoverMode &&
+    popoverPosition &&
+    popoverPosition.cardKey === tooltipCardKey &&
+    placedCard;
   const pendingOverlayStyle = pendingOverlayPosition
     ? ({
         left: `${pendingOverlayPosition.left}px`,
@@ -148,78 +161,172 @@ export const Cell: React.FC<CellProps> = ({
       } satisfies CSSProperties)
     : undefined;
 
-  const clearTooltipCloseTimeout = () => {
-    if (tooltipCloseTimeoutRef.current !== null) {
-      window.clearTimeout(tooltipCloseTimeoutRef.current);
-      tooltipCloseTimeoutRef.current = null;
+  const clearPopoverTimers = useCallback(() => {
+    if (popoverOpenTimeoutRef.current !== null) {
+      window.clearTimeout(popoverOpenTimeoutRef.current);
+      popoverOpenTimeoutRef.current = null;
     }
-  };
 
-  const clearTooltipOpenTimeout = () => {
-    if (tooltipOpenTimeoutRef.current !== null) {
-      window.clearTimeout(tooltipOpenTimeoutRef.current);
-      tooltipOpenTimeoutRef.current = null;
+    if (popoverCloseTimeoutRef.current !== null) {
+      window.clearTimeout(popoverCloseTimeoutRef.current);
+      popoverCloseTimeoutRef.current = null;
     }
+  }, []);
+
+  const closePopover = useCallback(() => {
+    clearPopoverTimers();
+    popoverRequestIdRef.current += 1;
+    popoverStateRef.current = {
+      mode: 'hidden',
+      cardKey: null,
+    };
+    setPopoverMode('hidden');
+    setPopoverPosition(null);
+    setIsPopoverExpanded(false);
+  }, [clearPopoverTimers]);
+
+  const loadSummary = (cardKey: string, cardName: string, requestId: number) => {
+    setPopoverSummary({
+      cardKey,
+      status: 'loading',
+      summary: null,
+    });
+
+    void getConceptSummary(cardName)
+      .then((summary) => {
+        if (popoverRequestIdRef.current !== requestId) return;
+
+        setPopoverSummary({
+          cardKey,
+          status: summary ? 'ready' : 'empty',
+          summary,
+        });
+      })
+      .catch(() => {
+        if (popoverRequestIdRef.current !== requestId) return;
+
+        setPopoverSummary({
+          cardKey,
+          status: 'error',
+          summary: null,
+        });
+      });
   };
 
-  const closeTooltip = () => {
-    clearTooltipOpenTimeout();
-    clearTooltipCloseTimeout();
-    tooltipRequestIdRef.current += 1;
-    setTooltipPosition(null);
-  };
-
-  const scheduleTooltipClose = () => {
-    clearTooltipOpenTimeout();
-    clearTooltipCloseTimeout();
-    tooltipRequestIdRef.current += 1;
-    tooltipCloseTimeoutRef.current = window.setTimeout(() => {
-      setTooltipPosition(null);
-      tooltipCloseTimeoutRef.current = null;
-    }, 140);
-  };
-
-  const scheduleTooltipOpen = () => {
-    clearTooltipOpenTimeout();
-    clearTooltipCloseTimeout();
+  const schedulePopoverOpen = () => {
+    clearPopoverTimers();
 
     if (!showTooltip || !tooltipCardKey || !placedCard || !cardRef.current) return;
 
     const nextCardKey = tooltipCardKey;
     const nextCardName = placedCard.cardName;
-    const nextRequestId = tooltipRequestIdRef.current + 1;
-    tooltipRequestIdRef.current = nextRequestId;
+    const nextRequestId = popoverRequestIdRef.current + 1;
+    popoverRequestIdRef.current = nextRequestId;
+    setIsPopoverExpanded(false);
+    loadSummary(nextCardKey, nextCardName, nextRequestId);
 
-    tooltipOpenTimeoutRef.current = window.setTimeout(() => {
-      if (!cardRef.current) return;
+    popoverOpenTimeoutRef.current = window.setTimeout(() => {
+      if (!cardRef.current || popoverRequestIdRef.current !== nextRequestId) return;
 
-      setTooltipPosition(getTooltipPosition(cardRef.current, nextCardKey));
-      setTooltipDescription({
+      setPopoverPosition(getPopoverPosition(cardRef.current, nextCardKey, 'tooltip'));
+      popoverStateRef.current = {
+        mode: 'tooltip',
         cardKey: nextCardKey,
-        status: 'loading',
-        text: null,
-      });
-
-      void getShortConceptDescription(nextCardName)
-        .then((description) => {
-          if (tooltipRequestIdRef.current !== nextRequestId) return;
-
-          setTooltipDescription({
-            cardKey: nextCardKey,
-            status: description ? 'ready' : 'empty',
-            text: description,
-          });
+      };
+      setPopoverMode('tooltip');
+      popoverOpenTimeoutRef.current = null;
+      window.dispatchEvent(
+        new CustomEvent('card-info-popover-open', {
+          detail: { cardKey: nextCardKey },
         })
-        .catch(() => {
-          if (tooltipRequestIdRef.current !== nextRequestId) return;
-
-          setTooltipDescription({
-            cardKey: nextCardKey,
-            status: 'empty',
-            text: null,
-          });
-        });
+      );
     }, 250);
+  };
+
+  const schedulePopoverClose = () => {
+    if (popoverOpenTimeoutRef.current !== null) {
+      window.clearTimeout(popoverOpenTimeoutRef.current);
+      popoverOpenTimeoutRef.current = null;
+    }
+
+    setPopoverMode((currentMode) => {
+      if (currentMode === 'pinning' || currentMode === 'pinned') return currentMode;
+
+      if (popoverCloseTimeoutRef.current !== null) {
+        window.clearTimeout(popoverCloseTimeoutRef.current);
+      }
+
+      popoverCloseTimeoutRef.current = window.setTimeout(() => {
+        popoverCloseTimeoutRef.current = null;
+
+        if (
+          popoverStateRef.current.mode !== 'pinning' &&
+          popoverStateRef.current.mode !== 'pinned'
+        ) {
+          popoverRequestIdRef.current += 1;
+          popoverStateRef.current = {
+            mode: 'hidden',
+            cardKey: null,
+          };
+          setPopoverPosition(null);
+          setIsPopoverExpanded(false);
+          setPopoverMode('hidden');
+        }
+      }, 140);
+
+      return currentMode;
+    });
+  };
+
+  const handleCardPointerEnter = () => {
+    if (
+      (popoverStateRef.current.mode === 'pinning' ||
+        popoverStateRef.current.mode === 'pinned') &&
+      popoverStateRef.current.cardKey === tooltipCardKey
+    ) {
+      return;
+    }
+
+    schedulePopoverOpen();
+  };
+
+  const handleCardPointerLeave = () => {
+    schedulePopoverClose();
+  };
+
+  const handlePopoverPointerEnter = () => {
+    clearPopoverTimers();
+
+    if (
+      popoverStateRef.current.mode !== 'tooltip' ||
+      !cardRef.current ||
+      !tooltipCardKey
+    ) {
+      return;
+    }
+
+    popoverStateRef.current = {
+      mode: 'pinning',
+      cardKey: tooltipCardKey,
+    };
+    setPopoverPosition(getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned'));
+    setPopoverMode('pinning');
+    setIsPopoverExpanded(false);
+
+    window.requestAnimationFrame(() => {
+      if (popoverStateRef.current.cardKey !== tooltipCardKey) return;
+
+      popoverStateRef.current = {
+        mode: 'pinned',
+        cardKey: tooltipCardKey,
+      };
+      setPopoverMode('pinned');
+      window.dispatchEvent(
+        new CustomEvent('card-info-popover-pinned', {
+          detail: { cardKey: tooltipCardKey },
+        })
+      );
+    });
   };
 
   useLayoutEffect(() => {
@@ -292,92 +399,62 @@ export const Cell: React.FC<CellProps> = ({
   ]);
 
   const handleConfirmPendingMove = () => {
-    closeTooltip();
+    closePopover();
     onConfirmPendingMove?.();
   };
 
   const handleReturnPendingMove = () => {
-    closeTooltip();
+    closePopover();
     onReturnPendingMove?.();
   };
 
   const handleApprovePendingCross = () => {
-    closeTooltip();
+    closePopover();
     onApprovePendingCross?.();
   };
 
   const handleRejectPendingCross = () => {
-    closeTooltip();
+    closePopover();
     onRejectPendingCross?.();
   };
 
-  const handleOpenDictionary = () => {
-    if (!placedCard) return;
-
-    closeTooltip();
-    onOpenDictionary?.(placedCard.cardName);
+  const handleTogglePopoverExpanded = () => {
+    setIsPopoverExpanded((current) => {
+      const nextExpanded = !current;
+      if (cardRef.current && tooltipCardKey) {
+        setPopoverPosition(
+          getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned', nextExpanded)
+        );
+      }
+      return nextExpanded;
+    });
   };
 
-  const handleCardPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-
-    cardPointerStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
+  useEffect(() => {
+    const handleOtherPopover = (event: Event) => {
+      if (!(event instanceof CustomEvent)) return;
+      if (event.detail?.cardKey !== popoverStateRef.current.cardKey) closePopover();
     };
-  };
 
-  const handleCardPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
+    const handleGlobalClose = () => closePopover();
 
-    const start = cardPointerStartRef.current;
-    cardPointerStartRef.current = null;
-    if (!placedCard || !start) return;
+    window.addEventListener('card-info-popover-open', handleOtherPopover);
+    window.addEventListener('card-info-popover-pinned', handleOtherPopover);
+    window.addEventListener('card-info-close', handleGlobalClose);
 
-    const moveDistance = Math.hypot(event.clientX - start.x, event.clientY - start.y);
-    if (moveDistance > 8) return;
-
-    const now = Date.now();
-    const lastClick = lastCardClickRef.current;
-    const isDoubleClick =
-      lastClick !== null &&
-      lastClick.cardId === placedCard.id &&
-      now - lastClick.time < 300 &&
-      Math.hypot(event.clientX - lastClick.x, event.clientY - lastClick.y) <= 8;
-
-    if (event.altKey || isDoubleClick) {
-      event.preventDefault();
-      event.stopPropagation();
-      suppressNextCardClickRef.current = true;
-      lastCardClickRef.current = null;
-      handleOpenDictionary();
-      return;
-    }
-
-    lastCardClickRef.current = {
-      cardId: placedCard.id,
-      time: now,
-      x: event.clientX,
-      y: event.clientY,
+    return () => {
+      window.removeEventListener('card-info-popover-open', handleOtherPopover);
+      window.removeEventListener('card-info-popover-pinned', handleOtherPopover);
+      window.removeEventListener('card-info-close', handleGlobalClose);
     };
-  };
-
-  const tooltipDescriptionText =
-    tooltipDescription?.cardKey === tooltipCardKey
-      ? tooltipDescription.status === 'loading'
-        ? 'Загрузка описания...'
-        : tooltipDescription.status === 'ready'
-          ? tooltipDescription.text
-          : 'Описание не найдено.'
-      : 'Загрузка описания...';
+  }, [closePopover]);
 
   useEffect(
     () => () => {
-      clearTooltipOpenTimeout();
-      clearTooltipCloseTimeout();
-      tooltipRequestIdRef.current += 1;
+      clearPopoverTimers();
+      popoverRequestIdRef.current += 1;
     },
-    []
+    [clearPopoverTimers]
   );
 
   return (
@@ -405,35 +482,39 @@ export const Cell: React.FC<CellProps> = ({
           } ${placedCard.status === 'pending' ? 'pending' : ''} ${
             isCrossPending ? 'cross-pending-card' : ''
           } ${isCrossPendingCenter ? 'cross-pending-center' : ''}`}
-          onClick={(event) => {
-            if (suppressNextCardClickRef.current) {
-              event.preventDefault();
-              event.stopPropagation();
-              suppressNextCardClickRef.current = false;
-            }
-          }}
-          onMouseEnter={scheduleTooltipOpen}
-          onMouseLeave={scheduleTooltipClose}
-          onPointerDown={handleCardPointerDown}
-          onPointerUp={handleCardPointerUp}
+          onPointerEnter={handleCardPointerEnter}
+          onPointerLeave={handleCardPointerLeave}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
           <span className="card-title" lang="ru">
             {placedCard.cardName}
           </span>
           {shouldShowTooltip &&
+            activePopoverMode &&
+            popoverPosition &&
             createPortal(
-              <div
-                className={`card-tooltip ${getOwnerClassName(placedCard.playerId)}`}
-                style={tooltipStyle}
-              >
-                <strong>{placedCard.cardName}</strong>
-                <span>Владелец: {getOwnerLabel(placedCard.playerId)}</span>
-                <p>{tooltipDescriptionText}</p>
-                <span className="card-tooltip-hint">
-                  Двойной клик или Alt+клик — справка
-                </span>
-              </div>,
+              <CardInfoPopover
+                cardName={placedCard.cardName}
+                className={getOwnerClassName(placedCard.playerId)}
+                isExpanded={isPopoverExpanded}
+                mode={activePopoverMode}
+                onClose={closePopover}
+                onPointerEnter={handlePopoverPointerEnter}
+                onToggleExpanded={handleTogglePopoverExpanded}
+                ownerLabel={getOwnerLabel(placedCard.playerId)}
+                position={popoverPosition}
+                status={
+                  popoverSummary?.cardKey === tooltipCardKey
+                    ? popoverSummary.status
+                    : 'loading'
+                }
+                summary={
+                  popoverSummary?.cardKey === tooltipCardKey
+                    ? popoverSummary.summary
+                    : null
+                }
+                wiktionaryUrl={getWiktionarySearchUrl(placedCard.cardName)}
+              />,
               document.body
             )}
           {shouldShowPendingOverlay &&

@@ -9,6 +9,7 @@ interface PlayerHandProps {
   deckCount: number;
   selectedCard: RegularCardName | null;
   isActive: boolean;
+  className?: string;
   hideCards?: boolean;
   onMoveCardDrag: (event: React.DragEvent<HTMLDivElement>) => void;
   onStartCardDrag: (
@@ -31,6 +32,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   deckCount,
   selectedCard,
   isActive,
+  className = '',
   hideCards = false,
   onMoveCardDrag,
   onStartCardDrag,
@@ -40,42 +42,44 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   const playerLabel = playerNumber === 0 ? 'Игрок 1 (Синий)' : 'Игрок 2 (Оранжевый)';
 
   return (
-    <div className={`player-hand player-${playerNumber} ${isActive ? 'active' : 'inactive'}`}>
+    <div className={`player-hand player-${playerNumber} ${isActive ? 'active' : 'inactive'} ${className}`}>
       <div className="hand-content">
-        <div className="deck-stack" aria-label={`Карт в колоде: ${deckCount}`}>
-          <div className={`deck-card-back player-${playerNumber}`}>
-            <span>{deckCount}</span>
+        <div className="hand-main-group">
+          <div className="deck-stack" aria-label={`Карт в колоде: ${deckCount}`}>
+            <div className={`deck-card-back player-${playerNumber}`}>
+              <span>{deckCount}</span>
+            </div>
+            <p>Колода</p>
           </div>
-          <p>Колода</p>
-        </div>
 
-        <div className="cards-container">
-          {/* FIXME(MVP): Рука оппонента скрыта только в UI, но технически остаётся доступна в gameState. */}
-          {hideCards
-            ? cards.map((_, index) => (
-                <div
-                  aria-label="Скрытая карта оппонента"
-                  className={`hidden-hand-card player-${playerNumber}`}
-                  key={`hidden-${playerNumber}-${index}`}
-                />
-              ))
-            : cards.map((card, index) => (
-                <Card
-                  key={`${card}-${index}`}
-                  cardName={card}
-                  playerColor={playerColors[playerNumber]}
-                  isSelected={selectedCard === card}
-                  draggable={isActive}
-                  onDrag={isActive ? onMoveCardDrag : undefined}
-                  onDragStart={
-                    isActive
-                      ? (event) => onStartCardDrag(card, playerColors[playerNumber], event)
-                      : undefined
-                  }
-                  onDragEnd={isActive ? onCancelCardDrag : undefined}
-                  onOpenDictionary={onOpenDictionary}
-                />
-              ))}
+          <div className="cards-container">
+            {/* FIXME(MVP): Рука оппонента скрыта только в UI, но технически остаётся доступна в gameState. */}
+            {hideCards
+              ? cards.map((_, index) => (
+                  <div
+                    aria-label="Скрытая карта оппонента"
+                    className={`hidden-hand-card player-${playerNumber}`}
+                    key={`hidden-${playerNumber}-${index}`}
+                  />
+                ))
+              : cards.map((card, index) => (
+                  <Card
+                    key={`${card}-${index}`}
+                    cardName={card}
+                    playerColor={playerColors[playerNumber]}
+                    isSelected={selectedCard === card}
+                    draggable={isActive}
+                    onDrag={isActive ? onMoveCardDrag : undefined}
+                    onDragStart={
+                      isActive
+                        ? (event) => onStartCardDrag(card, playerColors[playerNumber], event)
+                        : undefined
+                    }
+                    onDragEnd={isActive ? onCancelCardDrag : undefined}
+                    onOpenDictionary={onOpenDictionary}
+                  />
+                ))}
+          </div>
         </div>
 
         <div className="player-plate">

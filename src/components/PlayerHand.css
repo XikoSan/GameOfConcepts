@@ -99,6 +99,43 @@
   gap: clamp(8px, 0.85vw, 16px);
 }
 
+.hand-main-group {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.85vw, 16px);
+  flex: 1;
+  min-width: 0;
+}
+
+.local-player-hand .hand-content {
+  display: grid;
+  grid-template-columns:
+    clamp(74px, 7vw, 108px)
+    minmax(0, 1fr)
+    clamp(112px, 11vw, 160px);
+  column-gap: clamp(12px, 1.25vw, 22px);
+}
+
+.local-player-hand .hand-main-group {
+  display: contents;
+}
+
+.local-player-hand .deck-stack {
+  grid-column: 1;
+  justify-self: end;
+}
+
+.local-player-hand .cards-container {
+  grid-column: 2;
+  justify-self: center;
+  flex: 0 1 auto;
+}
+
+.local-player-hand .player-plate {
+  grid-column: 3;
+  justify-self: end;
+}
+
 .deck-stack {
   width: clamp(52px, 4.6vw, 74px);
   flex: 0 0 clamp(52px, 4.6vw, 74px);

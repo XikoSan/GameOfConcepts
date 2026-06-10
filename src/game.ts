@@ -29,6 +29,7 @@ export type {
 const BOARD_CENTER: Coordinates = { x: 7, y: 7 };
 const HAND_SIZE = 5;
 const ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR = 2;
+const SAME_NAME_PLACEMENT_WARNING = 'Нельзя ставить одинаковые понятия рядом.';
 
 export function initializeGame(): GameState {
   const shuffle = (arr: RegularCardName[]): RegularCardName[] => {
@@ -90,6 +91,17 @@ function getAdjacentCoordinates(coordinates: Coordinates): Coordinates[] {
     { x: coordinates.x - 1, y: coordinates.y },
     { x: coordinates.x + 1, y: coordinates.y },
   ];
+}
+
+export function hasSameNameOrthogonalNeighbor(
+  board: GameState['board'],
+  coordinates: Coordinates,
+  cardName: CardName
+): boolean {
+  return getAdjacentCoordinates(coordinates).some((adjacentCoordinates) => {
+    const adjacentCard = board[getBoardKey(adjacentCoordinates)];
+    return adjacentCard?.cardName === cardName;
+  });
 }
 
 function getCrossArmCoordinates(center: Coordinates): Coordinates[] {
@@ -374,11 +386,21 @@ function drawToHand(
   return newCards;
 }
 
-export function canPlaceCard(gameState: GameState, coordinates: Coordinates): boolean {
+export function canPlaceCard(
+  gameState: GameState,
+  coordinates: Coordinates,
+  cardName?: CardName
+): boolean {
   if (gameState.pendingMove || gameState.pendingCross) return false;
 
   const key = getBoardKey(coordinates);
   if (gameState.board[key]) return false;
+  if (
+    cardName &&
+    hasSameNameOrthogonalNeighbor(gameState.board, coordinates, cardName)
+  ) {
+    return false;
+  }
 
   return getAdjacentCoordinates(coordinates).some((adjacentCoordinates) => {
     const adjacentCard = gameState.board[getBoardKey(adjacentCoordinates)];
@@ -394,7 +416,11 @@ export function placeCard(
   const newBoard = { ...gameState.board };
   const key = getBoardKey(coordinates);
 
-  if (!canPlaceCard(gameState, coordinates)) {
+  if (!canPlaceCard(gameState, coordinates, cardName)) {
+    if (hasSameNameOrthogonalNeighbor(gameState.board, coordinates, cardName)) {
+      // TODO(MVP): Show this placement validation reason in the game UI.
+      console.warn(SAME_NAME_PLACEMENT_WARNING);
+    }
     return gameState;
   }
 

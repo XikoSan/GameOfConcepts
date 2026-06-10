@@ -20,7 +20,6 @@ interface GameBoardProps {
   pendingCrossReviewerLabel: string;
   onApprovePendingCross: () => void;
   onRejectPendingCross: () => void;
-  onOpenDictionary: (term: string) => void;
 }
 
 interface CameraState {
@@ -82,7 +81,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   pendingCrossReviewerLabel,
   onApprovePendingCross,
   onRejectPendingCross,
-  onOpenDictionary,
 }) => {
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
@@ -102,7 +100,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleCellClick = useCallback(
     (x: number, y: number) => {
       const coordinates = { x, y };
-      if (selectedCard && canPlaceCard(gameState, coordinates)) {
+      if (selectedCard && canPlaceCard(gameState, coordinates, selectedCard)) {
         onPlaceCard(selectedCard, coordinates);
       }
     },
@@ -149,7 +147,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       if (!selectedCard) return;
 
       const coordinates = getDropCoordinates(event);
-      if (coordinates && canPlaceCard(gameState, coordinates)) {
+      if (coordinates && canPlaceCard(gameState, coordinates, selectedCard)) {
         onPlaceCard(selectedCard, coordinates);
       }
       onFinishDrag();
@@ -295,7 +293,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           const isPlayable =
             showPlayableHighlights &&
             selectedCard !== null &&
-            canPlaceCard(gameState, coordinates);
+            canPlaceCard(gameState, coordinates, selectedCard);
           const isCrossPending =
             Boolean(placedCard) && pendingCrossCardIds.has(placedCard.id);
           const isCrossPendingCenter = key === pendingCrossCenterKey;
@@ -325,7 +323,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               onApprovePendingCross={onApprovePendingCross}
               onRejectPendingCross={onRejectPendingCross}
               tooltipScopeKey={tooltipScopeKey}
-              onOpenDictionary={onOpenDictionary}
             />
           );
         })}
