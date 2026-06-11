@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DictionaryModal } from './components/DictionaryModal';
@@ -10,6 +10,7 @@ import { useGameState } from './hooks/useGameState';
 import { usePlayerIdentity } from './hooks/usePlayerIdentity';
 import {
   createRoom,
+  deleteRoom,
   getAvailableRooms,
   getRoomById,
   joinRoom,
@@ -17,10 +18,10 @@ import {
 } from './services/roomService';
 import { initializeGame } from './game';
 import type { Coordinates, PendingMove, RegularCardName } from './game';
-import type { Room } from './types/room';
+import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
 
-const getPlayerLabel = (playerId: 0 | 1) => (playerId === 0 ? 'Игрок 1' : 'Игрок 2');
+const getPlayerLabel = (playerId: number) => `Игрок ${playerId + 1}`;
 
 const getPendingMovePlayerIndex = (pendingMove: PendingMove | null) =>
   pendingMove?.playerIndex ?? pendingMove?.playerId ?? null;
@@ -28,10 +29,80 @@ const getPendingMovePlayerIndex = (pendingMove: PendingMove | null) =>
 const getPendingMoveReviewerIndex = (pendingMove: PendingMove | null) =>
   pendingMove?.reviewerIndex ?? pendingMove?.reviewerId ?? null;
 
+const getPendingMoveVoteState = (
+  pendingMove: PendingMove | null,
+  playerId: string
+) => {
+  if (!pendingMove?.requiredVoters) {
+    return {
+      canVote: false,
+      acceptedCount: 0,
+      requiredCount: 0,
+      statusLabel: 'ожидает',
+    };
+  }
+
+  const votes = pendingMove.votes ?? {};
+  const acceptedCount = pendingMove.requiredVoters.filter(
+    (voterId) => votes[voterId] === 'accept'
+  ).length;
+  const requiredCount = pendingMove.requiredVoters.length;
+  const majority = Math.floor(requiredCount / 2) + 1;
+  const hasVoted = Boolean(votes[playerId]);
+
+  return {
+    canVote: pendingMove.requiredVoters.includes(playerId) && !hasVoted,
+    acceptedCount,
+    requiredCount,
+    statusLabel: `✓ ${acceptedCount}/${requiredCount} · нужно ${majority}`,
+  };
+};
+
+const getRoomPlayersForDisplay = (room: Room | null): RoomPlayer[] => {
+  if (!room) return [];
+
+  if (Array.isArray(room.players) && room.players.length > 0) {
+    return [...room.players].sort((playerA, playerB) => playerA.seatIndex - playerB.seatIndex);
+  }
+
+  const players: RoomPlayer[] = [];
+
+  if (room.player_1_id) {
+    players.push({
+      id: room.player_1_id,
+      nickname: room.player_1_nickname?.trim() || 'Игрок 1',
+      seatIndex: 0,
+      color: 'blue',
+      isHost: true,
+      connected: true,
+      joinedAt: room.created_at,
+    });
+  }
+
+  if (room.player_2_id) {
+    players.push({
+      id: room.player_2_id,
+      nickname: room.player_2_nickname?.trim() || 'Игрок 2',
+      seatIndex: 1,
+      color: 'orange',
+      isHost: false,
+      connected: true,
+      joinedAt: room.created_at,
+    });
+  }
+
+  return players;
+};
+
 const getAvailableRoomRoleLabel = (room: Room, playerId: string) => {
+  const roomPlayers = getRoomPlayersForDisplay(room);
+  const roomPlayer = roomPlayers.find((player) => player.id === playerId);
+  if (roomPlayer) return `Вы ${roomPlayer.nickname}`;
   if (room.player_1_id === playerId) return 'Вы Игрок 1';
   if (room.player_2_id === playerId) return 'Вы Игрок 2';
-  if (!room.player_2_id) return 'Свободная комната';
+  if (room.status === 'waiting' && roomPlayers.length < (room.max_players ?? 2)) {
+    return 'Свободная комната';
+  }
   return 'Недоступна';
 };
 
@@ -59,9 +130,12 @@ const getRoomList = (rooms: Room[], currentRoom: Room | null) => {
   return Array.from(roomsById.values());
 };
 
+const isRoomHost = (room: Room | null, playerId: string) =>
+  Boolean(room && (room.host_player_id ?? room.player_1_id) === playerId);
+
 interface DragPreview {
   cardName: RegularCardName;
-  playerColor: 'blue' | 'orange';
+  playerColor: 'blue' | 'orange' | 'green' | 'purple';
   x: number;
   y: number;
 }
@@ -76,7 +150,7 @@ const defaultInterfaceSettings = {
 function App() {
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
   // localStorage playerId.
-  const playerId = usePlayerIdentity();
+  const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -86,6 +160,8 @@ function App() {
   const [isOnlineLoading, setIsOnlineLoading] = useState(false);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [isRoomListLoading, setIsRoomListLoading] = useState(false);
+  const [onlineNickname, setOnlineNickname] = useState(savedNickname);
+  const [maxPlayers, setMaxPlayers] = useState<MaxPlayers>(2);
   const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
   const [interfaceSettings, setInterfaceSettings] = useState(
@@ -97,6 +173,7 @@ function App() {
     gameState,
     mode,
     localPlayerIndex,
+    activePlayerIndex,
     error: gameControllerError,
     placeCard,
     confirmCard,
@@ -113,31 +190,39 @@ function App() {
   });
   const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
-  const canControlPlayer = (playerIndex: 0 | 1) =>
+  const canControlPlayer = (playerIndex: number) =>
     mode === 'local' || localPlayerIndex === playerIndex;
   const isOnlineTable = Boolean(onlineRoom);
-  const bottomTablePlayerIndex: 0 | 1 | null = isOnlineTable
+  const bottomTablePlayerIndex: number | null = isOnlineTable
     ? localPlayerIndex
     : 0;
+  const pendingMoveVoteState = getPendingMoveVoteState(
+    gameState.pendingMove,
+    playerId
+  );
   const canReviewPendingMove =
-    mode === 'local' ||
-    (localPlayerIndex !== null &&
-      getPendingMoveReviewerIndex(gameState.pendingMove) === localPlayerIndex);
+    mode === 'local'
+      ? true
+      : Boolean(gameState.pendingMove) && pendingMoveVoteState.canVote;
   const pendingMovePlayerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
   const pendingMoveReviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
   const showPendingWaitBadge =
     Boolean(gameState.pendingMove) &&
     !canReviewPendingMove &&
-    localPlayerIndex !== null &&
-    pendingMovePlayerIndex === localPlayerIndex;
+    (mode === 'multiplayer' ||
+      (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
   const roomList = getRoomList(availableRooms, onlineRoom);
-  const activeScoreIndex = pendingMoveReviewerIndex ?? gameState.currentPlayerIndex;
+  const onlinePlayers = getRoomPlayersForDisplay(onlineRoom);
+  const currentPlayerId = onlineRoom?.turn_order?.[onlineRoom.current_turn_index] ?? null;
+  const isOnlineHost = isRoomHost(onlineRoom, playerId);
+  const activeScoreIndex = pendingMoveReviewerIndex ?? activePlayerIndex;
   const scoreStateLabel = gameState.pendingMove ? 'решение' : 'ход';
   const canReviewPendingCross =
     mode === 'local' ||
     (localPlayerIndex !== null &&
       Boolean(gameState.pendingCross) &&
-      gameState.currentPlayerIndex === localPlayerIndex);
+      activePlayerIndex === localPlayerIndex);
+  const getSeatScore = (seatIndex: number) => gameState.scores?.[seatIndex] ?? 0;
 
   const handlePlaceCard = (cardName: RegularCardName, coordinates: Coordinates) => {
     if (!selectedCard || hasPendingDecision) return;
@@ -148,6 +233,24 @@ function App() {
   const handleOpenDictionary = (term: string) => {
     setDictionaryTerm(term);
     setIsDictionaryOpen(true);
+  };
+
+  const getValidatedOnlineNickname = (): string | null => {
+    const nickname = onlineNickname.trim();
+
+    if (!nickname) {
+      setOnlineError('Введите никнейм.');
+      return null;
+    }
+
+    if (nickname.length > 20) {
+      setOnlineError('Никнейм слишком длинный.');
+      return null;
+    }
+
+    saveNickname(nickname);
+    setOnlineNickname(nickname);
+    return nickname;
   };
 
   const handleStartCardDrag = (
@@ -213,7 +316,34 @@ function App() {
     setInterfaceSettings(defaultInterfaceSettings);
   };
 
-  const loadAvailableRooms = async () => {
+  const getOnlineHandMeta = (playerIndex: number) => {
+    if (!onlineRoom || localPlayerIndex !== playerIndex) return {};
+
+    const localPlayer = onlinePlayers.find((player) => player.id === playerId);
+    const displayName =
+      localPlayer?.nickname?.trim() ||
+      (localPlayerIndex === null ? undefined : `Игрок ${localPlayerIndex + 1}`);
+    const isPendingAuthor =
+      gameState.pendingMove?.placedByPlayerId === playerId ||
+      gameState.pendingMove?.placedBySeatIndex === playerIndex ||
+      getPendingMovePlayerIndex(gameState.pendingMove) === playerIndex;
+    let statusLabel = 'Ожидает';
+
+    if (gameState.pendingMove && isPendingAuthor) {
+      statusLabel = 'Ожидаем голоса';
+    } else if (gameState.pendingMove && pendingMoveVoteState.canVote) {
+      statusLabel = 'Нужно решение';
+    } else if (activePlayerIndex === playerIndex && !hasPendingDecision) {
+      statusLabel = 'Ход активен';
+    }
+
+    return {
+      displayName,
+      statusLabel,
+    };
+  };
+
+  const loadAvailableRooms = useCallback(async () => {
     setIsRoomListLoading(true);
     setOnlineError(null);
 
@@ -227,14 +357,14 @@ function App() {
     } finally {
       setIsRoomListLoading(false);
     }
-  };
+  }, [playerId]);
 
   const handleOpenNewGameModal = () => {
     setActiveModal('new-game');
     void loadAvailableRooms();
   };
 
-  const syncOnlineRoom = async (reason: string) => {
+  const syncOnlineRoom = useCallback(async (reason: string) => {
     const currentRoom = onlineRoomRef.current;
     if (!currentRoom) return;
 
@@ -249,11 +379,14 @@ function App() {
       console.log('[manual sync room]', { reason, room: fetchedRoom });
 
       if (!fetchedRoom) {
-        console.warn('[online polling no changes]', {
+        console.warn('[online room missing]', {
           reason,
           currentVersion: currentRoom.version,
           fetchedVersion: null,
         });
+        setOnlineRoom(null);
+        setOnlineError('Комната удалена или недоступна.');
+        void loadAvailableRooms();
         return;
       }
 
@@ -275,7 +408,7 @@ function App() {
     } catch (error) {
       console.error('[online polling fetch error]', { reason, error });
     }
-  };
+  }, [loadAvailableRooms]);
 
   const handleRoomConnected = (room: Room) => {
     roomSubscriptionRef.current?.unsubscribe();
@@ -291,6 +424,11 @@ function App() {
       setOnlineRoom(updatedRoom);
     }, () => {
       void syncOnlineRoom('realtime status problem');
+    }, () => {
+      console.warn('[app room deleted]', { roomId: room.id, code: room.code });
+      setOnlineRoom(null);
+      setOnlineError('Комната удалена.');
+      void loadAvailableRooms();
     });
   };
 
@@ -298,21 +436,66 @@ function App() {
     void syncOnlineRoom('manual sync');
   };
 
+  const handleDeleteOnlineRoom = async (targetRoom?: Room) => {
+    const room = targetRoom ?? onlineRoom;
+    if (!room || !isRoomHost(room, playerId)) return;
+
+    const shouldDelete = window.confirm(
+      'Удалить комнату? Все игроки потеряют доступ к партии.'
+    );
+    if (!shouldDelete) return;
+
+    setIsOnlineLoading(true);
+    setOnlineError(null);
+
+    try {
+      await deleteRoom(room.id, playerId);
+      if (onlineRoomRef.current?.id === room.id) {
+        setOnlineRoom(null);
+      }
+      void loadAvailableRooms();
+    } catch (error) {
+      console.error('[delete online room error]', error);
+      setOnlineError(
+        error instanceof Error
+          ? `Не удалось удалить комнату: ${error.message}`
+          : 'Не удалось удалить комнату.'
+      );
+    } finally {
+      setIsOnlineLoading(false);
+    }
+  };
+
   const handleCreateOnlineRoom = async () => {
+    const nickname = getValidatedOnlineNickname();
+    if (!nickname) return;
+
     setIsOnlineLoading(true);
     setOnlineError(null);
 
     try {
       console.log('[create room click]');
       console.log('[create room playerId]', playerId);
+      console.log('[create room nickname]', nickname);
+      console.log('[create room maxPlayers]', maxPlayers);
+      console.debug('[create room click debug]', {
+        playerId,
+        nickname,
+        maxPlayers,
+      });
       console.log('[create room env check]', {
         hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
         hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
       });
-      const initialGameState = initializeGame();
+      const initialGameState = initializeGame(maxPlayers);
       console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
-      const room = await createRoom(playerId, initialGameState);
+      const room = await createRoom({
+        playerId,
+        nickname,
+        maxPlayers,
+        initialGameState,
+      });
       handleRoomConnected(room);
       void loadAvailableRooms();
     } catch (error) {
@@ -332,6 +515,9 @@ function App() {
   };
 
   const handleReturnToRoom = async (roomId: string) => {
+    const nickname = getValidatedOnlineNickname();
+    if (!nickname) return;
+
     setIsOnlineLoading(true);
     setOnlineError(null);
 
@@ -354,11 +540,18 @@ function App() {
   };
 
   const handleJoinListedRoom = async (room: Room) => {
+    const nickname = getValidatedOnlineNickname();
+    if (!nickname) return;
+
     setIsOnlineLoading(true);
     setOnlineError(null);
 
     try {
-      const joinedRoom = await joinRoom(room.code, playerId);
+      const joinedRoom = await joinRoom({
+        code: room.code,
+        playerId,
+        nickname,
+      });
       handleRoomConnected(joinedRoom);
       void loadAvailableRooms();
     } catch (error) {
@@ -419,7 +612,36 @@ function App() {
     return () => {
       window.clearInterval(pollingId);
     };
-  }, [onlineRoom]);
+  }, [onlineRoom, syncOnlineRoom]);
+
+  useEffect(() => {
+    if (!onlineRoom) return;
+
+    console.debug('[game debug local hand]', {
+      localPlayerId: playerId,
+      localSeatIndex: localPlayerIndex,
+      handsLength: gameState.players.length,
+      decksLength: gameState.deck.length,
+      scoresLength: gameState.scores.length,
+      handLength:
+        localPlayerIndex === null
+          ? null
+          : gameState.players[localPlayerIndex]?.cards.length,
+      activePlayerId: currentPlayerId,
+      activeSeatIndex: activePlayerIndex,
+      turnOrder: onlineRoom.turn_order,
+      currentTurnIndex: onlineRoom.current_turn_index,
+    });
+  }, [
+    activePlayerIndex,
+    currentPlayerId,
+    gameState.deck.length,
+    gameState.players,
+    gameState.scores.length,
+    localPlayerIndex,
+    onlineRoom,
+    playerId,
+  ]);
 
   const renderPartyPanel = () => (
     <aside className="side-panel party-panel" aria-label="Панель партии">
@@ -432,20 +654,45 @@ function App() {
 
       <section className="panel-section players-score-section">
         <h2>Игроки</h2>
-        <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
-          <span>
-            Игрок 1
-            {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
-          </span>
-          <strong>{gameState.scores[0]}</strong>
-        </div>
-        <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
-          <span>
-            Игрок 2
-            {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
-          </span>
-          <strong>{gameState.scores[1]}</strong>
-        </div>
+        {(onlineRoom ? onlinePlayers : []).length > 0 ? (
+          onlinePlayers.map((player) => {
+            const isActiveScore =
+              currentPlayerId !== null
+                ? currentPlayerId === player.id
+                : activeScoreIndex === player.seatIndex;
+
+            return (
+              <div
+                className={`score-row player-score-${player.color} ${isActiveScore ? 'active-score' : ''}`}
+                key={player.id}
+              >
+                <span>
+                  {player.nickname}
+                  {player.id === playerId && <small>вы</small>}
+                  {isActiveScore && <small>{scoreStateLabel}</small>}
+                </span>
+                <strong>{getSeatScore(player.seatIndex)}</strong>
+              </div>
+            );
+          })
+        ) : (
+          <>
+            <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
+              <span>
+                Игрок 1
+                {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
+              </span>
+              <strong>{gameState.scores[0]}</strong>
+            </div>
+            <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
+              <span>
+                Игрок 2
+                {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
+              </span>
+              <strong>{gameState.scores[1]}</strong>
+            </div>
+          </>
+        )}
       </section>
 
       <section className="panel-section log-section">
@@ -471,21 +718,24 @@ function App() {
 
   const renderOnlinePlayerStrip = () => (
     <div className="online-player-strip" aria-label="Игроки за столом">
-      {([0, 1] as const).map((playerIndex) => {
-        const isActiveScore = activeScoreIndex === playerIndex;
-        const isLocalPlayer = localPlayerIndex === playerIndex;
+      {onlinePlayers.map((player) => {
+        const isActiveScore =
+          currentPlayerId !== null
+            ? currentPlayerId === player.id
+            : activeScoreIndex === player.seatIndex;
+        const isLocalPlayer = player.id === playerId;
 
         return (
           <div
-            className={`online-player-chip online-player-chip-${playerIndex} ${isActiveScore ? 'active' : ''}`}
-            key={playerIndex}
+            className={`online-player-chip online-player-chip-${player.color} ${isActiveScore ? 'active' : ''}`}
+            key={player.id}
           >
             <span className="online-player-dot" aria-hidden="true" />
             <span className="online-player-name">
-              {getPlayerLabel(playerIndex)}
+              {player.nickname}
               {isLocalPlayer && <small>вы</small>}
             </span>
-            <strong>{gameState.scores[playerIndex]}</strong>
+            <strong>{getSeatScore(player.seatIndex)}</strong>
             {isActiveScore && (
               <span className="online-player-status">
                 {scoreStateLabel}
@@ -508,10 +758,13 @@ function App() {
       showTooltips={interfaceSettings.showCardTooltips}
       canReviewPendingMove={canReviewPendingMove}
       showPendingWaitBadge={showPendingWaitBadge}
+      pendingMoveStatusLabel={
+        mode === 'multiplayer' ? pendingMoveVoteState.statusLabel : undefined
+      }
       onConfirmPendingMove={confirmCard}
       onReturnPendingMove={returnCard}
       canReviewPendingCross={canReviewPendingCross}
-      pendingCrossReviewerLabel={getPlayerLabel(gameState.currentPlayerIndex)}
+      pendingCrossReviewerLabel={getPlayerLabel(activePlayerIndex)}
       onApprovePendingCross={approveCross}
       onRejectPendingCross={rejectCross}
     />
@@ -545,6 +798,16 @@ function App() {
           {onlineRoom && (
             <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
               Синхронизировать
+            </button>
+          )}
+          {onlineRoom && isOnlineHost && (
+            <button
+              className="action-button action-button-quiet"
+              disabled={isOnlineLoading}
+              type="button"
+              onClick={() => void handleDeleteOnlineRoom()}
+            >
+              Удалить комнату
             </button>
           )}
         </section>
@@ -581,28 +844,42 @@ function App() {
     </aside>
   );
 
-  const renderPlayerHand = (playerIndex: 0 | 1, className?: string) => (
-    <PlayerHand
-      playerNumber={playerIndex}
-      cards={gameState.players[playerIndex].cards}
-      deckCount={gameState.deck[playerIndex].length}
-      selectedCard={
-        gameState.currentPlayerIndex === playerIndex && canControlPlayer(playerIndex)
-          ? activeSelectedCard
-          : null
-      }
-      isActive={
-        gameState.currentPlayerIndex === playerIndex &&
-        !hasPendingDecision &&
-        canControlPlayer(playerIndex)
-      }
-      className={className}
-      onMoveCardDrag={handleMoveCardDrag}
-      onStartCardDrag={handleStartCardDrag}
-      onCancelCardDrag={handleCancelCardDrag}
-      onOpenDictionary={handleOpenDictionary}
-    />
-  );
+  const renderPlayerHand = (
+    playerIndex: number,
+    className?: string,
+    forceInactive = false
+  ) => {
+    const player = gameState.players[playerIndex];
+    const deck = gameState.deck[playerIndex];
+    if (!player || !deck) return null;
+    const onlineHandMeta = getOnlineHandMeta(playerIndex);
+
+    return (
+      <PlayerHand
+        playerNumber={playerIndex}
+        cards={player.cards}
+        deckCount={deck.length}
+        selectedCard={
+          activePlayerIndex === playerIndex && canControlPlayer(playerIndex)
+            ? activeSelectedCard
+            : null
+        }
+        isActive={
+          !forceInactive &&
+          activePlayerIndex === playerIndex &&
+          !hasPendingDecision &&
+          canControlPlayer(playerIndex)
+        }
+        className={className}
+        displayName={onlineHandMeta.displayName}
+        statusLabel={onlineHandMeta.statusLabel}
+        onMoveCardDrag={handleMoveCardDrag}
+        onStartCardDrag={handleStartCardDrag}
+        onCancelCardDrag={handleCancelCardDrag}
+        onOpenDictionary={handleOpenDictionary}
+      />
+    );
+  };
 
   return (
     <div className="app-container">
@@ -623,7 +900,14 @@ function App() {
                     {renderBoard()}
                   </div>
                   {bottomTablePlayerIndex !== null &&
-                    renderPlayerHand(bottomTablePlayerIndex, 'local-player-hand')}
+                    renderPlayerHand(
+                      bottomTablePlayerIndex,
+                      'local-player-hand',
+                      onlinePlayers.length < 2
+                    )}
+                  {onlinePlayers.length < 2 && (
+                    <p className="online-waiting-note">Ожидание второго игрока</p>
+                  )}
                 </div>
 
                 {renderControlPanel(true)}
@@ -663,7 +947,35 @@ function App() {
         <Modal onClose={() => setActiveModal(null)} title="Онлайн игра">
           <div className="new-game-modal">
             <section className="online-room-block">
+              <label className="online-profile-field" htmlFor="online-nickname">
+                <span>Никнейм</span>
+                <input
+                  id="online-nickname"
+                  maxLength={20}
+                  onChange={(event) => {
+                    setOnlineNickname(event.target.value);
+                    setOnlineError(null);
+                  }}
+                  placeholder="Как вас показывать за столом"
+                  type="text"
+                  value={onlineNickname}
+                />
+              </label>
+
               <div className="online-create-row">
+                <div className="max-players-picker" aria-label="Количество игроков">
+                  <span>Игроков</span>
+                  {([2, 3, 4] as const).map((playersCount) => (
+                    <button
+                      className={maxPlayers === playersCount ? 'active' : ''}
+                      key={playersCount}
+                      onClick={() => setMaxPlayers(playersCount)}
+                      type="button"
+                    >
+                      {playersCount}
+                    </button>
+                  ))}
+                </div>
                 <button
                   disabled={isOnlineLoading}
                   type="button"
@@ -692,9 +1004,15 @@ function App() {
                 <div className="available-rooms-list">
                   {roomList.map((room) => {
                     const isCurrentRoom = onlineRoom?.id === room.id;
-                    const isParticipant =
-                      room.player_1_id === playerId || room.player_2_id === playerId;
-                    const canJoinRoom = room.status === 'waiting' && !room.player_2_id;
+                    const listedRoomPlayers = getRoomPlayersForDisplay(room);
+                    const isParticipant = listedRoomPlayers.some(
+                      (player) => player.id === playerId
+                    );
+                    const listedMaxPlayers = room.max_players ?? 2;
+                    const canDeleteListedRoom = isRoomHost(room, playerId);
+                    const canJoinRoom =
+                      room.status !== 'finished' &&
+                      listedRoomPlayers.length < listedMaxPlayers;
 
                     return (
                       <div
@@ -705,7 +1023,9 @@ function App() {
                           <strong>
                             {room.code}
                           </strong>
-                          <span>{room.status}</span>
+                          <span>
+                            {room.status} · {listedRoomPlayers.length} / {listedMaxPlayers}
+                          </span>
                         </div>
                         <small>{getAvailableRoomRoleLabel(room, playerId)}</small>
                         <small>{formatRoomUpdatedAt(room.updated_at)}</small>
@@ -728,6 +1048,15 @@ function App() {
                             onClick={() => void handleJoinListedRoom(room)}
                           >
                             Подключиться
+                          </button>
+                        )}
+                        {canDeleteListedRoom && (
+                          <button
+                            disabled={isOnlineLoading}
+                            type="button"
+                            onClick={() => void handleDeleteOnlineRoom(room)}
+                          >
+                            Удалить
                           </button>
                         )}
                       </div>

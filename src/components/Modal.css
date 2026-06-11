@@ -448,6 +448,29 @@
   line-height: 1.2;
 }
 
+.online-profile-field {
+  display: grid;
+  gap: 5px;
+}
+
+.online-profile-field input {
+  min-height: 32px;
+  box-sizing: border-box;
+  border: 1px solid rgba(214, 174, 118, 0.22);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.28);
+  color: #f6efe2;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  padding: 0 10px;
+}
+
+.online-profile-field input:focus {
+  border-color: rgba(214, 174, 118, 0.52);
+  box-shadow: 0 0 0 2px rgba(214, 174, 118, 0.1);
+}
+
 .inline-actions {
   justify-content: flex-start;
   margin-top: 0;
@@ -455,10 +478,29 @@
 
 .online-create-row {
   display: flex;
+  align-items: center;
+  gap: 10px;
   justify-content: flex-start;
 }
 
-.online-create-row button {
+.max-players-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px;
+  border: 1px solid rgba(214, 174, 118, 0.16);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.max-players-picker span {
+  color: #b8aa98;
+  font-size: 12px;
+  padding: 0 5px;
+}
+
+.online-create-row button,
+.max-players-picker button {
   min-height: 31px;
   border: 1px solid rgba(199, 140, 55, 0.52);
   border-radius: 7px;
@@ -472,6 +514,25 @@
   font-size: 12px;
   font-weight: 700;
   padding: 0 12px;
+}
+
+.max-players-picker button {
+  min-height: 24px;
+  min-width: 28px;
+  border-color: rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+    #12161a;
+  color: #d6cec2;
+  padding: 0 8px;
+}
+
+.max-players-picker button.active {
+  border-color: rgba(199, 140, 55, 0.6);
+  background:
+    linear-gradient(180deg, rgba(181, 118, 41, 0.3), rgba(84, 50, 13, 0.54)),
+    #402707;
+  color: #fff3d8;
 }
 
 .modal-actions button:disabled {

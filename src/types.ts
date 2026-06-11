@@ -46,26 +46,35 @@ export interface PlacedCard {
   id: string;
   cardName: CardName;
   coordinates: Coordinates;
-  playerId: 0 | 1 | null;
+  playerId: number | null;
   status: 'confirmed' | 'pending';
   crossId?: string;
   connections: string[];
 }
 
 export interface PendingMove {
+  id?: string;
   cardId: string;
   cardName: RegularCardName;
-  playerIndex: 0 | 1;
-  reviewerIndex: 0 | 1;
-  playerId?: 0 | 1;
-  reviewerId?: 0 | 1;
+  playerIndex: number;
+  reviewerIndex: number;
+  playerId?: number;
+  reviewerId?: number;
+  fromSeatIndex?: number;
+  placedByPlayerId?: string;
+  placedBySeatIndex?: number;
+  position?: Coordinates;
+  requiredVoters?: string[];
+  votes?: Record<string, 'accept' | 'reject'>;
+  status?: 'voting';
+  createdAt?: string;
 }
 
 export interface Cross {
   id: string;
   centerX: number;
   centerY: number;
-  playerId: 0 | 1;
+  playerId: number;
   cardNames: CardName[];
   points: 5;
 }
@@ -73,7 +82,7 @@ export interface Cross {
 export interface PendingCross {
   centerX: number;
   centerY: number;
-  playerId: 0 | 1;
+  playerId: number;
   cardIds: string[];
   cardNames: CardName[];
   centerCardName: CardName;
@@ -81,7 +90,7 @@ export interface PendingCross {
 }
 
 export interface TurnScoreResult {
-  playerId: 0 | 1;
+  playerId: number;
   cardName: CardName;
   basePoints: number;
   adjacencyBonus: number;
@@ -93,23 +102,23 @@ export interface TurnScoreResult {
 
 // Рука игрока
 export interface PlayerHand {
-  playerId: 0 | 1;
+  playerId: number;
   cards: RegularCardName[];
 }
 
 // Состояние игры
 export interface GameState {
   board: Record<string, PlacedCard>;
-  players: [PlayerHand, PlayerHand];
-  currentPlayerIndex: 0 | 1;
-  deck: [RegularCardName[], RegularCardName[]];
+  players: PlayerHand[];
+  currentPlayerIndex: number;
+  deck: RegularCardName[][];
   startCard: PlacedCard;
   lastPlacedCardId: string | null;
   pendingMove: PendingMove | null;
   pendingCross: PendingCross | null;
   pendingTurnScore: TurnScoreResult | null;
   crosses: Cross[];
-  scores: [number, number];
+  scores: number[];
   log: string[];
   gameOver: boolean;
 }

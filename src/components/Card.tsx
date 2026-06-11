@@ -9,7 +9,7 @@ interface CardProps {
   onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd?: () => void;
   onOpenDictionary?: (cardName: string) => void;
-  playerColor?: 'blue' | 'orange';
+  playerColor?: 'blue' | 'orange' | 'green' | 'purple';
 }
 
 export const Card: React.FC<CardProps> = ({

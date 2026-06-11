@@ -139,6 +139,22 @@
     0 18px 34px rgba(0, 0, 0, 0.48);
 }
 
+.card-info-popover.player-2 {
+  border-color: rgba(92, 178, 112, 0.82);
+  box-shadow:
+    inset 0 0 24px rgba(92, 178, 112, 0.08),
+    0 0 24px rgba(77, 165, 100, 0.18),
+    0 18px 34px rgba(0, 0, 0, 0.48);
+}
+
+.card-info-popover.player-3 {
+  border-color: rgba(165, 139, 224, 0.82);
+  box-shadow:
+    inset 0 0 24px rgba(165, 139, 224, 0.08),
+    0 0 24px rgba(141, 110, 208, 0.18),
+    0 18px 34px rgba(0, 0, 0, 0.48);
+}
+
 .card-info-popover.player-neutral {
   border-color: rgba(244, 211, 94, 0.88);
   box-shadow:

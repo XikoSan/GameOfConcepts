@@ -98,6 +98,38 @@
   filter: brightness(1.12);
 }
 
+.card.player-green {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.13), transparent 28%),
+    linear-gradient(145deg, #2f7c47, #12391f);
+  border-color: rgba(92, 178, 112, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(77, 165, 100, 0.14),
+    0 5px 12px rgba(0, 0, 0, 0.28);
+}
+
+.card.player-green:hover {
+  filter: brightness(1.12);
+}
+
+.card.player-purple {
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.13), transparent 28%),
+    linear-gradient(145deg, #614a9f, #2a214d);
+  border-color: rgba(165, 139, 224, 0.72);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 18px rgba(0, 0, 0, 0.28),
+    0 0 10px rgba(141, 110, 208, 0.14),
+    0 5px 12px rgba(0, 0, 0, 0.28);
+}
+
+.card.player-purple:hover {
+  filter: brightness(1.12);
+}
+
 .card.selected {
   border-color: #d6ae76;
   box-shadow:

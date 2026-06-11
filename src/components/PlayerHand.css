@@ -39,6 +39,28 @@
   color: #d69a55;
 }
 
+.player-hand.player-2 {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(77, 165, 100, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(13, 45, 24, 0.94), rgba(6, 18, 11, 0.98));
+  border-color: rgba(77, 165, 100, 0.34);
+}
+
+.player-hand.player-2 h3 {
+  color: #79c889;
+}
+
+.player-hand.player-3 {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(141, 110, 208, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(38, 29, 70, 0.95), rgba(15, 11, 27, 0.98));
+  border-color: rgba(141, 110, 208, 0.34);
+}
+
+.player-hand.player-3 h3 {
+  color: #b89bea;
+}
+
 .player-hand.inactive {
   opacity: 0.72;
 }
@@ -84,6 +106,18 @@
     url('../assets/card-back-orange.png') center / cover,
     radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 28%),
     #754007;
+}
+
+.hidden-hand-card.player-2 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.17), transparent 28%),
+    #235832;
+}
+
+.hidden-hand-card.player-3 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.17), transparent 28%),
+    #413070;
 }
 
 .card-count {
@@ -177,6 +211,20 @@
     radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.2), transparent 28%),
     linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 44%),
     #754007;
+}
+
+.deck-card-back.player-2 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.17), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.11), transparent 44%),
+    #235832;
+}
+
+.deck-card-back.player-3 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.17), transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.11), transparent 44%),
+    #413070;
 }
 
 .deck-stack p {

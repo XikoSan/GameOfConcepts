@@ -31,7 +31,7 @@ const HAND_SIZE = 5;
 const ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR = 2;
 const SAME_NAME_PLACEMENT_WARNING = 'Нельзя ставить одинаковые понятия рядом.';
 
-export function initializeGame(): GameState {
+export function initializeGame(playerCount = 2): GameState {
   const shuffle = (arr: RegularCardName[]): RegularCardName[] => {
     const result = [...arr];
     for (let i = result.length - 1; i > 0; i--) {
@@ -41,11 +41,14 @@ export function initializeGame(): GameState {
     return result;
   };
 
-  const deck0 = shuffle([...CARD_NAMES]);
-  const deck1 = shuffle([...CARD_NAMES]);
-
-  const hand0 = deck0.splice(0, HAND_SIZE);
-  const hand1 = deck1.splice(0, HAND_SIZE);
+  const normalizedPlayerCount = Math.min(Math.max(playerCount, 2), 4);
+  const decks = Array.from({ length: normalizedPlayerCount }, () =>
+    shuffle([...CARD_NAMES])
+  );
+  const players = decks.map((deck, playerId) => ({
+    playerId,
+    cards: deck.splice(0, HAND_SIZE),
+  }));
   const startCardName =
     START_CARD_NAMES[Math.floor(Math.random() * START_CARD_NAMES.length)];
   const startCard: PlacedCard = {
@@ -62,19 +65,16 @@ export function initializeGame(): GameState {
     board: {
       [startCardKey]: startCard,
     },
-    players: [
-      { playerId: 0, cards: hand0 },
-      { playerId: 1, cards: hand1 },
-    ],
+    players,
     currentPlayerIndex: 0,
-    deck: [deck0, deck1],
+    deck: decks,
     startCard,
     lastPlacedCardId: startCard.id,
     pendingMove: null,
     pendingCross: null,
     pendingTurnScore: null,
     crosses: [],
-    scores: [0, 0],
+    scores: Array.from({ length: normalizedPlayerCount }, () => 0),
     log: [],
     gameOver: false,
   };
@@ -114,15 +114,15 @@ function getCrossArmCoordinates(center: Coordinates): Coordinates[] {
   ];
 }
 
-function getPlayerLabel(playerId: 0 | 1): string {
-  return playerId === 0 ? 'Игрок 1' : 'Игрок 2';
+function getPlayerLabel(playerId: number): string {
+  return `Игрок ${playerId + 1}`;
 }
 
-function getPendingMovePlayerIndex(pendingMove: PendingMove): 0 | 1 | null {
+function getPendingMovePlayerIndex(pendingMove: PendingMove): number | null {
   return pendingMove.playerIndex ?? pendingMove.playerId ?? null;
 }
 
-function getPendingMoveReviewerIndex(pendingMove: PendingMove): 0 | 1 | null {
+function getPendingMoveReviewerIndex(pendingMove: PendingMove): number | null {
   return pendingMove.reviewerIndex ?? pendingMove.reviewerId ?? null;
 }
 
@@ -132,14 +132,14 @@ function isPlacedAnchor(card: PlacedCard): boolean {
 
 function isConfirmedPlayerCard(
   card: PlacedCard | undefined,
-  playerId: 0 | 1
+  playerId: number
 ): boolean {
   return card?.status === 'confirmed' && card.playerId === playerId;
 }
 
 function isConfirmedOtherColorCard(
   card: PlacedCard | undefined,
-  playerId: 0 | 1
+  playerId: number
 ): boolean {
   return card?.status === 'confirmed' && card.playerId !== playerId;
 }
@@ -147,7 +147,7 @@ function isConfirmedOtherColorCard(
 function getAdjacencyBonus(
   board: GameState['board'],
   card: PlacedCard,
-  playerId: 0 | 1
+  playerId: number
 ): number {
   const enemyNeighborCount = getAdjacentCoordinates(card.coordinates).filter(
     (coordinates) => isConfirmedOtherColorCard(board[getBoardKey(coordinates)], playerId)
@@ -174,7 +174,7 @@ function getChainBonusForLineLength(lineLength: number): number {
 
 function getChainBonusForPlayer(
   board: GameState['board'],
-  playerId: 0 | 1,
+  playerId: number,
   direction: 'horizontal' | 'vertical'
 ): number {
   return Object.values(board).reduce((bonus, card) => {
@@ -204,7 +204,7 @@ function getChainBonusForPlayer(
   }, 0);
 }
 
-function getCrossBonus(crosses: Cross[], playerId: 0 | 1): number {
+function getCrossBonus(crosses: Cross[], playerId: number): number {
   return crosses.reduce(
     (bonus, cross) => (cross.playerId === playerId ? bonus + cross.points : bonus),
     0
@@ -222,7 +222,7 @@ interface ScoreBreakdown {
 function getScoreBreakdown(
   board: GameState['board'],
   crosses: Cross[],
-  playerId: 0 | 1
+  playerId: number
 ): ScoreBreakdown {
   const confirmedCards = Object.values(board).filter((card) =>
     isConfirmedPlayerCard(card, playerId)
@@ -248,12 +248,12 @@ function getScoreBreakdown(
 
 function calculateScores(
   board: GameState['board'],
-  crosses: Cross[]
+  crosses: Cross[],
+  playerCount: number
 ): GameState['scores'] {
-  return [
-    getScoreBreakdown(board, crosses, 0).total,
-    getScoreBreakdown(board, crosses, 1).total,
-  ];
+  return Array.from({ length: playerCount }, (_, playerId) =>
+    getScoreBreakdown(board, crosses, playerId).total
+  );
 }
 
 function getChainLabelByBonus(chainBonus: number): string {
@@ -265,7 +265,7 @@ function getChainLabelByBonus(chainBonus: number): string {
 }
 
 function createTurnScoreResult(
-  playerId: 0 | 1,
+  playerId: number,
   cardName: CardName,
   before: ScoreBreakdown,
   after: ScoreBreakdown,
@@ -309,18 +309,19 @@ function formatTurnScoreLog(
   )}. Итог ${turnScore.totalGained}.`;
 }
 
-function getCrossMajorityPlayerId(cards: PlacedCard[]): 0 | 1 | null {
-  let playerOneCards = 0;
-  let playerTwoCards = 0;
+function getCrossMajorityPlayerId(cards: PlacedCard[]): number | null {
+  const counts = new Map<number, number>();
 
   cards.forEach((card) => {
-    if (card.playerId === 0) playerOneCards += 1;
-    if (card.playerId === 1) playerTwoCards += 1;
+    if (card.playerId === null) return;
+    counts.set(card.playerId, (counts.get(card.playerId) ?? 0) + 1);
   });
 
-  if (playerOneCards > playerTwoCards) return 0;
-  if (playerTwoCards > playerOneCards) return 1;
-  return null;
+  const sortedCounts = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  if (!sortedCounts[0]) return null;
+  if (sortedCounts[1] && sortedCounts[1][1] === sortedCounts[0][1]) return null;
+
+  return sortedCounts[0][0];
 }
 
 function findPendingCrossCandidate(
@@ -451,10 +452,10 @@ export function placeCard(
     }
 
     return player;
-  }) as GameState['players'];
+  });
 
   const playerIndex = gameState.currentPlayerIndex;
-  const reviewerIndex = playerIndex === 0 ? 1 : 0;
+  const reviewerIndex = (playerIndex + 1) % gameState.players.length;
 
   return {
     ...gameState,
@@ -495,7 +496,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
       ...player,
       cards: drawToHand(player.cards, gameState.deck[index]),
     };
-  }) as GameState['players'];
+  });
   const newDeck = gameState.deck.map((deck, index) => {
     if (
       index === playerIndex &&
@@ -504,7 +505,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
       return deck.slice(0, -1);
     }
     return deck;
-  }) as GameState['deck'];
+  });
   const confirmedPlacedCard = Object.values(newBoard).find((card) => card.id === cardId);
   const pendingCross = confirmedPlacedCard
     ? findPendingCrossCandidate(newBoard, confirmedPlacedCard)
@@ -520,7 +521,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
     pendingMove: null,
     pendingCross,
     pendingTurnScore: pendingCross ? turnScore : null,
-    scores: calculateScores(newBoard, gameState.crosses),
+    scores: calculateScores(newBoard, gameState.crosses, gameState.players.length),
     currentPlayerIndex: reviewerIndex,
     log: pendingCross
       ? gameState.log
@@ -552,7 +553,7 @@ export function returnPendingCard(gameState: GameState): GameState {
       ...player,
       cards: [...player.cards, cardName],
     };
-  }) as GameState['players'];
+  });
 
   return {
     ...gameState,
@@ -560,7 +561,7 @@ export function returnPendingCard(gameState: GameState): GameState {
     players: newPlayers,
     pendingMove: null,
     pendingTurnScore: null,
-    scores: calculateScores(newBoard, gameState.crosses),
+    scores: calculateScores(newBoard, gameState.crosses, gameState.players.length),
     currentPlayerIndex: playerIndex,
     lastPlacedCardId: gameState.startCard.id,
   };
@@ -587,7 +588,7 @@ export function approvePendingCross(gameState: GameState): GameState {
     ])
   ) as GameState['board'];
   const newCrosses = [...gameState.crosses, cross];
-  const newScores = calculateScores(newBoard, newCrosses);
+  const newScores = calculateScores(newBoard, newCrosses, gameState.players.length);
 
   return {
     ...gameState,
@@ -612,7 +613,7 @@ export function rejectPendingCross(gameState: GameState): GameState {
     ...gameState,
     pendingCross: null,
     pendingTurnScore: null,
-    scores: calculateScores(gameState.board, gameState.crosses),
+    scores: calculateScores(gameState.board, gameState.crosses, gameState.players.length),
     log: [
       ...gameState.log,
       `${getPlayerLabel(reviewerId)} не одобрил крестовину ${getPlayerLabel(playerId)}`,

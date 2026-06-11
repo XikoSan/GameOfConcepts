@@ -14,6 +14,7 @@ interface GameBoardProps {
   showTooltips: boolean;
   canReviewPendingMove: boolean;
   showPendingWaitBadge: boolean;
+  pendingMoveStatusLabel?: string;
   onConfirmPendingMove: () => void;
   onReturnPendingMove: () => void;
   canReviewPendingCross: boolean;
@@ -75,6 +76,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   showTooltips,
   canReviewPendingMove,
   showPendingWaitBadge,
+  pendingMoveStatusLabel,
   onConfirmPendingMove,
   onReturnPendingMove,
   canReviewPendingCross,
@@ -313,6 +315,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               showPendingWaitBadge={
                 placedCard?.status === 'pending' && showPendingWaitBadge
               }
+              pendingMoveStatusLabel={pendingMoveStatusLabel}
               onConfirmPendingMove={onConfirmPendingMove}
               onReturnPendingMove={onReturnPendingMove}
               pendingOverlayRefreshKey={pendingOverlayRefreshKey}

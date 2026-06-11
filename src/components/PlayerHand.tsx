@@ -4,17 +4,19 @@ import { Card } from './Card';
 import './PlayerHand.css';
 
 interface PlayerHandProps {
-  playerNumber: 0 | 1;
+  playerNumber: number;
   cards: RegularCardName[];
   deckCount: number;
   selectedCard: RegularCardName | null;
   isActive: boolean;
   className?: string;
   hideCards?: boolean;
+  displayName?: string;
+  statusLabel?: string;
   onMoveCardDrag: (event: React.DragEvent<HTMLDivElement>) => void;
   onStartCardDrag: (
     cardName: RegularCardName,
-    playerColor: 'blue' | 'orange',
+    playerColor: 'blue' | 'orange' | 'green' | 'purple',
     event: React.DragEvent<HTMLDivElement>
   ) => void;
   onCancelCardDrag: () => void;
@@ -24,6 +26,8 @@ interface PlayerHandProps {
 const playerColors = {
   0: 'blue' as const,
   1: 'orange' as const,
+  2: 'green' as const,
+  3: 'purple' as const,
 };
 
 export const PlayerHand: React.FC<PlayerHandProps> = ({
@@ -34,12 +38,23 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   isActive,
   className = '',
   hideCards = false,
+  displayName,
+  statusLabel,
   onMoveCardDrag,
   onStartCardDrag,
   onCancelCardDrag,
   onOpenDictionary,
 }) => {
-  const playerLabel = playerNumber === 0 ? 'Игрок 1 (Синий)' : 'Игрок 2 (Оранжевый)';
+  const playerColor = playerColors[playerNumber as keyof typeof playerColors] ?? 'blue';
+  const playerColorLabels = {
+    blue: 'Синий',
+    orange: 'Оранжевый',
+    green: 'Зелёный',
+    purple: 'Фиолетовый',
+  };
+  const playerLabel =
+    displayName?.trim() || `Игрок ${playerNumber + 1} (${playerColorLabels[playerColor]})`;
+  const playerStatusLabel = statusLabel ?? (isActive ? 'Ход активен' : 'Ожидает');
 
   return (
     <div className={`player-hand player-${playerNumber} ${isActive ? 'active' : 'inactive'} ${className}`}>
@@ -64,17 +79,17 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                 ))
               : cards.map((card, index) => (
                   <Card
-                    key={`${card}-${index}`}
-                    cardName={card}
-                    playerColor={playerColors[playerNumber]}
-                    isSelected={selectedCard === card}
-                    draggable={isActive}
-                    onDrag={isActive ? onMoveCardDrag : undefined}
-                    onDragStart={
-                      isActive
-                        ? (event) => onStartCardDrag(card, playerColors[playerNumber], event)
-                        : undefined
-                    }
+                  key={`${card}-${index}`}
+                  cardName={card}
+                  playerColor={playerColor}
+                  isSelected={selectedCard === card}
+                  draggable={isActive}
+                  onDrag={isActive ? onMoveCardDrag : undefined}
+                  onDragStart={
+                    isActive
+                      ? (event) => onStartCardDrag(card, playerColor, event)
+                      : undefined
+                  }
                     onDragEnd={isActive ? onCancelCardDrag : undefined}
                     onOpenDictionary={onOpenDictionary}
                   />
@@ -84,7 +99,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
 
         <div className="player-plate">
           <h3>{playerLabel}</h3>
-          <span className="card-count">{isActive ? 'Ход активен' : 'Ожидает'}</span>
+          <span className="card-count">{playerStatusLabel}</span>
         </div>
       </div>
     </div>

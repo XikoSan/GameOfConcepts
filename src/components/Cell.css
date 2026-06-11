@@ -145,6 +145,20 @@
   border-color: rgba(210, 142, 59, 0.7);
 }
 
+.card-in-cell.player-2 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.13), transparent 30%),
+    linear-gradient(145deg, #2f7c47, #12391f);
+  border-color: rgba(92, 178, 112, 0.68);
+}
+
+.card-in-cell.player-3 {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.13), transparent 30%),
+    linear-gradient(145deg, #614a9f, #2a214d);
+  border-color: rgba(165, 139, 224, 0.68);
+}
+
 .card-in-cell.player-neutral {
   background:
     url('../assets/neutral-card-frame.png') center / 100% 100% no-repeat,

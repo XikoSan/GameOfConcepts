@@ -25,6 +25,7 @@ interface CellProps {
   showTooltip?: boolean;
   showPendingActions?: boolean;
   showPendingWaitBadge?: boolean;
+  pendingMoveStatusLabel?: string;
   onConfirmPendingMove?: () => void;
   onReturnPendingMove?: () => void;
   pendingOverlayRefreshKey?: string;
@@ -44,14 +45,12 @@ const getFontSize = (cardName: string) => {
 };
 
 const getOwnerLabel = (playerId: PlacedCard['playerId']) => {
-  if (playerId === 0) return 'Игрок 1';
-  if (playerId === 1) return 'Игрок 2';
+  if (playerId !== null) return `Игрок ${playerId + 1}`;
   return 'Нейтральная карта';
 };
 
 const getOwnerClassName = (playerId: PlacedCard['playerId']) => {
-  if (playerId === 0) return 'player-0';
-  if (playerId === 1) return 'player-1';
+  if (playerId !== null) return `player-${playerId}`;
   return 'player-neutral';
 };
 
@@ -109,6 +108,7 @@ export const Cell: React.FC<CellProps> = ({
   showTooltip = true,
   showPendingActions = false,
   showPendingWaitBadge = false,
+  pendingMoveStatusLabel,
   onConfirmPendingMove,
   onReturnPendingMove,
   pendingOverlayRefreshKey,
@@ -579,7 +579,9 @@ export const Cell: React.FC<CellProps> = ({
                     </button>
                   </div>
                 ) : (
-                  <span className="pending-card-badge">ожидает</span>
+                  <span className="pending-card-badge">
+                    {pendingMoveStatusLabel ?? 'ожидает'}
+                  </span>
                 )}
               </div>,
               document.body

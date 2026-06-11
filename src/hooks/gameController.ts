@@ -8,8 +8,8 @@ export interface GameController {
   mode: GameMode;
   connectionStatus: GameConnectionStatus;
   error: string | null;
-  localPlayerIndex: 0 | 1 | null;
-  activePlayerIndex: 0 | 1;
+  localPlayerIndex: number | null;
+  activePlayerIndex: number;
   placeCard: (cardName: RegularCardName, coordinates: Coordinates) => void;
   confirmCard: () => void;
   returnCard: () => void;

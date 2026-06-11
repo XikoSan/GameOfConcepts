@@ -31,9 +31,17 @@ export function useGameState({
       code: room?.code,
       version: room?.version,
       pendingMove: room?.game_state?.pendingMove,
+      localPlayerId,
+      localSeatIndex: multiplayerController.localPlayerIndex,
+      handsLength: room?.game_state?.players.length,
+      handLength:
+        multiplayerController.localPlayerIndex === null
+          ? null
+          : room?.game_state?.players[multiplayerController.localPlayerIndex]?.cards
+              .length,
       board: room?.game_state?.board,
     });
-  }, [room?.code, room?.game_state, room?.version]);
+  }, [localPlayerId, multiplayerController.localPlayerIndex, room?.code, room?.game_state, room?.version]);
 
   // TODO(MVP): Сейчас фасад выбирает режим по наличию комнаты. Позже
   // здесь появится полноценный выбор local/multiplayer и восстановление сессии.
