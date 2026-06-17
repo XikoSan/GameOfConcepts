@@ -42,6 +42,7 @@ export function initializeGame(playerCount = 2): GameState {
   };
 
   const normalizedPlayerCount = Math.min(Math.max(playerCount, 2), 4);
+  // Hands, decks, scores, and card ownership are all indexed by this stable seat count.
   const decks = Array.from({ length: normalizedPlayerCount }, () =>
     shuffle([...CARD_NAMES])
   );
@@ -149,6 +150,7 @@ function getAdjacencyBonus(
   card: PlacedCard,
   playerId: number
 ): number {
+  // The neutral start card has playerId null, so it counts as "other color" for adjacency.
   const enemyNeighborCount = getAdjacentCoordinates(card.coordinates).filter(
     (coordinates) => isConfirmedOtherColorCard(board[getBoardKey(coordinates)], playerId)
   ).length;
@@ -177,6 +179,7 @@ function getChainBonusForPlayer(
   playerId: number,
   direction: 'horizontal' | 'vertical'
 ): number {
+  // Count each straight line once by starting only at cells without a same-color predecessor.
   return Object.values(board).reduce((bonus, card) => {
     if (!isConfirmedPlayerCard(card, playerId)) return bonus;
 
@@ -224,6 +227,7 @@ function getScoreBreakdown(
   crosses: Cross[],
   playerId: number
 ): ScoreBreakdown {
+  // Keep scoring componentized so turn logs can report only the delta from this move.
   const confirmedCards = Object.values(board).filter((card) =>
     isConfirmedPlayerCard(card, playerId)
   );
@@ -271,6 +275,7 @@ function createTurnScoreResult(
   after: ScoreBreakdown,
   crossBonus = 0
 ): TurnScoreResult {
+  // Chain and adjacency bonuses are recalculated globally, then diffed to avoid double-logging.
   const basePoints = after.basePoints - before.basePoints;
   const adjacencyBonus = after.adjacencyBonus - before.adjacencyBonus;
   const chainBonus = after.chainBonus - before.chainBonus;
@@ -347,6 +352,7 @@ function findPendingCrossCandidate(
         (card): card is PlacedCard =>
           Boolean(card) &&
           card.status === 'confirmed' &&
+          // Neutral cards count for adjacency, but never for cross ownership or eligibility.
           card.playerId !== null &&
           !card.crossId
       )
@@ -455,6 +461,8 @@ export function placeCard(
   });
 
   const playerIndex = gameState.currentPlayerIndex;
+  // This reviewer is kept for the legacy/two-player action path; multiplayer hooks
+  // replace it with turn_order-based requiredVoters before persisting the move.
   const reviewerIndex = (playerIndex + 1) % gameState.players.length;
 
   return {
@@ -482,6 +490,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
 
   if (playerIndex === null || reviewerIndex === null) return gameState;
 
+  // Score the author seat, not the reviewer who confirms the pending move.
   const scoreBefore = getScoreBreakdown(gameState.board, gameState.crosses, playerIndex);
   const newBoard = Object.fromEntries(
     Object.entries(gameState.board).map(([key, card]) => [

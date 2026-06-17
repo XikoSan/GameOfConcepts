@@ -1,4 +1,4 @@
-// Доступные карты в колоде
+/** Regular concept cards that can appear in player hands and decks. */
 export const CARD_NAMES = [
   'Сознание',
   'Труд',
@@ -35,41 +35,57 @@ export type StartCardName = (typeof START_CARD_NAMES)[number];
 export type CardName = RegularCardName | StartCardName;
 export const CARDS = CARD_NAMES;
 
-// Координаты на бесконечном поле (целые числа)
+/** Integer grid coordinates on the conceptual board. */
 export interface Coordinates {
   x: number;
   y: number;
 }
 
-// Карта, размещённая на доске
+/**
+ * Board card keyed by coordinates in GameState.board.
+ * playerId is a stable seat index; null is the neutral start card.
+ */
 export interface PlacedCard {
   id: string;
   cardName: CardName;
   coordinates: Coordinates;
   playerId: number | null;
+  /** Pending cards are visible on the board but are not final until voting resolves. */
   status: 'confirmed' | 'pending';
+  /** A card can belong to only one approved cross. */
   crossId?: string;
   connections: string[];
 }
 
+/**
+ * Shared confirmation state for a placed card.
+ * In online mode voter keys are playerId strings; in local mode they are seatIndex values.
+ */
 export interface PendingMove {
   id?: string;
   cardId: string;
   cardName: RegularCardName;
+  /** Seat index that placed the card in the original two-player flow. */
   playerIndex: number;
+  /** Legacy single-reviewer seat; multiplayer voting uses requiredVoters instead. */
   reviewerIndex: number;
   playerId?: number;
   reviewerId?: number;
+  /** Original hand/deck seat for returning the card if the move is rejected. */
   fromSeatIndex?: number;
+  /** Online player id that authored the move; this player never votes on it. */
   placedByPlayerId?: string;
+  /** Source of truth for scoring and card return ownership. */
   placedBySeatIndex?: number;
   position?: Coordinates;
-  requiredVoters?: string[];
+  /** Voters excluding the author; playerId strings online, seat indexes local. */
+  requiredVoters?: Array<string | number>;
   votes?: Record<string, 'accept' | 'reject'>;
   status?: 'voting';
   createdAt?: string;
 }
 
+/** Approved cross bonus; playerId is the seat that receives the +5 points. */
 export interface Cross {
   id: string;
   centerX: number;
@@ -79,6 +95,7 @@ export interface Cross {
   points: 5;
 }
 
+/** Cross awaiting a separate bonus decision after the underlying move is confirmed. */
 export interface PendingCross {
   centerX: number;
   centerY: number;
@@ -89,6 +106,7 @@ export interface PendingCross {
   points: 5;
 }
 
+/** Points gained by a single confirmed move, stored for readable turn logs. */
 export interface TurnScoreResult {
   playerId: number;
   cardName: CardName;
@@ -100,16 +118,21 @@ export interface TurnScoreResult {
   newTotalScore: number;
 }
 
-// Рука игрока
+/** Player hand indexed by the same stable seat index as deck and scores. */
 export interface PlayerHand {
   playerId: number;
   cards: RegularCardName[];
 }
 
-// Состояние игры
+/**
+ * Complete game state that can be stored locally or serialized to rooms.game_state.
+ * Arrays are indexed by stable seatIndex/playerId values, not by UI position.
+ */
 export interface GameState {
+  /** Coordinate-keyed board map: "x,y" -> placed card. */
   board: Record<string, PlacedCard>;
   players: PlayerHand[];
+  /** Active seat index in local game state; online derives the active seat from room turn_order. */
   currentPlayerIndex: number;
   deck: RegularCardName[][];
   startCard: PlacedCard;
@@ -123,7 +146,7 @@ export interface GameState {
   gameOver: boolean;
 }
 
-// Границы видимого поля (для оптимизации рендеринга)
+/** Visible board bounds used for rendering optimizations. */
 export interface BoardBounds {
   minX: number;
   maxX: number;

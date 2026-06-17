@@ -157,6 +157,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     [gameState, getDropCoordinates, onFinishDrag, onPlaceCard, selectedCard]
   );
 
+  const handleBoardClick = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('card-info-close-pinned'));
+  }, []);
+
   const handleWheel = useCallback((event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
 
@@ -281,6 +285,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       onPointerCancel={handlePointerUp}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
+      onClick={handleBoardClick}
     >
       <div
         className="game-board"

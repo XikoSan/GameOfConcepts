@@ -134,6 +134,8 @@ function ensureGameStateCapacity(
   const currentDeck = Array.isArray(gameState.deck) ? gameState.deck : [];
   const currentScores = Array.isArray(gameState.scores) ? gameState.scores : [];
 
+  // Room rows may be created or resumed with fewer seats than max_players.
+  // Grow seat-indexed arrays, but never shrink them because existing card ownership may point there.
   console.debug('[room debug capacity before]', {
     requiredCount: normalizedCount,
     gameStatePlayersLength: currentPlayers.length,
@@ -187,6 +189,8 @@ function ensureGameStateCapacity(
 }
 
 const getNextTurnOrder = (room: Room, players: RoomPlayer[], playerId: string) => {
+  // turn_order is independent from players[] order so reconnects and nickname updates
+  // cannot silently change who moves next.
   const sortedPlayerIds = [...players]
     .sort((playerA, playerB) => playerA.seatIndex - playerB.seatIndex)
     .map((player) => player.id);
@@ -229,6 +233,8 @@ export async function getRoomByCode(code: string): Promise<Room | null> {
 
 export async function getRoomById(roomId: string): Promise<Room | null> {
   const supabase = getSupabaseClient();
+  // This is the authoritative server snapshot used after reconnects and version conflicts.
+  // null means the room was deleted, hidden by policy, or never existed.
   const { data, error } = await supabase
     .from('rooms')
     .select('*')
@@ -302,6 +308,7 @@ export async function createRoom({
   maxPlayers,
   initialGameState,
 }: CreateRoomInput): Promise<Room> {
+  // Clamp to the supported prototype range; game arrays and color slots are seat-indexed 0..3.
   const normalizedMaxPlayers = normalizePlayerCount(
     Number(maxPlayers) || 2
   ) as MaxPlayers;
@@ -328,6 +335,8 @@ export async function createRoom({
     joinedAt: now,
   };
 
+  // New rooms must be born with players, turn_order, and game_state together.
+  // Creating a legacy row would leave clients unable to resolve seats or current turn.
   console.log('[roomService createRoom before insert]', {
     code: roomCode,
     status: 'waiting',
@@ -371,6 +380,7 @@ export async function createRoom({
     scoresLength: nextGameState.scores.length,
   });
 
+  // Keep the full state in JSONB for the MVP; privacy and validation move server-side later.
   // TODO(MVP): Сейчас весь gameState хранится в JSONB. Позже нужно разделить
   // публичное состояние и приватные данные игроков.
   // FIXME(MVP): Рука оппонента технически доступна в клиенте через gameState.
@@ -393,6 +403,8 @@ export async function createRoom({
   const insertRoom = async (payload: RoomInsertPayload) => {
     const cleanPayload = stripUndefined(payload);
     console.debug('[createRoom debug insert payload]', cleanPayload);
+    // .select().single() returns the inserted server row with defaults, ids, and timestamps.
+    // The client should not continue from a locally guessed room shape.
     const { data, error, status, statusText } = await supabase
       .from('rooms')
       .insert(cleanPayload)
@@ -452,6 +464,8 @@ export async function createRoom({
     console.debug('[createRoom legacy fallback disabled]', {
       allowLegacyRoomFallback: ALLOW_LEGACY_ROOM_FALLBACK,
     });
+    // Legacy fallback is intentionally disabled: old two-player rows break 2-4 player
+    // turn_order, stable seats, and multiplayer voting invariants.
     throw new Error(ROOM_SCHEMA_ERROR_MESSAGE, { cause: error });
   }
 }
@@ -475,6 +489,8 @@ export async function joinRoom({
   const maxPlayers = getRoomMaxPlayers(room);
   const players = getRoomPlayers(room);
   console.debug('[room debug join before]', getRoomDebugSnapshot(room, players));
+  // A reconnecting browser keeps its previous seat; seat indexes must not be recomputed
+  // from array position because players[] can be patched or sorted independently.
   const existingPlayer = players.find((player) => player.id === playerId);
   let nextPlayers: RoomPlayer[];
   let joinedSeatIndex = existingPlayer?.seatIndex ?? null;
@@ -490,6 +506,8 @@ export async function joinRoom({
       throw new Error('Комната заполнена.');
     }
 
+    // Pick the first free seat, not players.length, so gaps left by old/disconnected
+    // entries do not shift ownership of hands, decks, scores, or cards.
     const seatIndex = getNextSeatIndex(players, maxPlayers);
     if (seatIndex === null) {
       throw new Error('Комната заполнена.');
@@ -646,6 +664,7 @@ export async function deleteRoom(roomId: string, playerId: string): Promise<Room
     throw new Error('Комната не найдена.');
   }
 
+  // host_player_id is the new authority; player_1_id fallback keeps older rows deletable.
   const hostPlayerId = room.host_player_id ?? room.player_1_id;
   if (hostPlayerId !== playerId) {
     throw new Error('Удалить комнату может только создатель.');
@@ -654,6 +673,7 @@ export async function deleteRoom(roomId: string, playerId: string): Promise<Room
   const { data, error } = await supabase
     .from('rooms')
     .delete()
+    // Always filter by room id so host permission never becomes a broad delete.
     .eq('id', roomId)
     .select()
     .single<Room>();
@@ -681,6 +701,8 @@ export function subscribeToRoom(
 
   return supabase
     .channel(`room:${roomId}`)
+    // Realtime only delivers row changes; rooms.game_state remains the source of truth.
+    // Clients replace their room snapshot instead of applying separate local patches.
     .on(
       'postgres_changes',
       {
@@ -705,6 +727,7 @@ export function subscribeToRoom(
       },
       (payload) => {
         console.log('[room realtime delete raw]', payload);
+        // DELETE means every client must leave the online room locally.
         onRoomDelete?.();
       }
     )

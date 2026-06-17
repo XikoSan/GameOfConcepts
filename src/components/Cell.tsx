@@ -294,6 +294,30 @@ export const Cell: React.FC<CellProps> = ({
     schedulePopoverClose();
   };
 
+  const openPinnedPopover = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+
+    clearPopoverTimers();
+
+    if (!showTooltip || !tooltipCardKey || !placedCard || !cardRef.current) return;
+
+    const nextRequestId = popoverRequestIdRef.current + 1;
+    popoverRequestIdRef.current = nextRequestId;
+    setIsPopoverExpanded(false);
+    loadSummary(tooltipCardKey, placedCard.cardName, nextRequestId);
+    setPopoverPosition(getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned'));
+    popoverStateRef.current = {
+      mode: 'pinned',
+      cardKey: tooltipCardKey,
+    };
+    setPopoverMode('pinned');
+    window.dispatchEvent(
+      new CustomEvent('card-info-popover-pinned', {
+        detail: { cardKey: tooltipCardKey },
+      })
+    );
+  };
+
   const handlePopoverPointerEnter = () => {
     clearPopoverTimers();
 
@@ -398,22 +422,26 @@ export const Cell: React.FC<CellProps> = ({
     showPendingCrossActions,
   ]);
 
-  const handleConfirmPendingMove = () => {
+  const handleConfirmPendingMove = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     closePopover();
     onConfirmPendingMove?.();
   };
 
-  const handleReturnPendingMove = () => {
+  const handleReturnPendingMove = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     closePopover();
     onReturnPendingMove?.();
   };
 
-  const handleApprovePendingCross = () => {
+  const handleApprovePendingCross = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     closePopover();
     onApprovePendingCross?.();
   };
 
-  const handleRejectPendingCross = () => {
+  const handleRejectPendingCross = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     closePopover();
     onRejectPendingCross?.();
   };
@@ -437,15 +465,25 @@ export const Cell: React.FC<CellProps> = ({
     };
 
     const handleGlobalClose = () => closePopover();
+    const handlePinnedClose = () => {
+      if (
+        popoverStateRef.current.mode === 'pinning' ||
+        popoverStateRef.current.mode === 'pinned'
+      ) {
+        closePopover();
+      }
+    };
 
     window.addEventListener('card-info-popover-open', handleOtherPopover);
     window.addEventListener('card-info-popover-pinned', handleOtherPopover);
     window.addEventListener('card-info-close', handleGlobalClose);
+    window.addEventListener('card-info-close-pinned', handlePinnedClose);
 
     return () => {
       window.removeEventListener('card-info-popover-open', handleOtherPopover);
       window.removeEventListener('card-info-popover-pinned', handleOtherPopover);
       window.removeEventListener('card-info-close', handleGlobalClose);
+      window.removeEventListener('card-info-close-pinned', handlePinnedClose);
     };
   }, [closePopover]);
 
@@ -484,6 +522,7 @@ export const Cell: React.FC<CellProps> = ({
           } ${isCrossPendingCenter ? 'cross-pending-center' : ''}`}
           onPointerEnter={handleCardPointerEnter}
           onPointerLeave={handleCardPointerLeave}
+          onClick={openPinnedPopover}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
           <span className="card-title" lang="ru">

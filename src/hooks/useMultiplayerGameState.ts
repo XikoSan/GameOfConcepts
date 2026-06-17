@@ -21,6 +21,7 @@ const getLocalPlayerIndex = (
   localPlayerId: string
 ): number | null => {
   if (!room) return null;
+  // Resolve by stable playerId first; visual order and players[] index are not game identity.
   const roomPlayer = room.players?.find((player) => player.id === localPlayerId);
   if (roomPlayer) return roomPlayer.seatIndex;
   if (room.player_1_id === localPlayerId) return 0;
@@ -31,6 +32,8 @@ const getLocalPlayerIndex = (
 const getCurrentRoomPlayerId = (room: Room): string | null =>
   room.turn_order?.[room.current_turn_index] ?? null;
 
+// current_turn_index selects a playerId inside turn_order.
+// Resolve that id back to a seat before reading hands, decks, scores, or ownership.
 const getCurrentRoomSeatIndex = (room: Room): number =>
   room.players?.find((player) => player.id === getCurrentRoomPlayerId(room))
     ?.seatIndex ?? room.game_state.currentPlayerIndex;
@@ -57,9 +60,11 @@ const getSeatIndexForTurnIndex = (
 
 const getNextTurnIndex = (room: Room): number | undefined => {
   if (!room.turn_order?.length) return undefined;
+  // Keep turn rotation tied to the room's turn_order length, not the old two-player modulo.
   return (room.current_turn_index + 1) % room.turn_order.length;
 };
 
+// Online room turn data is authoritative; sync the embedded GameState before applying actions.
 const syncGameStateToRoomTurn = (room: Room): GameState => ({
   ...room.game_state,
   currentPlayerIndex: getCurrentRoomSeatIndex(room),
@@ -78,6 +83,7 @@ const syncPendingMoveReviewerToTurnOrder = (
   const reviewerIndex = getSeatIndexForTurnIndex(room, nextTurnIndex);
   if (reviewerIndex === undefined) return gameState;
   const placedByPlayerId = getCurrentRoomPlayerId(room);
+  // The author is excluded from voting; every other playerId in turn_order is required.
   const requiredVoters = room.turn_order.filter(
     (playerId) => playerId !== placedByPlayerId
   );
@@ -143,6 +149,8 @@ const getPendingMoveRequiredVoters = (
   if (!pendingMove) return [];
   if (Array.isArray(pendingMove.requiredVoters)) return pendingMove.requiredVoters;
 
+  // Older pendingMove objects may lack requiredVoters; reconstruct from turn_order
+  // while still excluding the move author.
   const placedByPlayerId =
     pendingMove.placedByPlayerId ??
     room.players?.find(
@@ -167,6 +175,8 @@ const getPendingMoveVoteCounts = (
     (playerId) => votes[playerId] === 'reject'
   ).length;
   const requiredCount = requiredVoters.length;
+  // Majority is among non-author voters: 1 of 1, 2 of 2, or 2 of 3.
+  // Once accepting is impossible, reject immediately so pendingMove cannot hang.
   const majority = Math.floor(requiredCount / 2) + 1;
   const votedCount = acceptedCount + rejectCount;
   const remainingCount = requiredCount - votedCount;
@@ -348,6 +358,8 @@ export function useMultiplayerGameState({
 
       try {
         setError(null);
+        // The room row stores turn position separately from game_state so all clients
+        // agree on the same active player after the JSONB update lands.
         const nextCurrentTurnIndex = getNextCurrentTurnIndex(room, nextGameState, action);
         const updatedRoom = await updateRoomGameState(
           room.id,
@@ -453,6 +465,7 @@ export function useMultiplayerGameState({
         }
 
         const nextVotes = {
+          // Merge into the latest server votes to reduce overwrites from near-simultaneous clicks.
           ...currentVotes,
           [localPlayerId]: vote,
         };
@@ -482,6 +495,8 @@ export function useMultiplayerGameState({
         });
 
         if (voteState.acceptedByMajority) {
+          // Scoring belongs to the seat that placed the card, not the reviewer who cast
+          // the deciding vote or the currently rendered local player.
           const scoringSeatIndex =
             latestPendingMove.placedBySeatIndex ??
             getPendingMovePlayerIndex(latestPendingMove);
@@ -520,6 +535,7 @@ export function useMultiplayerGameState({
             scores: nextScores,
           });
         } else if (voteState.rejectedByMajority || voteState.acceptImpossible) {
+          // Rejected cards return to the author and the turn stays with that same seat.
           nextGameState = applyGameAction(
             {
               ...latestGameState,

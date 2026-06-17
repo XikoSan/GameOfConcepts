@@ -17,7 +17,7 @@ import {
   subscribeToRoom,
 } from './services/roomService';
 import { initializeGame } from './game';
-import type { Coordinates, PendingMove, RegularCardName } from './game';
+import type { Coordinates, GameState, PendingMove, RegularCardName } from './game';
 import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
 
@@ -28,6 +28,8 @@ const getPendingMovePlayerIndex = (pendingMove: PendingMove | null) =>
 
 const getPendingMoveReviewerIndex = (pendingMove: PendingMove | null) =>
   pendingMove?.reviewerIndex ?? pendingMove?.reviewerId ?? null;
+
+const playerColors = ['blue', 'orange', 'green', 'purple'] as const;
 
 const getPendingMoveVoteState = (
   pendingMove: PendingMove | null,
@@ -93,6 +95,17 @@ const getRoomPlayersForDisplay = (room: Room | null): RoomPlayer[] => {
 
   return players;
 };
+
+const getLocalPlayersForDisplay = (gameState: GameState): RoomPlayer[] =>
+  gameState.players.map((player) => ({
+    id: `local-${player.playerId}`,
+    nickname: `Игрок ${player.playerId + 1}`,
+    seatIndex: player.playerId,
+    color: playerColors[player.playerId] ?? 'blue',
+    isHost: player.playerId === 0,
+    connected: true,
+    joinedAt: '',
+  }));
 
 const getAvailableRoomRoleLabel = (room: Room, playerId: string) => {
   const roomPlayers = getRoomPlayersForDisplay(room);
@@ -195,7 +208,7 @@ function App() {
   const isOnlineTable = Boolean(onlineRoom);
   const bottomTablePlayerIndex: number | null = isOnlineTable
     ? localPlayerIndex
-    : 0;
+    : activePlayerIndex;
   const pendingMoveVoteState = getPendingMoveVoteState(
     gameState.pendingMove,
     playerId
@@ -213,9 +226,11 @@ function App() {
       (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
   const roomList = getRoomList(availableRooms, onlineRoom);
   const onlinePlayers = getRoomPlayersForDisplay(onlineRoom);
+  const localPlayers = getLocalPlayersForDisplay(gameState);
   const currentPlayerId = onlineRoom?.turn_order?.[onlineRoom.current_turn_index] ?? null;
   const isOnlineHost = isRoomHost(onlineRoom, playerId);
-  const activeScoreIndex = pendingMoveReviewerIndex ?? activePlayerIndex;
+  const activeScoreIndex =
+    mode === 'local' ? activePlayerIndex : pendingMoveReviewerIndex ?? activePlayerIndex;
   const scoreStateLabel = gameState.pendingMove ? 'решение' : 'ход';
   const canReviewPendingCross =
     mode === 'local' ||
@@ -291,7 +306,7 @@ function App() {
   };
 
   const handleConfirmNewGame = () => {
-    resetGame();
+    resetGame(maxPlayers);
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -305,7 +320,7 @@ function App() {
     roomSubscriptionRef.current = null;
     setOnlineRoom(null);
     setOnlineError(null);
-    startLocalGame();
+    startLocalGame(maxPlayers);
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -316,8 +331,19 @@ function App() {
     setInterfaceSettings(defaultInterfaceSettings);
   };
 
-  const getOnlineHandMeta = (playerIndex: number) => {
-    if (!onlineRoom || localPlayerIndex !== playerIndex) return {};
+  const getHandMeta = (playerIndex: number) => {
+    if (!onlineRoom) {
+      return {
+        displayName: `Игрок ${playerIndex + 1}`,
+        statusLabel: gameState.pendingMove
+          ? 'Нужно решение'
+          : activePlayerIndex === playerIndex
+            ? 'Ход активен'
+            : 'Ожидает',
+      };
+    }
+
+    if (localPlayerIndex !== playerIndex) return {};
 
     const localPlayer = onlinePlayers.find((player) => player.id === playerId);
     const displayName =
@@ -362,6 +388,10 @@ function App() {
   const handleOpenNewGameModal = () => {
     setActiveModal('new-game');
     void loadAvailableRooms();
+  };
+
+  const closeOnlineModal = () => {
+    setActiveModal(null);
   };
 
   const syncOnlineRoom = useCallback(async (reason: string) => {
@@ -497,6 +527,9 @@ function App() {
         initialGameState,
       });
       handleRoomConnected(room);
+      // Modal visibility is controlled by explicit room actions; Realtime
+      // updates must not close the room browser unexpectedly.
+      closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       console.error('[create room error]', error);
@@ -529,6 +562,7 @@ function App() {
       }
 
       handleRoomConnected(room);
+      closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       setOnlineError(
@@ -553,6 +587,7 @@ function App() {
         nickname,
       });
       handleRoomConnected(joinedRoom);
+      closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       setOnlineError(
@@ -654,45 +689,26 @@ function App() {
 
       <section className="panel-section players-score-section">
         <h2>Игроки</h2>
-        {(onlineRoom ? onlinePlayers : []).length > 0 ? (
-          onlinePlayers.map((player) => {
-            const isActiveScore =
-              currentPlayerId !== null
-                ? currentPlayerId === player.id
-                : activeScoreIndex === player.seatIndex;
+        {(onlineRoom ? onlinePlayers : localPlayers).map((player) => {
+          const isActiveScore =
+            currentPlayerId !== null
+              ? currentPlayerId === player.id
+              : activeScoreIndex === player.seatIndex;
 
-            return (
-              <div
-                className={`score-row player-score-${player.color} ${isActiveScore ? 'active-score' : ''}`}
-                key={player.id}
-              >
-                <span>
-                  {player.nickname}
-                  {player.id === playerId && <small>вы</small>}
-                  {isActiveScore && <small>{scoreStateLabel}</small>}
-                </span>
-                <strong>{getSeatScore(player.seatIndex)}</strong>
-              </div>
-            );
-          })
-        ) : (
-          <>
-            <div className={`score-row player-score-blue ${activeScoreIndex === 0 ? 'active-score' : ''}`}>
+          return (
+            <div
+              className={`score-row player-score-${player.color} ${isActiveScore ? 'active-score' : ''}`}
+              key={player.id}
+            >
               <span>
-                Игрок 1
-                {activeScoreIndex === 0 && <small>{scoreStateLabel}</small>}
+                {player.nickname}
+                {onlineRoom && player.id === playerId && <small>вы</small>}
+                {isActiveScore && <small>{scoreStateLabel}</small>}
               </span>
-              <strong>{gameState.scores[0]}</strong>
+              <strong>{getSeatScore(player.seatIndex)}</strong>
             </div>
-            <div className={`score-row player-score-orange ${activeScoreIndex === 1 ? 'active-score' : ''}`}>
-              <span>
-                Игрок 2
-                {activeScoreIndex === 1 && <small>{scoreStateLabel}</small>}
-              </span>
-              <strong>{gameState.scores[1]}</strong>
-            </div>
-          </>
-        )}
+          );
+        })}
       </section>
 
       <section className="panel-section log-section">
@@ -714,37 +730,6 @@ function App() {
         </div>
       </section>
     </aside>
-  );
-
-  const renderOnlinePlayerStrip = () => (
-    <div className="online-player-strip" aria-label="Игроки за столом">
-      {onlinePlayers.map((player) => {
-        const isActiveScore =
-          currentPlayerId !== null
-            ? currentPlayerId === player.id
-            : activeScoreIndex === player.seatIndex;
-        const isLocalPlayer = player.id === playerId;
-
-        return (
-          <div
-            className={`online-player-chip online-player-chip-${player.color} ${isActiveScore ? 'active' : ''}`}
-            key={player.id}
-          >
-            <span className="online-player-dot" aria-hidden="true" />
-            <span className="online-player-name">
-              {player.nickname}
-              {isLocalPlayer && <small>вы</small>}
-            </span>
-            <strong>{getSeatScore(player.seatIndex)}</strong>
-            {isActiveScore && (
-              <span className="online-player-status">
-                {scoreStateLabel}
-              </span>
-            )}
-          </div>
-        );
-      })}
-    </div>
   );
 
   const renderBoard = () => (
@@ -788,6 +773,19 @@ function App() {
           <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
             Начать локально
           </button>
+          <div className="max-players-picker" aria-label="Количество локальных игроков">
+            <span>Игроков</span>
+            {([2, 3, 4] as const).map((playersCount) => (
+              <button
+                className={maxPlayers === playersCount ? 'active' : ''}
+                key={playersCount}
+                onClick={() => setMaxPlayers(playersCount)}
+                type="button"
+              >
+                {playersCount}
+              </button>
+            ))}
+          </div>
         </section>
 
         <section className="action-group" aria-label="Инструменты">
@@ -852,7 +850,7 @@ function App() {
     const player = gameState.players[playerIndex];
     const deck = gameState.deck[playerIndex];
     if (!player || !deck) return null;
-    const onlineHandMeta = getOnlineHandMeta(playerIndex);
+    const handMeta = getHandMeta(playerIndex);
 
     return (
       <PlayerHand
@@ -871,8 +869,8 @@ function App() {
           canControlPlayer(playerIndex)
         }
         className={className}
-        displayName={onlineHandMeta.displayName}
-        statusLabel={onlineHandMeta.statusLabel}
+        displayName={handMeta.displayName}
+        statusLabel={handMeta.statusLabel}
         onMoveCardDrag={handleMoveCardDrag}
         onStartCardDrag={handleStartCardDrag}
         onCancelCardDrag={handleCancelCardDrag}
@@ -895,10 +893,10 @@ function App() {
                 {renderPartyPanel()}
 
                 <div className="online-center-table">
-                  {renderOnlinePlayerStrip()}
                   <div className="board-section board-section-online">
                     {renderBoard()}
                   </div>
+                  {/* Online renders only the local player's hand; opponent hands stay hidden in UI. */}
                   {bottomTablePlayerIndex !== null &&
                     renderPlayerHand(
                       bottomTablePlayerIndex,
@@ -915,8 +913,6 @@ function App() {
             </div>
           ) : (
             <>
-              {renderPlayerHand(1)}
-
               <div className="table-middle">
                 {renderPartyPanel()}
                 <div className="board-section">
@@ -925,7 +921,8 @@ function App() {
                 {renderControlPanel()}
               </div>
 
-              {renderPlayerHand(0)}
+              {/* Local hot-seat shows one active hand so 2-4 players can pass the device around. */}
+              {renderPlayerHand(activePlayerIndex)}
             </>
           )}
         </section>
@@ -944,7 +941,7 @@ function App() {
         </div>
       )}
       {activeModal === 'new-game' && (
-        <Modal onClose={() => setActiveModal(null)} title="Онлайн игра">
+        <Modal onClose={closeOnlineModal} title="Онлайн игра">
           <div className="new-game-modal">
             <section className="online-room-block">
               <label className="online-profile-field" htmlFor="online-nickname">
@@ -1071,7 +1068,7 @@ function App() {
             )}
           </div>
           <div className="modal-actions">
-            <button type="button" onClick={() => setActiveModal(null)}>
+            <button type="button" onClick={closeOnlineModal}>
               Закрыть
             </button>
           </div>
