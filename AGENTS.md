@@ -10,6 +10,11 @@
 - `game-rules.md` считается основным источником правил игры.
 - Перед изменением правил, подсчёта очков, текста окна "Правила" или игровых ограничений сверяться с `game-rules.md`.
 - Не менять игровую механику, список карт, подсчёт очков или правила размещения без прямого запроса.
+- An accepted card gives its player +1 base point.
+- Active adjacency score is 1 / 4 / 6 / 8 for 1-4 orthogonal neighbors.
+- Each neighboring card awards +1 to its owner.
+- Neighbor-owner awards are distributed by stable seatIndex.
+- Neutral cards count for active adjacency but have no owner award.
 
 ## Online And Supabase
 
@@ -27,6 +32,31 @@
 - Карты на поле должны оставаться компактными; текст должен помещаться внутри клетки.
 - Tooltip и справка по понятию не должны ломать drag and drop, pending actions и camera pan.
 - В online-режиме рука оппонента скрывается только в UI; помнить, что это MVP-ограничение.
+
+## Card Catalog And Deck Architecture
+
+- Catalog size is dynamic. The planned first full catalog is 40/40/20, not a hard limit.
+- The approved 100-card catalog is connected with the first release distribution 40 easy / 40 medium / 20 hard.
+- Card definitions use stable ids; game cards use separate instance ids.
+- Standard deck ids are `easy`, `medium`, `hard`, and `mixed-all`.
+- Standard decks derive from difficulty, and custom decks reference card definition ids.
+- Deck sizes are arbitrary; counts must be derived from arrays, not stored as manual constants.
+- Local games can choose a standard deck before starting.
+- Online room hosts choose a standard deck; joining players use the room snapshot.
+- Active games use deck snapshots as the source of card composition so later catalog edits affect only new games.
+- Current UI does not expose deck editing.
+- Custom deck UI and mixed-ratio UI are intentionally absent for now.
+- Card roles and connection examples from planning docs are not runtime card data.
+
+Future steps:
+1. Обсудить критерии сложности.
+2. Составить 100 карт.
+3. Заполнить difficulty и stable ids.
+4. Проверить catalog validation.
+5. Подключить deck builder к local setup.
+6. Добавить выбор колоды в online room creation.
+7. Сохранять snapshot/config в game state.
+8. Позже добавить редактор каталога и кастомных колод.
 
 ## Development Workflow
 

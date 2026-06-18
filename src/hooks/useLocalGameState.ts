@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { applyGameAction } from '../gameActions';
 import { initializeGame } from '../game';
+import { getDeckDefinitionById, MIXED_ALL_DECK } from '../data/deckDefinitions';
 import type { Coordinates, GameState, RegularCardName } from '../game';
 import type { GameController } from './gameController';
 
@@ -86,6 +87,7 @@ const withLocalPendingVote = (gameState: GameState): GameState => {
 
 export function useLocalGameState(): GameController {
   const [localPlayerCount, setLocalPlayerCount] = useState(2);
+  const [localDeckId, setLocalDeckId] = useState(MIXED_ALL_DECK.id);
   const [gameState, setGameState] = useState<GameState>(() => initializeGame(2));
 
   const handlePlaceCard = useCallback(
@@ -99,11 +101,13 @@ export function useLocalGameState(): GameController {
     []
   );
 
-  const resetGame = useCallback((playerCount = localPlayerCount) => {
+  const resetGame = useCallback((playerCount = localPlayerCount, deckId = localDeckId) => {
     const normalizedPlayerCount = normalizePlayerCount(playerCount);
+    const deckDefinition = getDeckDefinitionById(deckId) ?? MIXED_ALL_DECK;
     setLocalPlayerCount(normalizedPlayerCount);
-    setGameState(initializeGame(normalizedPlayerCount));
-  }, [localPlayerCount]);
+    setLocalDeckId(deckDefinition.id);
+    setGameState(initializeGame(normalizedPlayerCount, deckDefinition));
+  }, [localDeckId, localPlayerCount]);
 
   const voteOnPendingMove = useCallback((vote: LocalVote) => {
     setGameState((prev) => {

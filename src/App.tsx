@@ -17,6 +17,11 @@ import {
   subscribeToRoom,
 } from './services/roomService';
 import { initializeGame } from './game';
+import {
+  getDeckDefinitionById,
+  MIXED_ALL_DECK,
+  USER_SELECTABLE_DECKS,
+} from './data/deckDefinitions';
 import type { Coordinates, GameState, PendingMove, RegularCardName } from './game';
 import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
@@ -175,6 +180,8 @@ function App() {
   const [isRoomListLoading, setIsRoomListLoading] = useState(false);
   const [onlineNickname, setOnlineNickname] = useState(savedNickname);
   const [maxPlayers, setMaxPlayers] = useState<MaxPlayers>(2);
+  const [localDeckId, setLocalDeckId] = useState(MIXED_ALL_DECK.id);
+  const [onlineDeckId, setOnlineDeckId] = useState(MIXED_ALL_DECK.id);
   const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
   const [interfaceSettings, setInterfaceSettings] = useState(
@@ -306,7 +313,7 @@ function App() {
   };
 
   const handleConfirmNewGame = () => {
-    resetGame(maxPlayers);
+    resetGame(maxPlayers, localDeckId);
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -320,7 +327,7 @@ function App() {
     roomSubscriptionRef.current = null;
     setOnlineRoom(null);
     setOnlineError(null);
-    startLocalGame(maxPlayers);
+    startLocalGame(maxPlayers, localDeckId);
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -508,6 +515,7 @@ function App() {
       console.log('[create room playerId]', playerId);
       console.log('[create room nickname]', nickname);
       console.log('[create room maxPlayers]', maxPlayers);
+      console.log('[create room deckId]', onlineDeckId);
       console.debug('[create room click debug]', {
         playerId,
         nickname,
@@ -517,7 +525,8 @@ function App() {
         hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
         hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
       });
-      const initialGameState = initializeGame(maxPlayers);
+      const deckDefinition = getDeckDefinitionById(onlineDeckId) ?? MIXED_ALL_DECK;
+      const initialGameState = initializeGame(maxPlayers, deckDefinition);
       console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
       const room = await createRoom({
@@ -773,19 +782,36 @@ function App() {
           <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
             Начать локально
           </button>
-          <div className="max-players-picker" aria-label="Количество локальных игроков">
-            <span>Игроков</span>
-            {([2, 3, 4] as const).map((playersCount) => (
-              <button
-                className={maxPlayers === playersCount ? 'active' : ''}
-                key={playersCount}
-                onClick={() => setMaxPlayers(playersCount)}
-                type="button"
-              >
-                {playersCount}
-              </button>
-            ))}
-          </div>
+          {!onlineRoom && (
+            <>
+              <div className="max-players-picker" aria-label="Количество локальных игроков">
+                <span>Игроков</span>
+                {([2, 3, 4] as const).map((playersCount) => (
+                  <button
+                    className={maxPlayers === playersCount ? 'active' : ''}
+                    key={playersCount}
+                    onClick={() => setMaxPlayers(playersCount)}
+                    type="button"
+                  >
+                    {playersCount}
+                  </button>
+                ))}
+              </div>
+              <label className="deck-select-field">
+                <span>Колода</span>
+                <select
+                  onChange={(event) => setLocalDeckId(event.target.value)}
+                  value={localDeckId}
+                >
+                  {USER_SELECTABLE_DECKS.map((deckDefinition) => (
+                    <option key={deckDefinition.id} value={deckDefinition.id}>
+                      {deckDefinition.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
         </section>
 
         <section className="action-group" aria-label="Инструменты">
@@ -826,8 +852,9 @@ function App() {
           <h3>Памятка</h3>
           <div className="control-hint-group">
             <strong>Очки</strong>
-            <p>Карта: +1 ПО</p>
-            <p>Соседство: +2 / +4 / +6 / +8</p>
+            <p>Размещение: +1 ПО</p>
+            <p>Соседи: 1/2/3/4 = +1/+4/+6/+8</p>
+            <p>Соседняя карта: владельцу +1</p>
             <p>Цепочки: 3/5/7/9 = +1/+2/+3/+4</p>
             <p>Крестовина: +5 ПО</p>
           </div>
@@ -836,6 +863,14 @@ function App() {
             <p>Одинаковые слова рядом — нельзя</p>
             <p>Связь объясняется устно</p>
             <p>Голосование: ✓ принять / ↩ вернуть</p>
+          </div>
+          <div className="control-hint-group">
+            <strong>Типы связей</strong>
+            <p>Вид</p>
+            <p>Часть</p>
+            <p>Причина</p>
+            <p>Свойство</p>
+            <p>Противоположность</p>
           </div>
         </section>
       )}
@@ -973,6 +1008,19 @@ function App() {
                     </button>
                   ))}
                 </div>
+                <label className="deck-select-field">
+                  <span>Колода</span>
+                  <select
+                    onChange={(event) => setOnlineDeckId(event.target.value)}
+                    value={onlineDeckId}
+                  >
+                    {USER_SELECTABLE_DECKS.map((deckDefinition) => (
+                      <option key={deckDefinition.id} value={deckDefinition.id}>
+                        {deckDefinition.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <button
                   disabled={isOnlineLoading}
                   type="button"

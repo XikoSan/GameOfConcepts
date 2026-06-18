@@ -97,22 +97,22 @@
 }
 
 .control-hint-card {
-  margin-top: clamp(14px, 1.2vw, 20px);
-  min-height: clamp(178px, 24vh, 260px);
+  margin-top: clamp(10px, 0.9vw, 14px);
+  min-height: 0;
   box-sizing: border-box;
-  padding: clamp(10px, 0.9vw, 14px);
+  padding: clamp(8px, 0.65vw, 10px);
   border: 1px solid rgba(220, 180, 110, 0.16);
   border-radius: 9px;
   color: rgba(245, 230, 205, 0.72);
   font-size: clamp(10px, 0.72vw, 12px);
-  line-height: 1.35;
+  line-height: 1.25;
   background:
     radial-gradient(circle at 20% 0%, rgba(214, 174, 118, 0.065), transparent 34%),
     rgba(255, 255, 255, 0.025);
 }
 
 .control-hint-card h3 {
-  margin: 0 0 clamp(8px, 0.8vw, 12px);
+  margin: 0 0 clamp(5px, 0.55vw, 8px);
   color: rgba(230, 185, 95, 0.92);
   font-size: clamp(10px, 0.72vw, 12px);
   font-weight: 800;
@@ -123,12 +123,12 @@
 
 .control-hint-group {
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .control-hint-group + .control-hint-group {
-  margin-top: clamp(10px, 1vw, 14px);
-  padding-top: clamp(8px, 0.8vw, 11px);
+  margin-top: clamp(6px, 0.65vw, 9px);
+  padding-top: clamp(5px, 0.55vw, 7px);
   border-top: 1px solid rgba(220, 180, 110, 0.12);
 }
 
@@ -140,6 +140,7 @@
 
 .control-hint-card p {
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .online-game-layout {
@@ -581,6 +582,31 @@
 
 .action-button:hover {
   filter: brightness(1.15);
+}
+
+.deck-select-field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  color: rgba(238, 221, 190, 0.82);
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 700;
+}
+
+.deck-select-field span {
+  line-height: 1;
+}
+
+.deck-select-field select {
+  min-width: 0;
+  height: clamp(28px, 3.4vh, 36px);
+  box-sizing: border-box;
+  border: 1px solid rgba(214, 174, 118, 0.25);
+  border-radius: 7px;
+  padding: 0 8px;
+  background: rgba(10, 12, 13, 0.78);
+  color: #f6efe2;
+  font: inherit;
 }
 
 .drag-card-preview {

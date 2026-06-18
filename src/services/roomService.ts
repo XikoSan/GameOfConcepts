@@ -1,6 +1,6 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabaseClient';
-import { initializeGame } from '../game';
+import { createPlayerDeckFromSnapshot, initializeGame } from '../game';
 import type { GameState } from '../game';
 import type { MaxPlayers, PlayerColor, Room, RoomPlayer } from '../types/room';
 
@@ -160,11 +160,18 @@ function ensureGameStateCapacity(
   }
 
   const fallbackGameState = initializeGame(normalizedCount);
+  const snapshotSeats = Array.from({ length: normalizedCount }, (_, index) =>
+    createPlayerDeckFromSnapshot(gameState.deckSnapshot, index)
+  );
   const players = Array.from({ length: normalizedCount }, (_, index) =>
-    currentPlayers[index] ?? fallbackGameState.players[index]
+    currentPlayers[index] ??
+    snapshotSeats[index]?.player ??
+    fallbackGameState.players[index]
   );
   const deck = Array.from({ length: normalizedCount }, (_, index) =>
-    currentDeck[index] ?? fallbackGameState.deck[index]
+    currentDeck[index] ??
+    snapshotSeats[index]?.deck ??
+    fallbackGameState.deck[index]
   );
   const scores = Array.from({ length: normalizedCount }, (_, index) =>
     currentScores[index] ?? 0

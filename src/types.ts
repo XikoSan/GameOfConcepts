@@ -1,37 +1,16 @@
+import {
+  CARD_NAMES,
+  START_CARD_NAMES,
+  type CardDefinition,
+  type CardDifficulty,
+} from './data/cardCatalog';
+
 /** Regular concept cards that can appear in player hands and decks. */
-export const CARD_NAMES = [
-  'Сознание',
-  'Труд',
-  'Деньги',
-  'Культура',
-  'Эволюция',
-  'Государство',
-  'Человек',
-  'Страх',
-  'Информация',
-  'Власть',
-  'Биология',
-  'Свобода',
-  'Семья',
-  'Искусство',
-  'Наука',
-  'Язык',
-  'Ценность',
-  'Рынок',
-  'Память',
-  'Игра',
-];
+export { CARD_NAMES, START_CARD_NAMES };
+export type { CardDefinition, CardDifficulty };
 
-export const START_CARD_NAMES = [
-  'Человек',
-  'Общество',
-  'Мир',
-  'Система',
-  'Изменение',
-];
-
-export type RegularCardName = (typeof CARD_NAMES)[number];
-export type StartCardName = (typeof START_CARD_NAMES)[number];
+export type RegularCardName = string;
+export type StartCardName = string;
 export type CardName = RegularCardName | StartCardName;
 export const CARDS = CARD_NAMES;
 
@@ -41,12 +20,19 @@ export interface Coordinates {
   y: number;
 }
 
+export interface GameCard {
+  instanceId: string;
+  definitionId: string;
+  name: RegularCardName;
+}
+
 /**
  * Board card keyed by coordinates in GameState.board.
  * playerId is a stable seat index; null is the neutral start card.
  */
 export interface PlacedCard {
   id: string;
+  definitionId?: string;
   cardName: CardName;
   coordinates: Coordinates;
   playerId: number | null;
@@ -114,8 +100,28 @@ export interface TurnScoreResult {
   adjacencyBonus: number;
   chainBonus: number;
   crossBonus: number;
+  activePlayerTotal: number;
+  neighborCount: number;
+  neighborOwnerAwards: Record<number, number>;
   totalGained: number;
   newTotalScore: number;
+}
+
+/** Pure spatial scoring result for one accepted placement. */
+export interface MoveScoreResult {
+  placementScore: number;
+  adjacencyScore: number;
+  chainScore: number;
+  crossScore: number;
+  activePlayerTotal: number;
+  neighborOwnerAwards: Record<number, number>;
+  neighborCount: number;
+}
+
+export interface GameDeckSnapshot {
+  sourceDeckId: string;
+  cardDefinitionIds: string[];
+  createdAt?: string;
 }
 
 /** Player hand indexed by the same stable seat index as deck and scores. */
@@ -135,6 +141,8 @@ export interface GameState {
   /** Active seat index in local game state; online derives the active seat from room turn_order. */
   currentPlayerIndex: number;
   deck: RegularCardName[][];
+  /** A running game owns a fixed deck snapshot; later catalog edits affect only new games. */
+  deckSnapshot?: GameDeckSnapshot;
   startCard: PlacedCard;
   lastPlacedCardId: string | null;
   pendingMove: PendingMove | null;

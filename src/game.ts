@@ -1,9 +1,17 @@
 import { CARD_NAMES, START_CARD_NAMES } from './types';
+import {
+  CARD_CATALOG,
+  START_CARD_CATALOG,
+  getCardDefinitionIdByName,
+} from './data/cardCatalog';
+import { MIXED_ALL_DECK, type DeckDefinition } from './data/deckDefinitions';
+import { buildDeck, validateDeckCapacity } from './decks/deckBuilder';
 import type {
   CardName,
   Coordinates,
   Cross,
   GameState,
+  MoveScoreResult,
   PendingCross,
   PendingMove,
   PlacedCard,
@@ -28,23 +36,60 @@ export type {
 
 const BOARD_CENTER: Coordinates = { x: 7, y: 7 };
 const HAND_SIZE = 5;
-const ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR = 2;
+const PLACEMENT_SCORE = 1;
+const NEIGHBOR_OWNER_SCORE = 1;
 const SAME_NAME_PLACEMENT_WARNING = 'Нельзя ставить одинаковые понятия рядом.';
 
-export function initializeGame(playerCount = 2): GameState {
-  const shuffle = (arr: RegularCardName[]): RegularCardName[] => {
-    const result = [...arr];
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
+function shuffleCards(cards: RegularCardName[]): RegularCardName[] {
+  const result = [...cards];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function getCardNamesByDefinitionIds(cardDefinitionIds: readonly string[]) {
+  const cardsById = new Map(CARD_CATALOG.map((card) => [card.id, card.name]));
+  return cardDefinitionIds
+    .map((cardId) => cardsById.get(cardId))
+    .filter((cardName): cardName is RegularCardName => Boolean(cardName));
+}
+
+export function createPlayerDeckFromSnapshot(
+  deckSnapshot: GameState['deckSnapshot'],
+  playerId: number
+): { player: PlayerHand; deck: RegularCardName[] } | null {
+  if (!deckSnapshot) return null;
+
+  // Joining players receive a deck from the room snapshot,
+  // not from the client's current catalog.
+  const cardNames = getCardNamesByDefinitionIds(deckSnapshot.cardDefinitionIds);
+  if (cardNames.length < HAND_SIZE) return null;
+
+  const deck = shuffleCards(cardNames);
+  const player = {
+    playerId,
+    cards: deck.splice(0, HAND_SIZE),
   };
 
+  return { player, deck };
+}
+
+export function initializeGame(
+  playerCount = 2,
+  deckDefinition: DeckDefinition = MIXED_ALL_DECK
+): GameState {
   const normalizedPlayerCount = Math.min(Math.max(playerCount, 2), 4);
+  const builtDeck = buildDeck(CARD_CATALOG, deckDefinition);
+  const capacity = validateDeckCapacity(builtDeck.totalCards, 1, HAND_SIZE);
+  if (!capacity.valid) {
+    throw new Error(capacity.message);
+  }
+  const deckTemplate = builtDeck.cards.map((card) => card.name);
   // Hands, decks, scores, and card ownership are all indexed by this stable seat count.
   const decks = Array.from({ length: normalizedPlayerCount }, () =>
-    shuffle([...CARD_NAMES])
+    shuffleCards(deckTemplate)
   );
   const players = decks.map((deck, playerId) => ({
     playerId,
@@ -54,6 +99,7 @@ export function initializeGame(playerCount = 2): GameState {
     START_CARD_NAMES[Math.floor(Math.random() * START_CARD_NAMES.length)];
   const startCard: PlacedCard = {
     id: `start_card_${Date.now()}_${Math.random()}`,
+    definitionId: getCardDefinitionIdByName(startCardName, START_CARD_CATALOG),
     cardName: startCardName,
     coordinates: BOARD_CENTER,
     playerId: null,
@@ -69,6 +115,13 @@ export function initializeGame(playerCount = 2): GameState {
     players,
     currentPlayerIndex: 0,
     deck: decks,
+    // A deck id is configuration; the snapshot is the immutable
+    // card composition owned by the running game.
+    deckSnapshot: {
+      sourceDeckId: deckDefinition.id,
+      cardDefinitionIds: builtDeck.cardDefinitionIds,
+      createdAt: new Date().toISOString(),
+    },
     startCard,
     lastPlacedCardId: startCard.id,
     pendingMove: null,
@@ -138,24 +191,26 @@ function isConfirmedPlayerCard(
   return card?.status === 'confirmed' && card.playerId === playerId;
 }
 
-function isConfirmedOtherColorCard(
-  card: PlacedCard | undefined,
-  playerId: number
-): boolean {
-  return card?.status === 'confirmed' && card.playerId !== playerId;
+function isConfirmedCard(card: PlacedCard | undefined): card is PlacedCard {
+  return card !== undefined && card.status === 'confirmed';
 }
 
-function getAdjacencyBonus(
+function getConfirmedAdjacentCards(
   board: GameState['board'],
-  card: PlacedCard,
-  playerId: number
-): number {
-  // The neutral start card has playerId null, so it counts as "other color" for adjacency.
-  const enemyNeighborCount = getAdjacentCoordinates(card.coordinates).filter(
-    (coordinates) => isConfirmedOtherColorCard(board[getBoardKey(coordinates)], playerId)
-  ).length;
+  coordinates: Coordinates
+): PlacedCard[] {
+  return getAdjacentCoordinates(coordinates)
+    .map((adjacentCoordinates) => board[getBoardKey(adjacentCoordinates)])
+    .filter(isConfirmedCard);
+}
 
-  return enemyNeighborCount * ADJACENCY_BONUS_PER_ENEMY_NEIGHBOR;
+export function getActiveAdjacencyScore(neighborCount: number): number {
+  if (neighborCount <= 0) return 0;
+  if (neighborCount === 1) return 1;
+
+  // The first neighbor is worth 1 point; placements with two or more
+  // neighbors reward the active player with 2 points per neighbor.
+  return Math.min(neighborCount, 4) * 2;
 }
 
 function getChainBonusForLineLength(lineLength: number): number {
@@ -207,89 +262,90 @@ function getChainBonusForPlayer(
   }, 0);
 }
 
-function getCrossBonus(crosses: Cross[], playerId: number): number {
-  return crosses.reduce(
-    (bonus, cross) => (cross.playerId === playerId ? bonus + cross.points : bonus),
-    0
-  );
-}
-
 interface ScoreBreakdown {
-  basePoints: number;
-  adjacencyBonus: number;
   chainBonus: number;
-  crossBonus: number;
-  total: number;
 }
 
-function getScoreBreakdown(
-  board: GameState['board'],
-  crosses: Cross[],
-  playerId: number
-): ScoreBreakdown {
-  // Keep scoring componentized so turn logs can report only the delta from this move.
-  const confirmedCards = Object.values(board).filter((card) =>
-    isConfirmedPlayerCard(card, playerId)
-  );
-  const basePoints = confirmedCards.length;
-  const adjacencyBonus = confirmedCards.reduce(
-    (bonus, card) => bonus + getAdjacencyBonus(board, card, playerId),
-    0
-  );
+function getScoreBreakdown(board: GameState['board'], playerId: number): ScoreBreakdown {
   const chainBonus =
     getChainBonusForPlayer(board, playerId, 'horizontal') +
     getChainBonusForPlayer(board, playerId, 'vertical');
-  const crossBonus = getCrossBonus(crosses, playerId);
 
   return {
-    basePoints,
-    adjacencyBonus,
     chainBonus,
-    crossBonus,
-    total: basePoints + adjacencyBonus + chainBonus + crossBonus,
   };
 }
 
-function calculateScores(
-  board: GameState['board'],
-  crosses: Cross[],
-  playerCount: number
-): GameState['scores'] {
-  return Array.from({ length: playerCount }, (_, playerId) =>
-    getScoreBreakdown(board, crosses, playerId).total
-  );
+function ensureScoreCapacity(scores: number[], playerCount: number): number[] {
+  const nextScores = [...scores];
+
+  while (nextScores.length < playerCount) {
+    nextScores.push(0);
+  }
+
+  return nextScores;
 }
 
-function getChainLabelByBonus(chainBonus: number): string {
-  if (chainBonus === 1) return 'цепочка в 3';
-  if (chainBonus === 2) return 'цепочка в 5';
-  if (chainBonus === 3) return 'цепочка в 7';
-  if (chainBonus === 4) return 'цепочка в 9';
-  return 'цепочка';
+export function calculateMoveScore(
+  boardBefore: GameState['board'],
+  boardAfter: GameState['board'],
+  placedCard: PlacedCard,
+  playerId: number,
+  crossScore = 0
+): MoveScoreResult {
+  const adjacentCards = getConfirmedAdjacentCards(boardAfter, placedCard.coordinates);
+  const neighborOwnerAwards = adjacentCards.reduce<Record<number, number>>(
+    (awards, neighbor) => {
+      if (neighbor.playerId === null) return awards;
+
+      // Each adjacent card also awards 1 point to its actual owner,
+      // independently of the active player's adjacency bonus.
+      awards[neighbor.playerId] =
+        (awards[neighbor.playerId] ?? 0) + NEIGHBOR_OWNER_SCORE;
+      return awards;
+    },
+    {}
+  );
+  const chainScore =
+    getScoreBreakdown(boardAfter, playerId).chainBonus -
+    getScoreBreakdown(boardBefore, playerId).chainBonus;
+  const placementScore = PLACEMENT_SCORE;
+  const adjacencyScore = getActiveAdjacencyScore(adjacentCards.length);
+  const activePlayerTotal =
+    placementScore + adjacencyScore + chainScore + crossScore;
+
+  return {
+    placementScore,
+    adjacencyScore,
+    chainScore,
+    crossScore,
+    activePlayerTotal,
+    neighborOwnerAwards,
+    neighborCount: adjacentCards.length,
+  };
 }
 
 function createTurnScoreResult(
   playerId: number,
   cardName: CardName,
-  before: ScoreBreakdown,
-  after: ScoreBreakdown,
-  crossBonus = 0
+  moveScore: MoveScoreResult,
+  newTotalScore: number
 ): TurnScoreResult {
-  // Chain and adjacency bonuses are recalculated globally, then diffed to avoid double-logging.
-  const basePoints = after.basePoints - before.basePoints;
-  const adjacencyBonus = after.adjacencyBonus - before.adjacencyBonus;
-  const chainBonus = after.chainBonus - before.chainBonus;
-  const totalGained = basePoints + adjacencyBonus + chainBonus + crossBonus;
+  const ownNeighborAward = moveScore.neighborOwnerAwards[playerId] ?? 0;
+  const totalGained = moveScore.activePlayerTotal + ownNeighborAward;
 
   return {
     playerId,
     cardName,
-    basePoints,
-    adjacencyBonus,
-    chainBonus,
-    crossBonus,
+    basePoints: moveScore.placementScore,
+    adjacencyBonus: moveScore.adjacencyScore,
+    chainBonus: moveScore.chainScore,
+    crossBonus: moveScore.crossScore,
+    activePlayerTotal: moveScore.activePlayerTotal,
+    neighborCount: moveScore.neighborCount,
+    neighborOwnerAwards: moveScore.neighborOwnerAwards,
     totalGained,
-    newTotalScore: after.total + crossBonus,
+    newTotalScore,
   };
 }
 
@@ -297,21 +353,17 @@ function formatTurnScoreLog(
   turnScore: TurnScoreResult,
   options?: { crossRejected?: boolean }
 ): string {
-  const scoreParts: string[] = [];
+  const ownerAwards = Object.entries(turnScore.neighborOwnerAwards)
+    .filter(([seatIndex]) => Number(seatIndex) !== turnScore.playerId)
+    .map(([seatIndex, award]) => `${getPlayerLabel(Number(seatIndex))} +${award}`);
+  const crossRejectedText = options?.crossRejected
+    ? '\nКрестовина не засчитана.'
+    : '';
+  const ownerAwardText = ownerAwards.length
+    ? `\nЗа соседние карты: ${ownerAwards.join(', ')}.`
+    : '';
 
-  if (turnScore.basePoints > 0) scoreParts.push(`+${turnScore.basePoints} карта`);
-  if (turnScore.adjacencyBonus > 0) {
-    scoreParts.push(`+${turnScore.adjacencyBonus} соседство`);
-  }
-  if (turnScore.chainBonus > 0) {
-    scoreParts.push(`+${turnScore.chainBonus} ${getChainLabelByBonus(turnScore.chainBonus)}`);
-  }
-  if (turnScore.crossBonus > 0) scoreParts.push(`+${turnScore.crossBonus} крестовина`);
-  if (options?.crossRejected) scoreParts.push('Крестовина не засчитана');
-
-  return `${getPlayerLabel(turnScore.playerId)} сыграл карту «${turnScore.cardName}».\n${scoreParts.join(
-    ', '
-  )}. Итог ${turnScore.totalGained}.`;
+  return `${getPlayerLabel(turnScore.playerId)} сыграл карту «${turnScore.cardName}». +${turnScore.totalGained}.${ownerAwardText}${crossRejectedText}`;
 }
 
 function getCrossMajorityPlayerId(cards: PlacedCard[]): number | null {
@@ -386,6 +438,7 @@ function drawToHand(
   const newCards = [...cards];
   const drawnCard = deck.at(-1);
 
+  // TODO(rules): Define the official end-of-game condition for exhausted decks.
   if (newCards.length < HAND_SIZE && drawnCard) {
     newCards.push(drawnCard);
   }
@@ -440,6 +493,7 @@ export function placeCard(
 
   const placedCard: PlacedCard = {
     id: `card_${Date.now()}_${Math.random()}`,
+    definitionId: getCardDefinitionIdByName(cardName),
     cardName,
     coordinates,
     playerId: gameState.currentPlayerIndex,
@@ -490,8 +544,6 @@ export function confirmPendingCard(gameState: GameState): GameState {
 
   if (playerIndex === null || reviewerIndex === null) return gameState;
 
-  // Score the author seat, not the reviewer who confirms the pending move.
-  const scoreBefore = getScoreBreakdown(gameState.board, gameState.crosses, playerIndex);
   const newBoard = Object.fromEntries(
     Object.entries(gameState.board).map(([key, card]) => [
       key,
@@ -519,8 +571,47 @@ export function confirmPendingCard(gameState: GameState): GameState {
   const pendingCross = confirmedPlacedCard
     ? findPendingCrossCandidate(newBoard, confirmedPlacedCard)
     : null;
-  const scoreAfter = getScoreBreakdown(newBoard, gameState.crosses, playerIndex);
-  const turnScore = createTurnScoreResult(playerIndex, cardName, scoreBefore, scoreAfter);
+  const moveScore = confirmedPlacedCard
+    ? calculateMoveScore(
+        gameState.board,
+        newBoard,
+        confirmedPlacedCard,
+        playerIndex
+      )
+    : null;
+  const nextScores = ensureScoreCapacity(
+    gameState.scores,
+    gameState.players.length
+  );
+
+  if (moveScore) {
+    nextScores[playerIndex] =
+      (nextScores[playerIndex] ?? 0) + moveScore.activePlayerTotal;
+
+    Object.entries(moveScore.neighborOwnerAwards).forEach(([seatKey, award]) => {
+      const seatIndex = Number(seatKey);
+      nextScores[seatIndex] = (nextScores[seatIndex] ?? 0) + award;
+    });
+  }
+
+  if (import.meta.env.DEV && moveScore) {
+    console.debug('[move score]', {
+      placedBySeatIndex: playerIndex,
+      neighborCount: moveScore.neighborCount,
+      placementScore: moveScore.placementScore,
+      adjacencyScore: moveScore.adjacencyScore,
+      chainScore: moveScore.chainScore,
+      crossScore: moveScore.crossScore,
+      activePlayerTotal: moveScore.activePlayerTotal,
+      neighborOwnerAwards: moveScore.neighborOwnerAwards,
+      scoresBefore: gameState.scores,
+      scoresAfter: nextScores,
+    });
+  }
+
+  const turnScore = moveScore
+    ? createTurnScoreResult(playerIndex, cardName, moveScore, nextScores[playerIndex])
+    : null;
 
   return {
     ...gameState,
@@ -530,9 +621,9 @@ export function confirmPendingCard(gameState: GameState): GameState {
     pendingMove: null,
     pendingCross,
     pendingTurnScore: pendingCross ? turnScore : null,
-    scores: calculateScores(newBoard, gameState.crosses, gameState.players.length),
+    scores: nextScores,
     currentPlayerIndex: reviewerIndex,
-    log: pendingCross
+    log: pendingCross || !turnScore
       ? gameState.log
       : [...gameState.log, formatTurnScoreLog(turnScore)],
   };
@@ -570,7 +661,7 @@ export function returnPendingCard(gameState: GameState): GameState {
     players: newPlayers,
     pendingMove: null,
     pendingTurnScore: null,
-    scores: calculateScores(newBoard, gameState.crosses, gameState.players.length),
+    scores: ensureScoreCapacity(gameState.scores, gameState.players.length),
     currentPlayerIndex: playerIndex,
     lastPlacedCardId: gameState.startCard.id,
   };
@@ -597,7 +688,8 @@ export function approvePendingCross(gameState: GameState): GameState {
     ])
   ) as GameState['board'];
   const newCrosses = [...gameState.crosses, cross];
-  const newScores = calculateScores(newBoard, newCrosses, gameState.players.length);
+  const newScores = ensureScoreCapacity(gameState.scores, gameState.players.length);
+  newScores[playerId] = (newScores[playerId] ?? 0) + cross.points;
 
   return {
     ...gameState,
@@ -608,6 +700,9 @@ export function approvePendingCross(gameState: GameState): GameState {
     scores: newScores,
     log: [
       ...gameState.log,
+      ...(gameState.pendingTurnScore
+        ? [formatTurnScoreLog(gameState.pendingTurnScore)]
+        : []),
       `${getPlayerLabel(reviewerId)} одобрил крестовину ${getPlayerLabel(playerId)}: +5 очков`,
     ],
   };
@@ -622,9 +717,12 @@ export function rejectPendingCross(gameState: GameState): GameState {
     ...gameState,
     pendingCross: null,
     pendingTurnScore: null,
-    scores: calculateScores(gameState.board, gameState.crosses, gameState.players.length),
+    scores: ensureScoreCapacity(gameState.scores, gameState.players.length),
     log: [
       ...gameState.log,
+      ...(gameState.pendingTurnScore
+        ? [formatTurnScoreLog(gameState.pendingTurnScore)]
+        : []),
       `${getPlayerLabel(reviewerId)} не одобрил крестовину ${getPlayerLabel(playerId)}`,
     ],
   };

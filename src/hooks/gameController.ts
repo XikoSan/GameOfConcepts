@@ -15,6 +15,6 @@ export interface GameController {
   returnCard: () => void;
   approveCross: () => void;
   rejectCross: () => void;
-  resetGame: (playerCount?: number) => void;
-  startLocalGame: (playerCount?: number) => void;
+  resetGame: (playerCount?: number, deckId?: string) => void;
+  startLocalGame: (playerCount?: number, deckId?: string) => void;
 }
