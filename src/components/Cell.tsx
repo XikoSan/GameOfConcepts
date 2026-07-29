@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
+import type { CardRelationLabel } from '../scoring/semanticRelations';
 import type { PlacedCard } from '../game';
 import {
   getConceptSummary,
@@ -36,6 +37,10 @@ interface CellProps {
   onApprovePendingCross?: () => void;
   onRejectPendingCross?: () => void;
   tooltipScopeKey?: string;
+  semanticRelationLabels?: CardRelationLabel[];
+  isRelationHighlighted?: boolean;
+  onRelationEnter?: (cardInstanceId: string) => void;
+  onRelationLeave?: () => void;
 }
 
 const getFontSize = (cardName: string) => {
@@ -119,6 +124,10 @@ export const Cell: React.FC<CellProps> = ({
   onApprovePendingCross,
   onRejectPendingCross,
   tooltipScopeKey = 'default',
+  semanticRelationLabels = [],
+  isRelationHighlighted = false,
+  onRelationEnter,
+  onRelationLeave,
 }) => {
   const [popoverMode, setPopoverMode] = useState<PopoverStateMode>('hidden');
   const [popoverPosition, setPopoverPosition] = useState<PopoverPosition | null>(null);
@@ -318,6 +327,10 @@ export const Cell: React.FC<CellProps> = ({
     );
   };
 
+  const handleCardPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.stopPropagation();
+  };
+
   const handlePopoverPointerEnter = () => {
     clearPopoverTimers();
 
@@ -508,6 +521,8 @@ export const Cell: React.FC<CellProps> = ({
       } ${placedCard?.playerId === null ? 'neutral' : ''} ${
         placedCard?.status === 'pending' ? 'pending' : ''
       } ${
+        isRelationHighlighted ? 'relation-highlighted' : ''
+      } ${
         placedCard ? 'occupied' : 'empty'
       }`}
       onClick={onCellClick}
@@ -522,6 +537,7 @@ export const Cell: React.FC<CellProps> = ({
           } ${isCrossPendingCenter ? 'cross-pending-center' : ''}`}
           onPointerEnter={handleCardPointerEnter}
           onPointerLeave={handleCardPointerLeave}
+          onPointerDown={handleCardPointerDown}
           onClick={openPinnedPopover}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
@@ -539,6 +555,8 @@ export const Cell: React.FC<CellProps> = ({
                 mode={activePopoverMode}
                 onClose={closePopover}
                 onPointerEnter={handlePopoverPointerEnter}
+                onRelationEnter={onRelationEnter}
+                onRelationLeave={onRelationLeave}
                 onToggleExpanded={handleTogglePopoverExpanded}
                 ownerLabel={getOwnerLabel(placedCard.playerId)}
                 position={popoverPosition}
@@ -552,6 +570,7 @@ export const Cell: React.FC<CellProps> = ({
                     ? popoverSummary.summary
                     : null
                 }
+                semanticRelations={semanticRelationLabels}
                 wiktionaryUrl={getWiktionarySearchUrl(placedCard.cardName)}
               />,
               document.body

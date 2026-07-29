@@ -22,7 +22,14 @@ import {
   MIXED_ALL_DECK,
   USER_SELECTABLE_DECKS,
 } from './data/deckDefinitions';
-import type { Coordinates, GameState, PendingMove, RegularCardName } from './game';
+import { createSemanticEdgeFromPending, formatSemanticRelation } from './scoring/semanticRelations';
+import type {
+  Coordinates,
+  GameState,
+  PendingMove,
+  PendingSemanticEdge,
+  RegularCardName,
+} from './game';
 import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
 
@@ -196,6 +203,10 @@ function App() {
     activePlayerIndex,
     error: gameControllerError,
     placeCard,
+    upsertSemanticEdge,
+    removeSemanticEdge,
+    submitSemanticMove,
+    cancelPendingMove,
     confirmCard,
     returnCard,
     approveCross,
@@ -221,9 +232,10 @@ function App() {
     playerId
   );
   const canReviewPendingMove =
-    mode === 'local'
+    gameState.pendingMove?.semanticStatus === 'voting' &&
+    (mode === 'local'
       ? true
-      : Boolean(gameState.pendingMove) && pendingMoveVoteState.canVote;
+      : Boolean(gameState.pendingMove) && pendingMoveVoteState.canVote);
   const pendingMovePlayerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
   const pendingMoveReviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
   const showPendingWaitBadge =
@@ -237,14 +249,45 @@ function App() {
   const currentPlayerId = onlineRoom?.turn_order?.[onlineRoom.current_turn_index] ?? null;
   const isOnlineHost = isRoomHost(onlineRoom, playerId);
   const activeScoreIndex =
-    mode === 'local' ? activePlayerIndex : pendingMoveReviewerIndex ?? activePlayerIndex;
-  const scoreStateLabel = gameState.pendingMove ? 'решение' : 'ход';
+    gameState.pendingMove?.semanticStatus === 'defining-relations'
+      ? pendingMovePlayerIndex ?? activePlayerIndex
+      : mode === 'local'
+        ? activePlayerIndex
+        : pendingMoveReviewerIndex ?? activePlayerIndex;
+  const scoreStateLabel =
+    gameState.pendingMove?.semanticStatus === 'defining-relations'
+      ? 'связи'
+      : gameState.pendingMove
+        ? 'решение'
+        : 'ход';
   const canReviewPendingCross =
     mode === 'local' ||
     (localPlayerIndex !== null &&
       Boolean(gameState.pendingCross) &&
       activePlayerIndex === localPlayerIndex);
   const getSeatScore = (seatIndex: number) => gameState.scores?.[seatIndex] ?? 0;
+  const pendingSemanticEdges = gameState.pendingMove?.semanticEdges ?? [];
+  const pendingSemanticScore = gameState.pendingMove?.scorePreview;
+  const isSubmittingSemanticMove = false;
+  const canEditSemanticMove =
+    Boolean(gameState.pendingMove) &&
+    gameState.pendingMove?.semanticStatus === 'defining-relations' &&
+    (mode === 'local' ||
+      (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
+  const isPendingEdgeComplete = (edge: PendingSemanticEdge) =>
+    Boolean(edge.relation) &&
+    (edge.relation.family === 'opposite' || Boolean(edge.direction));
+  const canSubmitRelations =
+    canEditSemanticMove &&
+    pendingSemanticEdges.length > 0 &&
+    pendingSemanticEdges.every(isPendingEdgeComplete) &&
+    !isSubmittingSemanticMove;
+  const semanticSubmitHint =
+    pendingSemanticEdges.length === 0
+      ? 'Выберите минимум одну смысловую связь.'
+      : pendingSemanticEdges.every(isPendingEdgeComplete)
+        ? 'Ход готов к голосованию.'
+        : 'Укажите тип и направление каждой выбранной связи.';
 
   const handlePlaceCard = (cardName: RegularCardName, coordinates: Coordinates) => {
     if (!selectedCard || hasPendingDecision) return;
@@ -255,6 +298,25 @@ function App() {
   const handleOpenDictionary = (term: string) => {
     setDictionaryTerm(term);
     setIsDictionaryOpen(true);
+  };
+
+  const getPendingSemanticEdgeScore = (pendingEdgeId: string) =>
+    pendingSemanticScore?.edges.find((edge) => edge.pendingEdgeId === pendingEdgeId);
+
+  const getSemanticEdgeLabel = (
+    edge: PendingSemanticEdge
+  ) => {
+    const pendingMove = gameState.pendingMove;
+    const pendingCard = pendingMove
+      ? Object.values(gameState.board).find((card) => card.id === pendingMove.cardId)
+      : null;
+    if (!pendingMove || !pendingCard) return 'Связь';
+
+    const semanticEdge = createSemanticEdgeFromPending(pendingMove, edge, pendingCard);
+    const namesById = new Map(
+      Object.values(gameState.board).map((card) => [card.id, card.cardName])
+    );
+    return formatSemanticRelation(semanticEdge, namesById);
   };
 
   const getValidatedOnlineNickname = (): string | null => {
@@ -761,8 +823,50 @@ function App() {
       pendingCrossReviewerLabel={getPlayerLabel(activePlayerIndex)}
       onApprovePendingCross={approveCross}
       onRejectPendingCross={rejectCross}
+      canEditSemanticMove={canEditSemanticMove}
+      canSubmitSemanticMove={canSubmitRelations}
+      onUpsertSemanticEdge={upsertSemanticEdge}
+      onRemoveSemanticEdge={removeSemanticEdge}
+      onSubmitSemanticMove={submitSemanticMove}
+      onCancelPendingMove={cancelPendingMove}
     />
   );
+
+  const renderSemanticMovePanel = () => {
+    if (!gameState.pendingMove) return null;
+
+    const isDefining = gameState.pendingMove.semanticStatus === 'defining-relations';
+    const isVoting = gameState.pendingMove.semanticStatus === 'voting';
+
+    return (
+      <section className="semantic-move-panel" aria-label="Смысловые связи хода">
+        <div className="semantic-move-header">
+          <h2>{isDefining ? 'Связи хода' : 'Голосование'}</h2>
+          <strong>+{pendingSemanticScore?.total ?? 0}</strong>
+        </div>
+        {isDefining && (
+          <p className="semantic-move-note">
+            {canEditSemanticMove
+              ? semanticSubmitHint
+              : 'Автор хода выбирает связи на поле.'}
+          </p>
+        )}
+        {isVoting && (
+          <div className="semantic-vote-summary">
+            {(gameState.pendingMove.semanticEdges ?? []).map((edge) => {
+              const score = getPendingSemanticEdgeScore(edge.id);
+              return (
+                <p key={edge.id}>
+                  {getSemanticEdgeLabel(edge)}
+                  <strong>+{score?.total ?? 1}</strong>
+                </p>
+              );
+            })}
+          </div>
+        )}
+      </section>
+    );
+  };
 
   const renderControlPanel = (showScoreHint = false) => (
     <aside className="side-panel control-panel" aria-label="Панель управления">
@@ -772,6 +876,8 @@ function App() {
           <h1>Управление</h1>
         </div>
       </section>
+
+      {renderSemanticMovePanel()}
 
       <nav className="panel-actions" aria-label="Действия">
         <section className="action-group action-group-primary" aria-label="Партия">
@@ -847,21 +953,20 @@ function App() {
         </section>
       </nav>
 
-      {showScoreHint && (
+      {showScoreHint && !gameState.pendingMove && (
         <section className="control-hint-card" aria-label="Памятка по очкам">
           <h3>Памятка</h3>
           <div className="control-hint-group">
             <strong>Очки</strong>
-            <p>Размещение: +1 ПО</p>
-            <p>Соседи: 1/2/3/4 = +1/+4/+6/+8</p>
-            <p>Соседняя карта: владельцу +1</p>
-            <p>Цепочки: 3/5/7/9 = +1/+2/+3/+4</p>
-            <p>Крестовина: +5 ПО</p>
+            <p>Связь: +1</p>
+            <p>Путь: ещё +1</p>
+            <p>Узел: ещё +1</p>
+            <p>Максимум за связь: +3</p>
           </div>
           <div className="control-hint-group">
             <strong>База</strong>
             <p>Одинаковые слова рядом — нельзя</p>
-            <p>Связь объясняется устно</p>
+            <p>Нужна минимум 1 связь</p>
             <p>Голосование: ✓ принять / ↩ вернуть</p>
           </div>
           <div className="control-hint-group">

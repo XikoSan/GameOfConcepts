@@ -63,6 +63,32 @@
   line-height: 1.3;
 }
 
+.card-info-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+}
+
+.card-info-meta > span:first-child {
+  color: #d8d0c4;
+}
+
+.card-info-relation-count {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  box-sizing: border-box;
+  border: 1px solid rgba(220, 180, 110, 0.2);
+  border-radius: 999px;
+  padding: 2px 7px !important;
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 226, 164, 0.92) !important;
+  font-size: 11px !important;
+  font-weight: 750;
+  cursor: pointer;
+}
+
 .card-info-popover p {
   margin: 0;
   color: #efe2ca;
@@ -86,6 +112,56 @@
 
 .card-info-popover-pinned.expanded p {
   max-height: min(48vh, 430px);
+}
+
+.card-info-relations {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(220, 180, 110, 0.14);
+}
+
+.card-info-relations strong {
+  color: rgba(230, 185, 95, 0.8);
+  font-size: 12px;
+  line-height: 1.1;
+}
+
+.card-info-relations ul {
+  display: grid;
+  gap: 4px;
+  max-height: 128px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.card-info-relations li {
+  margin: 0;
+}
+
+.card-info-relations li button {
+  width: 100%;
+  min-height: 24px;
+  justify-content: flex-start;
+  border-color: rgba(255, 255, 255, 0.08);
+  border-radius: 7px;
+  padding: 4px 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(245, 230, 205, 0.82);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-align: left;
+  white-space: normal;
+}
+
+.card-info-relations li button:hover,
+.card-info-relations li button:focus-visible {
+  border-color: rgba(230, 185, 95, 0.32);
+  background: rgba(231, 189, 119, 0.1);
+  color: #fff2d4;
 }
 
 .card-info-hint {
@@ -121,6 +197,14 @@
 .card-info-popover a:hover {
   border-color: rgba(231, 189, 119, 0.52);
   background: rgba(231, 189, 119, 0.14);
+}
+
+.card-info-popover .card-info-relation-count {
+  min-height: 20px;
+  border-color: rgba(220, 180, 110, 0.2);
+  background: rgba(255, 255, 255, 0.045);
+  color: rgba(255, 226, 164, 0.92);
+  font-size: 11px;
 }
 
 .card-info-popover.player-0 {

@@ -1,4 +1,9 @@
-import type { CSSProperties } from 'react';
+import { useState } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
+import {
+  formatRelationCount,
+  type CardRelationLabel,
+} from '../scoring/semanticRelations';
 import type { ConceptSummary } from '../services/conceptDescriptionService';
 import './CardInfoPopover.css';
 
@@ -12,12 +17,15 @@ interface CardInfoPopoverProps {
   mode: CardInfoPopoverMode;
   onClose: () => void;
   onPointerEnter?: () => void;
+  onRelationEnter?: (cardInstanceId: string) => void;
+  onRelationLeave?: () => void;
   onToggleExpanded: () => void;
   ownerLabel: string;
   position: {
     left: number;
     top: number;
   };
+  semanticRelations?: CardRelationLabel[];
   status: CardInfoStatus;
   summary: ConceptSummary | null;
   wiktionaryUrl: string;
@@ -51,13 +59,17 @@ export function CardInfoPopover({
   mode,
   onClose,
   onPointerEnter,
+  onRelationEnter,
+  onRelationLeave,
   onToggleExpanded,
   ownerLabel,
   position,
+  semanticRelations = [],
   status,
   summary,
   wiktionaryUrl,
 }: CardInfoPopoverProps) {
+  const [relationsExpanded, setRelationsExpanded] = useState(false);
   const fullText = getBodyText(status, summary);
   const isLongDescription = status === 'ready' && fullText.length > COMPACT_TEXT_LENGTH;
   const visibleText =
@@ -66,6 +78,12 @@ export function CardInfoPopover({
     left: `${position.left}px`,
     top: `${position.top}px`,
   } satisfies CSSProperties;
+  const relationCountText = formatRelationCount(semanticRelations.length);
+
+  const handleToggleRelations = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setRelationsExpanded((current) => !current);
+  };
 
   return (
     <div
@@ -81,7 +99,20 @@ export function CardInfoPopover({
       <div className="card-info-header">
         <div>
           <strong>{cardName}</strong>
-          <span>Владелец: {ownerLabel}</span>
+          <div className="card-info-meta">
+            <span>{ownerLabel}</span>
+            {semanticRelations.length > 0 && (
+              <button
+                aria-expanded={relationsExpanded}
+                className="card-info-relation-count"
+                type="button"
+                onClick={handleToggleRelations}
+                onPointerDown={(event) => event.stopPropagation()}
+              >
+                {relationCountText} {relationsExpanded ? '▴' : '▾'}
+              </button>
+            )}
+          </div>
         </div>
         {mode === 'pinned' && (
           <button type="button" onClick={onClose}>
@@ -91,6 +122,30 @@ export function CardInfoPopover({
       </div>
 
       <p>{visibleText}</p>
+
+      {relationsExpanded && semanticRelations.length > 0 && (
+        <section className="card-info-relations" aria-label="Смысловые связи карты">
+          <strong>Связи</strong>
+          <ul>
+            {semanticRelations.map((relationLabel) => (
+              <li key={relationLabel.edgeId}>
+                <button
+                  type="button"
+                  title={relationLabel.fullText}
+                  onPointerEnter={() =>
+                    onRelationEnter?.(relationLabel.otherCardInstanceId)
+                  }
+                  onPointerLeave={() => onRelationLeave?.()}
+                  onFocus={() => onRelationEnter?.(relationLabel.otherCardInstanceId)}
+                  onBlur={() => onRelationLeave?.()}
+                >
+                  {relationLabel.fullText}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {mode === 'tooltip' ? (
         <span className="card-info-hint">Наведите на подсказку, чтобы закрепить</span>
