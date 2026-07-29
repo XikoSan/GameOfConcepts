@@ -56,7 +56,9 @@ const isCompatibleMultiplayerRoom = (room: Room) =>
   typeof room.max_players === 'number' &&
   Array.isArray(room.players) &&
   Array.isArray(room.turn_order) &&
-  typeof room.current_turn_index === 'number';
+  typeof room.current_turn_index === 'number' &&
+  room.game_state?.scoringVersion === 3 &&
+  Array.isArray(room.game_state?.semanticEdges);
 
 const getRoomPlayers = (room: Room): RoomPlayer[] => {
   if (Array.isArray(room.players) && room.players.length > 0) {
@@ -182,6 +184,8 @@ function ensureGameStateCapacity(
     players,
     deck,
     scores,
+    semanticEdges: gameState.semanticEdges ?? [],
+    scoringVersion: 3 as const,
   };
 
   console.debug('[room debug capacity after]', {
@@ -491,6 +495,10 @@ export async function joinRoom({
 
   if (room.status === 'finished') {
     throw new Error('Игра уже завершена.');
+  }
+
+  if (!isCompatibleMultiplayerRoom(room)) {
+    throw new Error('Комната создана в старой версии правил. Создайте новую комнату.');
   }
 
   const maxPlayers = getRoomMaxPlayers(room);

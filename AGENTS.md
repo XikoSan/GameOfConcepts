@@ -10,11 +10,19 @@
 - `game-rules.md` считается основным источником правил игры.
 - Перед изменением правил, подсчёта очков, текста окна "Правила" или игровых ограничений сверяться с `game-rules.md`.
 - Не менять игровую механику, список карт, подсчёт очков или правила размещения без прямого запроса.
-- An accepted card gives its player +1 base point.
-- Active adjacency score is 1 / 4 / 6 / 8 for 1-4 orthogonal neighbors.
-- Each neighboring card awards +1 to its owner.
-- Neighbor-owner awards are distributed by stable seatIndex.
-- Neutral cards count for active adjacency but have no owner award.
+- Physical adjacency does not create a semantic edge automatically.
+- A move requires at least one accepted semantic edge.
+- Every accepted new edge gives +1.
+- A new edge may receive at most one path bonus and one node bonus.
+- Path and node bonuses stack.
+- A semantic path continues through cards owned by the player.
+- A foreign or neutral card may be a terminal endpoint.
+- A foreign or neutral card cannot be an internal continuation vertex.
+- Path continuation requires head-to-tail semantic direction.
+- Same-source or same-target edges may form a node, not a path.
+- A node center may be owned, foreign, or neutral.
+- Relation family and direction together define connectivity.
+- Pending edges are scored in creation order.
 
 ## Online And Supabase
 

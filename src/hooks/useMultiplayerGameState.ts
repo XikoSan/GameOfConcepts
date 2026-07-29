@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { applyGameAction } from '../gameActions';
 import { getRoomById, updateRoomGameState } from '../services/roomService';
-import type { Coordinates, GameState, RegularCardName } from '../game';
+import type {
+  Coordinates,
+  GameState,
+  PendingSemanticEdge,
+  RegularCardName,
+  SemanticRelation,
+} from '../game';
 import type { GameAction } from '../gameActions';
 import type { Room } from '../types/room';
 import type { GameController } from './gameController';
@@ -70,12 +76,24 @@ const syncGameStateToRoomTurn = (room: Room): GameState => ({
   currentPlayerIndex: getCurrentRoomSeatIndex(room),
 });
 
-const syncPendingMoveReviewerToTurnOrder = (
+const syncPendingMoveToTurnOrder = (
   room: Room,
   gameState: GameState,
   action: GameAction
 ): GameState => {
-  if (action.type !== 'placeCard' || !gameState.pendingMove) return gameState;
+  if (
+    !['placeCard', 'submitSemanticMove'].includes(action.type) ||
+    !gameState.pendingMove
+  ) {
+    return gameState;
+  }
+
+  if (
+    action.type === 'submitSemanticMove' &&
+    gameState.pendingMove.semanticStatus !== 'voting'
+  ) {
+    return gameState;
+  }
 
   const nextTurnIndex = getNextTurnIndex(room);
   if (nextTurnIndex === undefined) return gameState;
@@ -111,8 +129,8 @@ const syncPendingMoveReviewerToTurnOrder = (
           (card) => card.id === gameState.pendingMove?.cardId
         )?.coordinates,
       requiredVoters,
-      votes: {},
-      status: 'voting',
+      votes: action.type === 'submitSemanticMove' ? {} : gameState.pendingMove.votes,
+      status: action.type === 'submitSemanticMove' ? 'voting' : gameState.pendingMove.status,
       createdAt: gameState.pendingMove.createdAt ?? new Date().toISOString(),
       reviewerIndex,
       reviewerId: reviewerIndex,
@@ -234,6 +252,9 @@ function getActionBlockReason(
     case 'confirmCard':
     case 'returnCard':
       if (!gameState.pendingMove) return `${action.type}: no pendingMove`;
+      if (gameState.pendingMove.semanticStatus !== 'voting') {
+        return `${action.type}: pendingMove is not voting`;
+      }
       if (gameState.pendingMove.requiredVoters) {
         const localPlayerId = room.players?.find(
           (player) => player.seatIndex === localPlayerIndex
@@ -250,6 +271,18 @@ function getActionBlockReason(
       return getPendingMoveReviewerIndex(gameState.pendingMove) === localPlayerIndex
         ? null
         : `${action.type}: localPlayerIndex is not reviewerIndex`;
+
+    case 'upsertSemanticEdge':
+    case 'removeSemanticEdge':
+    case 'submitSemanticMove':
+    case 'cancelPendingMove':
+      if (!gameState.pendingMove) return `${action.type}: no pendingMove`;
+      if (gameState.pendingMove.semanticStatus === 'voting') {
+        return `${action.type}: pendingMove is already voting`;
+      }
+      return getPendingMovePlayerIndex(gameState.pendingMove) === localPlayerIndex
+        ? null
+        : `${action.type}: localPlayerIndex is not move author`;
 
     case 'approveCross':
     case 'rejectCross':
@@ -343,7 +376,7 @@ export function useMultiplayerGameState({
       // TODO(MVP): Сейчас весь gameState синхронизируется целиком через JSONB.
       // FIXME(MVP): Руки и колоды обоих игроков доступны клиенту через gameState.
       // TODO(MVP): Позже действия должны валидироваться сервером.
-      const nextGameState = syncPendingMoveReviewerToTurnOrder(
+      const nextGameState = syncPendingMoveToTurnOrder(
         room,
         applyGameAction(currentGameState, action),
         action
@@ -415,6 +448,10 @@ export function useMultiplayerGameState({
         const latestPendingMove = latestRoom.game_state.pendingMove;
         if (!latestPendingMove) {
           console.warn('[online vote blocked]', 'no pendingMove');
+          return;
+        }
+        if (latestPendingMove.semanticStatus !== 'voting') {
+          console.warn('[online vote blocked]', 'pendingMove is not voting');
           return;
         }
 
@@ -593,6 +630,27 @@ export function useMultiplayerGameState({
     activePlayerIndex,
     placeCard: (cardName: RegularCardName, coordinates: Coordinates) => {
       void dispatchAction({ type: 'placeCard', cardName, coordinates });
+    },
+    upsertSemanticEdge: (
+      neighborCardInstanceId: string,
+      relation: SemanticRelation,
+      direction: PendingSemanticEdge['direction']
+    ) => {
+      void dispatchAction({
+        type: 'upsertSemanticEdge',
+        neighborCardInstanceId,
+        relation,
+        direction,
+      });
+    },
+    removeSemanticEdge: (neighborCardInstanceId: string) => {
+      void dispatchAction({ type: 'removeSemanticEdge', neighborCardInstanceId });
+    },
+    submitSemanticMove: () => {
+      void dispatchAction({ type: 'submitSemanticMove' });
+    },
+    cancelPendingMove: () => {
+      void dispatchAction({ type: 'cancelPendingMove' });
     },
     confirmCard: () => {
       void voteOnPendingMove('accept');

@@ -2,7 +2,13 @@ import { useCallback, useState } from 'react';
 import { applyGameAction } from '../gameActions';
 import { initializeGame } from '../game';
 import { getDeckDefinitionById, MIXED_ALL_DECK } from '../data/deckDefinitions';
-import type { Coordinates, GameState, RegularCardName } from '../game';
+import type {
+  Coordinates,
+  GameState,
+  PendingSemanticEdge,
+  RegularCardName,
+  SemanticRelation,
+} from '../game';
 import type { GameController } from './gameController';
 
 type LocalVote = 'accept' | 'reject';
@@ -27,6 +33,7 @@ const getLocalRequiredVoters = (gameState: GameState) => {
 
 const getNextLocalVoter = (gameState: GameState): number | null => {
   if (!gameState.pendingMove) return null;
+  if (gameState.pendingMove.semanticStatus !== 'voting') return null;
 
   const requiredVoters =
     gameState.pendingMove.requiredVoters?.map(Number) ?? getLocalRequiredVoters(gameState);
@@ -58,6 +65,7 @@ const getVoteResolution = (requiredVoters: number[], votes: Record<string, Local
 
 const withLocalPendingVote = (gameState: GameState): GameState => {
   if (!gameState.pendingMove) return gameState;
+  if (gameState.pendingMove.semanticStatus !== 'voting') return gameState;
 
   const placedBySeatIndex =
     gameState.pendingMove.placedBySeatIndex ?? gameState.pendingMove.playerIndex;
@@ -93,13 +101,45 @@ export function useLocalGameState(): GameController {
   const handlePlaceCard = useCallback(
     (cardName: RegularCardName, coordinates: Coordinates) => {
       setGameState((prev) =>
-        withLocalPendingVote(
-          applyGameAction(prev, { type: 'placeCard', cardName, coordinates })
-        )
+        applyGameAction(prev, { type: 'placeCard', cardName, coordinates })
       );
     },
     []
   );
+
+  const handleUpsertSemanticEdge = useCallback(
+    (
+      neighborCardInstanceId: string,
+      relation: SemanticRelation,
+      direction: PendingSemanticEdge['direction']
+    ) => {
+      setGameState((prev) =>
+        applyGameAction(prev, {
+          type: 'upsertSemanticEdge',
+          neighborCardInstanceId,
+          relation,
+          direction,
+        })
+      );
+    },
+    []
+  );
+
+  const handleRemoveSemanticEdge = useCallback((neighborCardInstanceId: string) => {
+    setGameState((prev) =>
+      applyGameAction(prev, { type: 'removeSemanticEdge', neighborCardInstanceId })
+    );
+  }, []);
+
+  const handleSubmitSemanticMove = useCallback(() => {
+    setGameState((prev) =>
+      withLocalPendingVote(applyGameAction(prev, { type: 'submitSemanticMove' }))
+    );
+  }, []);
+
+  const handleCancelPendingMove = useCallback(() => {
+    setGameState((prev) => applyGameAction(prev, { type: 'cancelPendingMove' }));
+  }, []);
 
   const resetGame = useCallback((playerCount = localPlayerCount, deckId = localDeckId) => {
     const normalizedPlayerCount = normalizePlayerCount(playerCount);
@@ -112,6 +152,7 @@ export function useLocalGameState(): GameController {
   const voteOnPendingMove = useCallback((vote: LocalVote) => {
     setGameState((prev) => {
       if (!prev.pendingMove) return prev;
+      if (prev.pendingMove.semanticStatus !== 'voting') return prev;
 
       const nextVoter = getNextLocalVoter(prev);
       if (nextVoter === null) return prev;
@@ -171,6 +212,10 @@ export function useLocalGameState(): GameController {
     // hand is shown while hot-seat players pass the device around.
     activePlayerIndex: getNextLocalVoter(gameState) ?? gameState.currentPlayerIndex,
     placeCard: handlePlaceCard,
+    upsertSemanticEdge: handleUpsertSemanticEdge,
+    removeSemanticEdge: handleRemoveSemanticEdge,
+    submitSemanticMove: handleSubmitSemanticMove,
+    cancelPendingMove: handleCancelPendingMove,
     confirmCard: handleConfirmCard,
     returnCard: handleReturnCard,
     approveCross: handleApproveCross,

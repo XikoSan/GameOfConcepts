@@ -3,10 +3,19 @@ import {
   confirmPendingCard,
   initializeGame,
   placeCard,
+  removePendingSemanticEdge,
   rejectPendingCross,
   returnPendingCard,
+  submitPendingSemanticMove,
+  upsertPendingSemanticEdge,
 } from './game';
-import type { Coordinates, GameState, RegularCardName } from './game';
+import type {
+  Coordinates,
+  GameState,
+  PendingSemanticEdge,
+  RegularCardName,
+  SemanticRelation,
+} from './game';
 
 export type GameAction =
   | { type: 'resetGame' }
@@ -17,6 +26,18 @@ export type GameAction =
     }
   | { type: 'confirmCard' }
   | { type: 'returnCard' }
+  | {
+      type: 'upsertSemanticEdge';
+      neighborCardInstanceId: string;
+      relation: SemanticRelation;
+      direction: PendingSemanticEdge['direction'];
+    }
+  | {
+      type: 'removeSemanticEdge';
+      neighborCardInstanceId: string;
+    }
+  | { type: 'submitSemanticMove' }
+  | { type: 'cancelPendingMove' }
   | { type: 'approveCross' }
   | { type: 'rejectCross' };
 
@@ -37,6 +58,23 @@ export function applyGameAction(
       return confirmPendingCard(gameState);
 
     case 'returnCard':
+      return returnPendingCard(gameState);
+
+    case 'upsertSemanticEdge':
+      return upsertPendingSemanticEdge(
+        gameState,
+        action.neighborCardInstanceId,
+        action.relation,
+        action.direction
+      );
+
+    case 'removeSemanticEdge':
+      return removePendingSemanticEdge(gameState, action.neighborCardInstanceId);
+
+    case 'submitSemanticMove':
+      return submitPendingSemanticMove(gameState);
+
+    case 'cancelPendingMove':
       return returnPendingCard(gameState);
 
     case 'approveCross':

@@ -1,4 +1,10 @@
-import type { Coordinates, GameState, RegularCardName } from '../game';
+import type {
+  Coordinates,
+  GameState,
+  PendingSemanticEdge,
+  RegularCardName,
+  SemanticRelation,
+} from '../game';
 
 export type GameMode = 'local' | 'multiplayer';
 export type GameConnectionStatus = 'local' | 'connecting' | 'connected' | 'disconnected' | 'error';
@@ -11,6 +17,14 @@ export interface GameController {
   localPlayerIndex: number | null;
   activePlayerIndex: number;
   placeCard: (cardName: RegularCardName, coordinates: Coordinates) => void;
+  upsertSemanticEdge: (
+    neighborCardInstanceId: string,
+    relation: SemanticRelation,
+    direction: PendingSemanticEdge['direction']
+  ) => void;
+  removeSemanticEdge: (neighborCardInstanceId: string) => void;
+  submitSemanticMove: () => void;
+  cancelPendingMove: () => void;
   confirmCard: () => void;
   returnCard: () => void;
   approveCross: () => void;

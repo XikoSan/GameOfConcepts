@@ -43,12 +43,92 @@ export interface PlacedCard {
   connections: string[];
 }
 
+export type RelationFamily =
+  | 'kind'
+  | 'part'
+  | 'cause'
+  | 'property'
+  | 'opposite';
+
+export type DirectedRelationRole =
+  | 'kind'
+  | 'general'
+  | 'part'
+  | 'whole'
+  | 'cause'
+  | 'effect'
+  | 'property'
+  | 'property-bearer';
+
+export type SemanticRelation =
+  | {
+      family: 'kind';
+      fromRole: 'kind';
+      toRole: 'general';
+    }
+  | {
+      family: 'part';
+      fromRole: 'part';
+      toRole: 'whole';
+    }
+  | {
+      family: 'cause';
+      fromRole: 'cause';
+      toRole: 'effect';
+    }
+  | {
+      family: 'property';
+      fromRole: 'property';
+      toRole: 'property-bearer';
+    }
+  | {
+      family: 'opposite';
+      symmetric: true;
+    };
+
+export interface PendingSemanticEdge {
+  id: string;
+  neighborPosition: Coordinates;
+  neighborCardInstanceId: string;
+  relation: SemanticRelation;
+  direction: 'new-to-neighbor' | 'neighbor-to-new';
+  createdOrder: number;
+}
+
+export interface SemanticEdge {
+  id: string;
+  fromCardInstanceId: string;
+  toCardInstanceId: string;
+  fromPosition: Coordinates;
+  toPosition: Coordinates;
+  relation: SemanticRelation;
+  createdBySeatIndex: number;
+  createdAtMoveId: string;
+  createdOrder: number;
+}
+
+export interface SemanticEdgeScore {
+  pendingEdgeId: string;
+  baseScore: 1;
+  pathBonus: 0 | 1;
+  nodeBonus: 0 | 1;
+  total: 1 | 2 | 3;
+  continuesPath: boolean;
+  continuesNode: boolean;
+}
+
+export interface SemanticMoveScore {
+  edges: SemanticEdgeScore[];
+  total: number;
+}
+
 /**
  * Shared confirmation state for a placed card.
  * In online mode voter keys are playerId strings; in local mode they are seatIndex values.
  */
 export interface PendingMove {
   id?: string;
+  moveId?: string;
   cardId: string;
   cardName: RegularCardName;
   /** Seat index that placed the card in the original two-player flow. */
@@ -67,7 +147,10 @@ export interface PendingMove {
   /** Voters excluding the author; playerId strings online, seat indexes local. */
   requiredVoters?: Array<string | number>;
   votes?: Record<string, 'accept' | 'reject'>;
-  status?: 'voting';
+  status?: 'defining-relations' | 'voting';
+  semanticStatus?: 'defining-relations' | 'voting';
+  semanticEdges?: PendingSemanticEdge[];
+  scorePreview?: SemanticMoveScore;
   createdAt?: string;
 }
 
@@ -96,26 +179,10 @@ export interface PendingCross {
 export interface TurnScoreResult {
   playerId: number;
   cardName: CardName;
-  basePoints: number;
-  adjacencyBonus: number;
-  chainBonus: number;
-  crossBonus: number;
-  activePlayerTotal: number;
-  neighborCount: number;
-  neighborOwnerAwards: Record<number, number>;
+  semanticScore?: SemanticMoveScore;
+  edgeCount?: number;
   totalGained: number;
   newTotalScore: number;
-}
-
-/** Pure spatial scoring result for one accepted placement. */
-export interface MoveScoreResult {
-  placementScore: number;
-  adjacencyScore: number;
-  chainScore: number;
-  crossScore: number;
-  activePlayerTotal: number;
-  neighborOwnerAwards: Record<number, number>;
-  neighborCount: number;
 }
 
 export interface GameDeckSnapshot {
@@ -149,6 +216,8 @@ export interface GameState {
   pendingCross: PendingCross | null;
   pendingTurnScore: TurnScoreResult | null;
   crosses: Cross[];
+  semanticEdges?: SemanticEdge[];
+  scoringVersion?: 3;
   scores: number[];
   log: string[];
   gameOver: boolean;
