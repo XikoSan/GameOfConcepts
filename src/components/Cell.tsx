@@ -579,6 +579,7 @@ export const Cell: React.FC<CellProps> = ({
     const measuredSize = { width: rect.width, height: rect.height };
     popoverMeasuredSizeRef.current = measuredSize;
     incrementCounter('overlay:initial-measure');
+    incrementCounter('overlay:card-info-initial-measure');
     onCardInfoRectChangeRef.current?.(toOverlayRect(rect));
 
     if (!cardRef.current || !tooltipCardKey || !activePopoverMode) return;

@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
 import { canPlaceCard, getPhysicalSemanticNeighbors } from '../game';
@@ -273,6 +279,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [pendingActionsElement, setPendingActionsElement] =
     useState<HTMLDivElement | null>(null);
   const previousRelationEditorRectRef = useRef<OverlayRect | null>(null);
+  const previousPendingActionsRectRef = useRef<OverlayRect | null>(null);
 
   const handleCellClick = useCallback(
     (x: number, y: number) => {
@@ -551,7 +558,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     [overlayRects]
   );
   const pendingActionsOccupiedRects = useMemo(
-    () => getOccupiedOverlayRects(overlayRects, ['pending-actions']),
+    () => getOccupiedOverlayRects(overlayRects, ['pending-actions', 'card-info']),
     [overlayRects]
   );
 
@@ -745,6 +752,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     pendingActionsAnchorRect && boardViewportRect
       ? (() => {
           const startTime = startMeasure();
+          incrementCounter('overlay:pending-position-calculated');
           const rect = calculateBoardOverlayPosition({
             anchorRect: pendingActionsAnchorRect,
             overlaySize: getOverlaySize(overlayRects['pending-actions'], {
@@ -756,6 +764,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             preferredPlacements: ['right', 'left', 'top', 'bottom'],
             safePadding: 8,
           });
+          incrementCounter('overlay:pending-position-applied');
           endMeasure('overlay:position:pending-actions', startTime);
           return rect;
         })()
@@ -773,6 +782,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     }
     previousRelationEditorRectRef.current = relationEditorRect;
   }, [activeRelationEditorForCurrentMove, relationEditorRect]);
+
+  useEffect(() => {
+    if (!pendingActionsRect) {
+      previousPendingActionsRectRef.current = null;
+      return;
+    }
+
+    const previousRect = previousPendingActionsRectRef.current;
+    if (previousRect && !areOverlayRectsEqual(previousRect, pendingActionsRect)) {
+      incrementCounter('overlay:pending-moved');
+    } else {
+      incrementCounter('overlay:pending-move-skipped');
+    }
+    previousPendingActionsRectRef.current = pendingActionsRect;
+  }, [pendingActionsRect]);
+
   return (
     <div
       className={`game-board-container ${selectedCard ? '' : 'can-pan'}`}
