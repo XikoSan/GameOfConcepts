@@ -133,8 +133,8 @@
 }
 
 .semantic-submit-popover {
-  position: absolute;
-  z-index: 38;
+  position: fixed;
+  z-index: 900;
   display: grid;
   gap: 6px;
   width: 126px;

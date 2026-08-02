@@ -17,6 +17,11 @@
     0 18px 34px rgba(0, 0, 0, 0.48);
 }
 
+.card-info-popover.measuring {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .card-info-popover-tooltip {
   width: min(300px, calc(100vw - 24px));
   max-height: min(210px, calc(100vh - 24px));

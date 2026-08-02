@@ -2,6 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
 import { canPlaceCard, getPhysicalSemanticNeighbors } from '../game';
+import {
+  endMeasure,
+  incrementCounter,
+  startMeasure,
+} from '../debug/performanceDiagnostics';
 import type {
   Coordinates,
   GameState,
@@ -14,6 +19,12 @@ import type {
 import { formatRelationForCard } from '../scoring/semanticRelations';
 import { Cell } from './Cell';
 import { SemanticRelationPopover } from './SemanticRelationPopover';
+import {
+  calculateBoardOverlayPosition,
+  type BoardOverlayId,
+  type OverlayRect,
+  toOverlayRect,
+} from './boardOverlayPositioning';
 import './GameBoard.css';
 
 interface GameBoardProps {
@@ -179,6 +190,38 @@ const getAcceptedRelationLabelsByCardId = (
 const getPendingMoveKey = (pendingMove: GameState['pendingMove']) =>
   pendingMove?.moveId ?? pendingMove?.id ?? pendingMove?.cardId ?? null;
 
+const getOverlaySize = (
+  rect: OverlayRect | undefined,
+  fallbackSize: { width: number; height: number }
+) => ({
+  width: rect?.width ?? fallbackSize.width,
+  height: rect?.height ?? fallbackSize.height,
+});
+
+const areOverlayRectsEqual = (
+  firstRect: OverlayRect | null | undefined,
+  secondRect: OverlayRect | null | undefined
+) => {
+  if (!firstRect || !secondRect) return firstRect === secondRect;
+
+  const threshold = 0.5;
+
+  return (
+    Math.abs(firstRect.left - secondRect.left) < threshold &&
+    Math.abs(firstRect.top - secondRect.top) < threshold &&
+    Math.abs(firstRect.width - secondRect.width) < threshold &&
+    Math.abs(firstRect.height - secondRect.height) < threshold
+  );
+};
+
+const getOccupiedOverlayRects = (
+  overlayRects: Partial<Record<BoardOverlayId, OverlayRect>>,
+  ignoredIds: BoardOverlayId[] = []
+) =>
+  (Object.entries(overlayRects) as Array<[BoardOverlayId, OverlayRect]>)
+    .filter(([id]) => !ignoredIds.includes(id))
+    .map(([, rect]) => rect);
+
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
   selectedCard,
@@ -202,6 +245,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   onSubmitSemanticMove,
   onCancelPendingMove,
 }) => {
+  incrementCounter('render:GameBoard');
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
   );
@@ -219,13 +263,16 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [activeRelationEditor, setActiveRelationEditor] = useState<{
     moveId: string;
     neighborCardInstanceId: string;
-    position: {
-      left: number;
-      top: number;
-    };
   } | null>(null);
   const [highlightedRelationCardId, setHighlightedRelationCardId] =
     useState<string | null>(null);
+  const [boardViewportRect, setBoardViewportRect] = useState<OverlayRect | null>(null);
+  const [overlayRects, setOverlayRects] = useState<
+    Partial<Record<BoardOverlayId, OverlayRect>>
+  >({});
+  const [pendingActionsElement, setPendingActionsElement] =
+    useState<HTMLDivElement | null>(null);
+  const previousRelationEditorRectRef = useRef<OverlayRect | null>(null);
 
   const handleCellClick = useCallback(
     (x: number, y: number) => {
@@ -242,6 +289,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       const container = containerRef.current;
       if (!container) return null;
 
+      incrementCounter('dom:getBoundingClientRect:drop-coordinates');
       const rect = container.getBoundingClientRect();
       const viewportCenterX = (viewport.width || rect.width) / 2;
       const viewportCenterY = (viewport.height || rect.height) / 2;
@@ -265,6 +313,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     (event: React.DragEvent<HTMLDivElement>) => {
       if (!selectedCard) return;
 
+      incrementCounter('drag:board-dragover');
       event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
     },
@@ -276,6 +325,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       event.preventDefault();
       if (!selectedCard) return;
 
+      incrementCounter('drag:board-drop');
       const coordinates = getDropCoordinates(event);
       if (coordinates && canPlaceCard(gameState, coordinates, selectedCard)) {
         onPlaceCard(selectedCard, coordinates);
@@ -296,6 +346,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
+    incrementCounter('dom:getBoundingClientRect:wheel');
     const rect = container.getBoundingClientRect();
     const viewportCenterX = (viewport.width || rect.width) / 2;
     const viewportCenterY = (viewport.height || rect.height) / 2;
@@ -326,10 +377,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     if (!container) return;
 
     const updateViewportSize = () => {
-      setViewport({
+      incrementCounter('resize-observer:board');
+      incrementCounter('dom:getBoundingClientRect:board-viewport');
+      const rect = container.getBoundingClientRect();
+      const nextViewport = {
         width: container.clientWidth,
         height: container.clientHeight,
-      });
+      };
+      const nextViewportRect = toOverlayRect(rect);
+
+      setViewport((currentViewport) =>
+        currentViewport.width === nextViewport.width &&
+        currentViewport.height === nextViewport.height
+          ? currentViewport
+          : nextViewport
+      );
+      setBoardViewportRect((currentRect) =>
+        areOverlayRectsEqual(currentRect, nextViewportRect)
+          ? currentRect
+          : nextViewportRect
+      );
     };
 
     updateViewportSize();
@@ -351,8 +418,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
-      if (selectedCard || event.button !== 0) return;
+    if (selectedCard || event.button !== 0) return;
 
+      incrementCounter('pan:pointerdown');
       dragRef.current = {
         isDragging: true,
         lastX: event.clientX,
@@ -367,6 +435,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     const drag = dragRef.current;
     if (!drag.isDragging) return;
 
+    incrementCounter('pan:pointermove');
     const deltaX = event.clientX - drag.lastX;
     const deltaY = event.clientY - drag.lastY;
     dragRef.current = {
@@ -383,6 +452,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     dragRef.current.isDragging = false;
+    incrementCounter('pan:pointerup');
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -416,7 +486,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const pendingSemanticEdges = pendingMove?.semanticEdges ?? [];
   const pendingSemanticScore = pendingMove?.scorePreview;
   const relationLabelsByCardId = useMemo(
-    () => getAcceptedRelationLabelsByCardId(boardCards, gameState.semanticEdges),
+    () => {
+      const startTime = startMeasure();
+      const labels = getAcceptedRelationLabelsByCardId(boardCards, gameState.semanticEdges);
+      endMeasure('derive:relation-labels', startTime);
+      return labels;
+    },
     [boardCards, gameState.semanticEdges]
   );
   const activeRelationEditorForCurrentMove =
@@ -441,23 +516,154 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     ? pendingSemanticScore?.edges.find((edge) => edge.pendingEdgeId === activeRelationEdge.id)
     : undefined;
 
-  const getRelationPopoverPosition = (neighbor: PlacedCard) => {
-    const container = containerRef.current;
-    if (!container || !pendingCard) return { left: 12, top: 12 };
+  const setBoardOverlayRect = useCallback(
+    (id: BoardOverlayId, rect: OverlayRect | null) => {
+      setOverlayRects((currentRects) => {
+        if (areOverlayRectsEqual(currentRects[id], rect)) {
+          incrementCounter('overlay:geometrySkippedAsEqual');
+          return currentRects;
+        }
 
-    const rect = container.getBoundingClientRect();
-    const pendingCenter = getCellCenter(pendingCard.coordinates);
-    const neighborCenter = getCellCenter(neighbor.coordinates);
-    const boardX = (pendingCenter.x + neighborCenter.x) / 2;
-    const boardY = (pendingCenter.y + neighborCenter.y) / 2;
-    const viewportLeft =
-      rect.left + viewport.width / 2 + camera.offsetX + boardX * camera.zoom;
-    const viewportTop =
-      rect.top + viewport.height / 2 + camera.offsetY + boardY * camera.zoom;
+        incrementCounter('overlay:updateGeometry');
+        const nextRects = { ...currentRects };
+        if (rect) {
+          nextRects[id] = rect;
+        } else {
+          delete nextRects[id];
+        }
+        return nextRects;
+      });
+    },
+    []
+  );
+
+  const cardInfoOccupiedRects = useMemo(
+    () => getOccupiedOverlayRects(overlayRects, ['card-info']),
+    [overlayRects]
+  );
+  const relationEditorOccupiedRects = useMemo(
+    () =>
+      getOccupiedOverlayRects(overlayRects, [
+        'relation-editor',
+        'card-info',
+        'pending-actions',
+      ]),
+    [overlayRects]
+  );
+  const pendingActionsOccupiedRects = useMemo(
+    () => getOccupiedOverlayRects(overlayRects, ['pending-actions']),
+    [overlayRects]
+  );
+
+  const handleCardInfoRectChange = useCallback(
+    (rect: OverlayRect | null) => {
+      setBoardOverlayRect('card-info', rect);
+    },
+    [setBoardOverlayRect]
+  );
+
+  const handleRelationEnter = useCallback((cardInstanceId: string) => {
+    setHighlightedRelationCardId(cardInstanceId);
+  }, []);
+
+  const handleRelationLeave = useCallback(() => {
+    setHighlightedRelationCardId(null);
+  }, []);
+
+  const handleRelationEditorMeasured = useCallback(
+    (rect: DOMRect) => {
+      setBoardOverlayRect('relation-editor', toOverlayRect(rect));
+    },
+    [setBoardOverlayRect]
+  );
+
+  useEffect(() => {
+    if (activeRelationEditorForCurrentMove) return;
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      incrementCounter('raf:clear-relation-editor-rect');
+      setBoardOverlayRect('relation-editor', null);
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [activeRelationEditorForCurrentMove, setBoardOverlayRect]);
+
+  useEffect(() => {
+    if (!pendingActionsElement) {
+      const animationFrameId = window.requestAnimationFrame(() => {
+        setBoardOverlayRect('pending-actions', null);
+      });
+
+      return () => window.cancelAnimationFrame(animationFrameId);
+    }
+
+    let animationFrameId = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      incrementCounter('raf:pending-actions-measure');
+      animationFrameId = window.requestAnimationFrame(() => {
+        incrementCounter('dom:getBoundingClientRect:pending-actions');
+        setBoardOverlayRect(
+          'pending-actions',
+          toOverlayRect(pendingActionsElement.getBoundingClientRect())
+        );
+      });
+    };
+    const resizeObserver = new ResizeObserver(measure);
+
+    measure();
+    incrementCounter('resize-observer:pending-actions-created');
+    resizeObserver.observe(pendingActionsElement);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
+      setBoardOverlayRect('pending-actions', null);
+    };
+  }, [pendingActionsElement, setBoardOverlayRect]);
+
+  const getCellViewportRect = (coordinates: Coordinates): OverlayRect | null => {
+    if (!boardViewportRect) return null;
+
+    const cellLeft =
+      boardViewportRect.left +
+      viewport.width / 2 +
+      camera.offsetX +
+      (coordinates.x - GRID_MIN) * CELL_SIZE * camera.zoom;
+    const cellTop =
+      boardViewportRect.top +
+      viewport.height / 2 +
+      camera.offsetY +
+      (coordinates.y - GRID_MIN) * CELL_SIZE * camera.zoom;
+    const cellSize = CELL_SIZE * camera.zoom;
 
     return {
-      left: Math.min(window.innerWidth - 340, Math.max(12, viewportLeft + 18)),
-      top: Math.min(window.innerHeight - 360, Math.max(12, viewportTop + 18)),
+      left: cellLeft,
+      top: cellTop,
+      width: cellSize,
+      height: cellSize,
+      right: cellLeft + cellSize,
+      bottom: cellTop + cellSize,
+    };
+  };
+
+  const getRelationAnchorRect = (neighbor: PlacedCard): OverlayRect | null => {
+    if (!pendingCard) return null;
+
+    const pendingRect = getCellViewportRect(pendingCard.coordinates);
+    const neighborRect = getCellViewportRect(neighbor.coordinates);
+    if (!pendingRect || !neighborRect) return null;
+
+    const left = (pendingRect.left + neighborRect.left) / 2;
+    const top = (pendingRect.top + neighborRect.top) / 2;
+
+    return {
+      left,
+      top,
+      width: CELL_SIZE * camera.zoom,
+      height: CELL_SIZE * camera.zoom,
+      right: left + CELL_SIZE * camera.zoom,
+      bottom: top + CELL_SIZE * camera.zoom,
     };
   };
 
@@ -469,7 +675,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     setActiveRelationEditor({
       moveId,
       neighborCardInstanceId: neighbor.id,
-      position: getRelationPopoverPosition(neighbor),
     });
   };
 
@@ -479,11 +684,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     direction: PendingSemanticEdge['direction']
   ) => {
     onUpsertSemanticEdge(neighborCardInstanceId, relation, direction);
+    setBoardOverlayRect('relation-editor', null);
     setActiveRelationEditor(null);
   };
 
   const handleRemoveRelation = (neighborCardInstanceId: string) => {
     onRemoveSemanticEdge(neighborCardInstanceId);
+    setBoardOverlayRect('relation-editor', null);
     setActiveRelationEditor(null);
   };
 
@@ -497,10 +704,75 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handleCancelSemanticMove = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     window.dispatchEvent(new CustomEvent('card-info-close'));
+    setBoardOverlayRect('relation-editor', null);
     setActiveRelationEditor(null);
     onCancelPendingMove();
   };
 
+  const relationAnchorRect = activeRelationNeighbor
+    ? getRelationAnchorRect(activeRelationNeighbor)
+    : null;
+  const relationEditorRect =
+    relationAnchorRect && boardViewportRect
+      ? (() => {
+          const startTime = startMeasure();
+          const rect = calculateBoardOverlayPosition({
+            anchorRect: relationAnchorRect,
+            overlaySize: getOverlaySize(overlayRects['relation-editor'], {
+              width: 330,
+              height: 340,
+            }),
+            boardRect: boardViewportRect,
+            occupiedRects: relationEditorOccupiedRects,
+            preferredPlacements: [
+              'right',
+              'left',
+              'bottom',
+              'top',
+              'right-shifted',
+              'left-shifted',
+            ],
+            safePadding: 8,
+          });
+          endMeasure('overlay:position:relation-editor', startTime);
+          return rect;
+        })()
+      : null;
+  const pendingActionsAnchorRect = pendingCard
+    ? getCellViewportRect(pendingCard.coordinates)
+    : null;
+  const pendingActionsRect =
+    pendingActionsAnchorRect && boardViewportRect
+      ? (() => {
+          const startTime = startMeasure();
+          const rect = calculateBoardOverlayPosition({
+            anchorRect: pendingActionsAnchorRect,
+            overlaySize: getOverlaySize(overlayRects['pending-actions'], {
+              width: 126,
+              height: 92,
+            }),
+            boardRect: boardViewportRect,
+            occupiedRects: pendingActionsOccupiedRects,
+            preferredPlacements: ['right', 'left', 'top', 'bottom'],
+            safePadding: 8,
+          });
+          endMeasure('overlay:position:pending-actions', startTime);
+          return rect;
+        })()
+      : null;
+
+  useEffect(() => {
+    if (!activeRelationEditorForCurrentMove || !relationEditorRect) {
+      previousRelationEditorRectRef.current = null;
+      return;
+    }
+
+    const previousRect = previousRelationEditorRectRef.current;
+    if (previousRect && !areOverlayRectsEqual(previousRect, relationEditorRect)) {
+      incrementCounter('overlay:relation-editor-moved');
+    }
+    previousRelationEditorRectRef.current = relationEditorRect;
+  }, [activeRelationEditorForCurrentMove, relationEditorRect]);
   return (
     <div
       className={`game-board-container ${selectedCard ? '' : 'can-pan'}`}
@@ -562,8 +834,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 placedCard ? relationLabelsByCardId.get(placedCard.id) ?? [] : []
               }
               isRelationHighlighted={placedCard?.id === highlightedRelationCardId}
-              onRelationEnter={setHighlightedRelationCardId}
-              onRelationLeave={() => setHighlightedRelationCardId(null)}
+              boardRect={boardViewportRect}
+              occupiedOverlayRects={cardInfoOccupiedRects}
+              onCardInfoRectChange={handleCardInfoRectChange}
+              onRelationEnter={handleRelationEnter}
+              onRelationLeave={handleRelationLeave}
             />
           );
         })}
@@ -626,14 +901,19 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               </span>
             );
           })}
-        {pendingCard && pendingMove?.semanticStatus === 'defining-relations' && (
+      </div>
+      {pendingCard &&
+        pendingMove?.semanticStatus === 'defining-relations' &&
+        pendingActionsRect &&
+        createPortal(
           <div
+            ref={setPendingActionsElement}
             className="semantic-submit-popover"
             onClick={(event) => event.stopPropagation()}
             onPointerDown={(event) => event.stopPropagation()}
             style={{
-              left: `${getCellCenter(pendingCard.coordinates).x + CELL_SIZE / 2 + 10}px`,
-              top: `${getCellCenter(pendingCard.coordinates).y - CELL_SIZE / 2}px`,
+              left: `${pendingActionsRect.left}px`,
+              top: `${pendingActionsRect.top}px`,
             }}
           >
             <strong>
@@ -650,21 +930,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             <button type="button" onClick={handleCancelSemanticMove}>
               Отменить
             </button>
-          </div>
+          </div>,
+          document.body
         )}
-      </div>
       {pendingCard &&
         activeRelationEditorForCurrentMove &&
         activeRelationNeighbor &&
+        relationEditorRect &&
         createPortal(
           <SemanticRelationPopover
             neighborCard={activeRelationNeighbor}
             pendingCard={pendingCard}
-            position={activeRelationEditorForCurrentMove.position}
+            position={relationEditorRect}
             selectedEdge={activeRelationEdge}
             selectedScore={activeRelationScore}
-            onClose={() => setActiveRelationEditor(null)}
+            onClose={() => {
+              setBoardOverlayRect('relation-editor', null);
+              setActiveRelationEditor(null);
+            }}
             onDelete={() => handleRemoveRelation(activeRelationNeighbor.id)}
+            onMeasuredRect={handleRelationEditorMeasured}
             onSave={(relation, direction) =>
               handleSaveRelation(activeRelationNeighbor.id, relation, direction)
             }

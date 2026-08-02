@@ -1,4 +1,5 @@
 import type { SemanticEdge, SemanticEdgeScore } from '../types';
+import { endMeasure, startMeasure } from '../debug/performanceDiagnostics';
 import { continuesSemanticNode } from './semanticNodes';
 import { continuesSemanticPath, isSemanticEdgeGeometryValid } from './semanticPaths';
 import { createSemanticEdgeFromPending } from './semanticRelations';
@@ -10,8 +11,10 @@ export function calculateSemanticMoveScore({
   pendingMove,
   activeSeatIndex,
 }: CalculateSemanticMoveScoreArgs): SemanticMoveScore {
+  const measureStart = startMeasure();
   const placedCard = board[`${pendingMove.position.x},${pendingMove.position.y}`];
   if (!placedCard || placedCard.id !== pendingMove.cardId) {
+    endMeasure('scoring:calculateSemanticMoveScore', measureStart);
     return { edges: [], total: 0 };
   }
 
@@ -59,8 +62,10 @@ export function calculateSemanticMoveScore({
       };
     });
 
-  return {
+  const result = {
     edges: scores,
     total: scores.reduce((total, edge) => total + edge.total, 0),
   };
+  endMeasure('scoring:calculateSemanticMoveScore', measureStart);
+  return result;
 }

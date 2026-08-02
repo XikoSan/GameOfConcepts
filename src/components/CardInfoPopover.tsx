@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties, MouseEvent } from 'react';
+import { incrementCounter } from '../debug/performanceDiagnostics';
 import {
   formatRelationCount,
   type CardRelationLabel,
@@ -14,9 +15,11 @@ interface CardInfoPopoverProps {
   cardName: string;
   className: string;
   isExpanded: boolean;
+  isPlacementReady?: boolean;
   mode: CardInfoPopoverMode;
   onClose: () => void;
   onPointerEnter?: () => void;
+  onMeasuredRect?: (rect: DOMRect) => void;
   onRelationEnter?: (cardInstanceId: string) => void;
   onRelationLeave?: () => void;
   onToggleExpanded: () => void;
@@ -56,8 +59,10 @@ export function CardInfoPopover({
   cardName,
   className,
   isExpanded,
+  isPlacementReady = true,
   mode,
   onClose,
+  onMeasuredRect,
   onPointerEnter,
   onRelationEnter,
   onRelationLeave,
@@ -69,7 +74,11 @@ export function CardInfoPopover({
   summary,
   wiktionaryUrl,
 }: CardInfoPopoverProps) {
+  incrementCounter('render:CardInfoPopover');
   const [relationsExpanded, setRelationsExpanded] = useState(false);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const onMeasuredRectRef = useRef(onMeasuredRect);
+  const countedHiddenMountRef = useRef(false);
   const fullText = getBodyText(status, summary);
   const isLongDescription = status === 'ready' && fullText.length > COMPACT_TEXT_LENGTH;
   const visibleText =
@@ -85,11 +94,48 @@ export function CardInfoPopover({
     setRelationsExpanded((current) => !current);
   };
 
+  useEffect(() => {
+    if (isPlacementReady || countedHiddenMountRef.current) return;
+
+    countedHiddenMountRef.current = true;
+    incrementCounter('overlay:mount-hidden');
+  }, [isPlacementReady]);
+
+  useEffect(() => {
+    onMeasuredRectRef.current = onMeasuredRect;
+  }, [onMeasuredRect]);
+
+  useLayoutEffect(() => {
+    const popoverElement = popoverRef.current;
+    if (!popoverElement) return;
+
+    let animationFrameId = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      incrementCounter('raf:card-info-measure');
+      animationFrameId = window.requestAnimationFrame(() => {
+        incrementCounter('dom:getBoundingClientRect:card-info-popover');
+        onMeasuredRectRef.current?.(popoverElement.getBoundingClientRect());
+      });
+    };
+    const resizeObserver = new ResizeObserver(measure);
+
+    measure();
+    incrementCounter('resize-observer:card-info-created');
+    resizeObserver.observe(popoverElement);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <div
+      ref={popoverRef}
       className={`card-info-popover card-info-popover-${mode} ${className} ${
         isExpanded ? 'expanded' : ''
-      }`}
+      } ${isPlacementReady ? '' : 'measuring'}`}
       onClick={(event) => event.stopPropagation()}
       onPointerDown={(event) => event.stopPropagation()}
       onPointerEnter={onPointerEnter}

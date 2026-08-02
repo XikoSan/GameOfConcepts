@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
+import { incrementCounter } from '../debug/performanceDiagnostics';
 import type {
   PendingSemanticEdge,
   PlacedCard,
@@ -25,6 +26,7 @@ interface SemanticRelationPopoverProps {
   };
   onClose: () => void;
   onDelete: () => void;
+  onMeasuredRect?: (rect: DOMRect) => void;
   onSave: (
     relation: SemanticRelation,
     direction: PendingSemanticEdge['direction']
@@ -42,8 +44,12 @@ export function SemanticRelationPopover({
   position,
   onClose,
   onDelete,
+  onMeasuredRect,
   onSave,
 }: SemanticRelationPopoverProps) {
+  incrementCounter('render:SemanticRelationPopover');
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const onMeasuredRectRef = useRef(onMeasuredRect);
   const [selectedFamily, setSelectedFamily] = useState<RelationFamily | null>(
     selectedEdge?.relation.family ?? null
   );
@@ -92,6 +98,35 @@ export function SemanticRelationPopover({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [onClose]);
 
+  useEffect(() => {
+    onMeasuredRectRef.current = onMeasuredRect;
+  }, [onMeasuredRect]);
+
+  useEffect(() => {
+    const popoverElement = popoverRef.current;
+    if (!popoverElement) return;
+
+    let animationFrameId = 0;
+    const measure = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      incrementCounter('raf:relation-editor-measure');
+      animationFrameId = window.requestAnimationFrame(() => {
+        incrementCounter('dom:getBoundingClientRect:relation-editor');
+        onMeasuredRectRef.current?.(popoverElement.getBoundingClientRect());
+      });
+    };
+    const resizeObserver = new ResizeObserver(measure);
+
+    measure();
+    incrementCounter('resize-observer:relation-editor-created');
+    resizeObserver.observe(popoverElement);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   const handleFamilySelect = (family: RelationFamily) => {
     setSelectedFamily(family);
     setSourceCardId(family === 'opposite' ? pendingCard.id : null);
@@ -104,6 +139,7 @@ export function SemanticRelationPopover({
 
   return (
     <div
+      ref={popoverRef}
       className="semantic-relation-popover"
       onClick={(event) => event.stopPropagation()}
       onPointerDown={(event) => event.stopPropagation()}

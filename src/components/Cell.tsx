@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { CSSProperties } from 'react';
+import {
+  endMeasure,
+  incrementCounter,
+  startMeasure,
+} from '../debug/performanceDiagnostics';
 import type { CardRelationLabel } from '../scoring/semanticRelations';
 import type { PlacedCard } from '../game';
 import {
@@ -13,6 +18,11 @@ import {
   type CardInfoPopoverMode,
   type CardInfoStatus,
 } from './CardInfoPopover';
+import {
+  calculateBoardOverlayPosition,
+  type OverlayRect,
+  toOverlayRect,
+} from './boardOverlayPositioning';
 import './Cell.css';
 
 type PopoverStateMode = 'hidden' | 'tooltip' | 'pinning' | 'pinned';
@@ -39,6 +49,9 @@ interface CellProps {
   tooltipScopeKey?: string;
   semanticRelationLabels?: CardRelationLabel[];
   isRelationHighlighted?: boolean;
+  boardRect?: OverlayRect | null;
+  occupiedOverlayRects?: OverlayRect[];
+  onCardInfoRectChange?: (rect: OverlayRect | null) => void;
   onRelationEnter?: (cardInstanceId: string) => void;
   onRelationLeave?: () => void;
 }
@@ -81,27 +94,54 @@ const getPopoverPosition = (
   element: HTMLElement,
   cardKey: string,
   mode: CardInfoPopoverMode,
-  isExpanded = false
+  isExpanded = false,
+  boardRect?: OverlayRect | null,
+  occupiedOverlayRects: OverlayRect[] = [],
+  measuredSize?: { width: number; height: number }
 ): PopoverPosition => {
+  const measureStart = startMeasure();
+  incrementCounter('dom:getBoundingClientRect:card-info-anchor');
   const rect = element.getBoundingClientRect();
   const popoverWidth =
-    mode === 'pinned' ? (isExpanded ? 640 : 340) : 300;
+    measuredSize?.width ?? (mode === 'pinned' ? (isExpanded ? 640 : 340) : 300);
   const popoverHeight =
-    mode === 'pinned' ? (isExpanded ? 620 : 460) : 210;
+    measuredSize?.height ?? (mode === 'pinned' ? (isExpanded ? 620 : 460) : 210);
   const width = Math.min(popoverWidth, window.innerWidth - 24);
   const height = Math.min(popoverHeight, window.innerHeight - 24);
-  const offset = 12;
-  const hasRoomOnRight = rect.right + offset + width <= window.innerWidth - 12;
-  const preferredLeft = hasRoomOnRight
-    ? rect.right + offset
-    : rect.left - width - offset;
-  const left = Math.min(window.innerWidth - width - 12, Math.max(12, preferredLeft));
-  const top = Math.min(
-    window.innerHeight - height - 12,
-    Math.max(12, rect.top)
-  );
+  const viewportRect =
+    boardRect ??
+    toOverlayRect(new DOMRect(0, 0, window.innerWidth, window.innerHeight));
+  const overlayRect = calculateBoardOverlayPosition({
+    anchorRect: toOverlayRect(rect),
+    overlaySize: { width, height },
+    boardRect: viewportRect,
+    occupiedRects: occupiedOverlayRects,
+    preferredPlacements: [
+      'right',
+      'left',
+      'bottom',
+      'top',
+      'right-shifted',
+      'left-shifted',
+    ],
+    safePadding: 8,
+  });
+  endMeasure('overlay:position:card-info', measureStart);
 
-  return { left, top, cardKey };
+  return { left: overlayRect.left, top: overlayRect.top, cardKey };
+};
+
+const arePopoverPositionsEqual = (
+  firstPosition: PopoverPosition | null,
+  secondPosition: PopoverPosition | null
+) => {
+  if (!firstPosition || !secondPosition) return firstPosition === secondPosition;
+
+  return (
+    firstPosition.cardKey === secondPosition.cardKey &&
+    Math.abs(firstPosition.left - secondPosition.left) < 0.5 &&
+    Math.abs(firstPosition.top - secondPosition.top) < 0.5
+  );
 };
 
 export const Cell: React.FC<CellProps> = ({
@@ -126,20 +166,27 @@ export const Cell: React.FC<CellProps> = ({
   tooltipScopeKey = 'default',
   semanticRelationLabels = [],
   isRelationHighlighted = false,
+  boardRect,
+  occupiedOverlayRects = [],
+  onCardInfoRectChange,
   onRelationEnter,
   onRelationLeave,
 }) => {
+  incrementCounter('render:Cell');
   const [popoverMode, setPopoverMode] = useState<PopoverStateMode>('hidden');
   const [popoverPosition, setPopoverPosition] = useState<PopoverPosition | null>(null);
   const [popoverSummary, setPopoverSummary] =
     useState<PopoverSummaryState | null>(null);
   const [isPopoverExpanded, setIsPopoverExpanded] = useState(false);
+  const [isPopoverPlacementReady, setIsPopoverPlacementReady] = useState(false);
   const [pendingOverlayPosition, setPendingOverlayPosition] =
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const popoverOpenTimeoutRef = useRef<number | null>(null);
   const popoverCloseTimeoutRef = useRef<number | null>(null);
   const popoverRequestIdRef = useRef(0);
+  const popoverMeasuredSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const onCardInfoRectChangeRef = useRef(onCardInfoRectChange);
   const popoverStateRef = useRef<{
     mode: PopoverStateMode;
     cardKey: string | null;
@@ -182,6 +229,18 @@ export const Cell: React.FC<CellProps> = ({
     }
   }, []);
 
+  useEffect(() => {
+    onCardInfoRectChangeRef.current = onCardInfoRectChange;
+  }, [onCardInfoRectChange]);
+
+  const setNextPopoverPosition = useCallback((nextPosition: PopoverPosition | null) => {
+    setPopoverPosition((currentPosition) =>
+      arePopoverPositionsEqual(currentPosition, nextPosition)
+        ? currentPosition
+        : nextPosition
+    );
+  }, []);
+
   const closePopover = useCallback(() => {
     clearPopoverTimers();
     popoverRequestIdRef.current += 1;
@@ -192,6 +251,9 @@ export const Cell: React.FC<CellProps> = ({
     setPopoverMode('hidden');
     setPopoverPosition(null);
     setIsPopoverExpanded(false);
+    setIsPopoverPlacementReady(false);
+    popoverMeasuredSizeRef.current = null;
+    onCardInfoRectChangeRef.current?.(null);
   }, [clearPopoverTimers]);
 
   const loadSummary = (cardKey: string, cardName: string, requestId: number) => {
@@ -232,12 +294,22 @@ export const Cell: React.FC<CellProps> = ({
     const nextRequestId = popoverRequestIdRef.current + 1;
     popoverRequestIdRef.current = nextRequestId;
     setIsPopoverExpanded(false);
+    setIsPopoverPlacementReady(false);
     loadSummary(nextCardKey, nextCardName, nextRequestId);
 
     popoverOpenTimeoutRef.current = window.setTimeout(() => {
       if (!cardRef.current || popoverRequestIdRef.current !== nextRequestId) return;
 
-      setPopoverPosition(getPopoverPosition(cardRef.current, nextCardKey, 'tooltip'));
+      setNextPopoverPosition(
+        getPopoverPosition(
+          cardRef.current,
+          nextCardKey,
+          'tooltip',
+          false,
+          boardRect,
+          occupiedOverlayRects
+        )
+      );
       popoverStateRef.current = {
         mode: 'tooltip',
         cardKey: nextCardKey,
@@ -277,8 +349,9 @@ export const Cell: React.FC<CellProps> = ({
             mode: 'hidden',
             cardKey: null,
           };
-          setPopoverPosition(null);
+          setNextPopoverPosition(null);
           setIsPopoverExpanded(false);
+          setIsPopoverPlacementReady(false);
           setPopoverMode('hidden');
         }
       }, 140);
@@ -313,8 +386,18 @@ export const Cell: React.FC<CellProps> = ({
     const nextRequestId = popoverRequestIdRef.current + 1;
     popoverRequestIdRef.current = nextRequestId;
     setIsPopoverExpanded(false);
+    setIsPopoverPlacementReady(false);
     loadSummary(tooltipCardKey, placedCard.cardName, nextRequestId);
-    setPopoverPosition(getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned'));
+    setNextPopoverPosition(
+      getPopoverPosition(
+        cardRef.current,
+        tooltipCardKey,
+        'pinned',
+        false,
+        boardRect,
+        occupiedOverlayRects
+      )
+    );
     popoverStateRef.current = {
       mode: 'pinned',
       cardKey: tooltipCardKey,
@@ -346,9 +429,20 @@ export const Cell: React.FC<CellProps> = ({
       mode: 'pinning',
       cardKey: tooltipCardKey,
     };
-    setPopoverPosition(getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned'));
+    setNextPopoverPosition(
+      getPopoverPosition(
+        cardRef.current,
+        tooltipCardKey,
+        'pinned',
+        false,
+        boardRect,
+        occupiedOverlayRects,
+        popoverMeasuredSizeRef.current ?? undefined
+      )
+    );
     setPopoverMode('pinning');
     setIsPopoverExpanded(false);
+    setIsPopoverPlacementReady(false);
 
     window.requestAnimationFrame(() => {
       if (popoverStateRef.current.cardKey !== tooltipCardKey) return;
@@ -376,6 +470,7 @@ export const Cell: React.FC<CellProps> = ({
       const rect = cardRef.current?.getBoundingClientRect();
       if (!rect) return;
 
+      incrementCounter('dom:getBoundingClientRect:pending-card-overlay-anchor');
       const overlayWidth = shouldShowPendingCrossOverlay
         ? 132
         : showPendingActions
@@ -463,13 +558,82 @@ export const Cell: React.FC<CellProps> = ({
     setIsPopoverExpanded((current) => {
       const nextExpanded = !current;
       if (cardRef.current && tooltipCardKey) {
-        setPopoverPosition(
-          getPopoverPosition(cardRef.current, tooltipCardKey, 'pinned', nextExpanded)
+        setNextPopoverPosition(
+          getPopoverPosition(
+            cardRef.current,
+            tooltipCardKey,
+            'pinned',
+            nextExpanded,
+            boardRect,
+            occupiedOverlayRects,
+            popoverMeasuredSizeRef.current ?? undefined
+          )
         );
       }
       return nextExpanded;
     });
   };
+
+  const handleCardInfoMeasured = (rect: DOMRect) => {
+    const wasPlacementReady = isPopoverPlacementReady;
+    const measuredSize = { width: rect.width, height: rect.height };
+    popoverMeasuredSizeRef.current = measuredSize;
+    incrementCounter('overlay:initial-measure');
+    onCardInfoRectChangeRef.current?.(toOverlayRect(rect));
+
+    if (!cardRef.current || !tooltipCardKey || !activePopoverMode) return;
+
+    setNextPopoverPosition(
+      getPopoverPosition(
+        cardRef.current,
+        tooltipCardKey,
+        activePopoverMode,
+        isPopoverExpanded,
+        boardRect,
+        occupiedOverlayRects,
+        measuredSize
+      )
+    );
+    if (!wasPlacementReady) {
+      incrementCounter('overlay:place-new');
+      incrementCounter('overlay:reveal');
+      setIsPopoverPlacementReady(true);
+    }
+  };
+
+  useEffect(() => {
+    if (!shouldShowTooltip || !cardRef.current || !tooltipCardKey || !activePopoverMode) {
+      return;
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      incrementCounter('raf:card-info-reposition');
+      if (!cardRef.current) return;
+
+      setNextPopoverPosition(
+        getPopoverPosition(
+          cardRef.current,
+          tooltipCardKey,
+          activePopoverMode,
+          isPopoverExpanded,
+          boardRect,
+          occupiedOverlayRects,
+          popoverMeasuredSizeRef.current ?? undefined
+        )
+      );
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
+  }, [
+    activePopoverMode,
+    boardRect,
+    isPopoverExpanded,
+    occupiedOverlayRects,
+    pendingOverlayRefreshKey,
+    setNextPopoverPosition,
+    shouldShowTooltip,
+    tooltipCardKey,
+  ]);
 
   useEffect(() => {
     const handleOtherPopover = (event: Event) => {
@@ -504,6 +668,7 @@ export const Cell: React.FC<CellProps> = ({
     () => () => {
       clearPopoverTimers();
       popoverRequestIdRef.current += 1;
+      onCardInfoRectChangeRef.current?.(null);
     },
     [clearPopoverTimers]
   );
@@ -552,8 +717,10 @@ export const Cell: React.FC<CellProps> = ({
                 cardName={placedCard.cardName}
                 className={getOwnerClassName(placedCard.playerId)}
                 isExpanded={isPopoverExpanded}
+                isPlacementReady={isPopoverPlacementReady}
                 mode={activePopoverMode}
                 onClose={closePopover}
+                onMeasuredRect={handleCardInfoMeasured}
                 onPointerEnter={handlePopoverPointerEnter}
                 onRelationEnter={onRelationEnter}
                 onRelationLeave={onRelationLeave}
