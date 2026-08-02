@@ -1,5 +1,6 @@
 import React from 'react';
 import type { RegularCardName } from '../game';
+import { incrementCounter } from '../debug/performanceDiagnostics';
 import { Card } from './Card';
 import './PlayerHand.css';
 
@@ -13,7 +14,6 @@ interface PlayerHandProps {
   hideCards?: boolean;
   displayName?: string;
   statusLabel?: string;
-  onMoveCardDrag: (event: React.DragEvent<HTMLDivElement>) => void;
   onStartCardDrag: (
     cardName: RegularCardName,
     playerColor: 'blue' | 'orange' | 'green' | 'purple',
@@ -40,11 +40,11 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   hideCards = false,
   displayName,
   statusLabel,
-  onMoveCardDrag,
   onStartCardDrag,
   onCancelCardDrag,
   onOpenDictionary,
 }) => {
+  incrementCounter('render:PlayerHand');
   const playerColor = playerColors[playerNumber as keyof typeof playerColors] ?? 'blue';
   const playerColorLabels = {
     blue: 'Синий',
@@ -84,7 +84,6 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                   playerColor={playerColor}
                   isSelected={selectedCard === card}
                   draggable={isActive}
-                  onDrag={isActive ? onMoveCardDrag : undefined}
                   onDragStart={
                     isActive
                       ? (event) => onStartCardDrag(card, playerColor, event)

@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
+import { incrementCounter } from '../debug/performanceDiagnostics';
 import './Card.css';
 
 interface CardProps {
   cardName: string;
   draggable?: boolean;
   isSelected?: boolean;
-  onDrag?: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragStart?: (event: React.DragEvent<HTMLDivElement>) => void;
   onDragEnd?: () => void;
   onOpenDictionary?: (cardName: string) => void;
@@ -16,17 +16,18 @@ export const Card: React.FC<CardProps> = ({
   cardName,
   draggable,
   isSelected,
-  onDrag,
   onDragStart,
   onDragEnd,
   onOpenDictionary,
   playerColor = 'blue',
 }) => {
+  incrementCounter('render:HandCard');
   const didDragRecentlyRef = useRef(false);
   const dragResetTimeoutRef = useRef<number | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    incrementCounter('drag:hand-card-dragstart');
     window.dispatchEvent(new CustomEvent('card-info-close'));
     didDragRecentlyRef.current = true;
     if (dragResetTimeoutRef.current !== null) {
@@ -44,6 +45,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const handleDragEnd = () => {
+    incrementCounter('drag:hand-card-dragend');
     onDragEnd?.();
     dragResetTimeoutRef.current = window.setTimeout(() => {
       didDragRecentlyRef.current = false;
@@ -77,7 +79,6 @@ export const Card: React.FC<CardProps> = ({
     <div
       className={`card ${isSelected ? 'selected' : ''} player-${playerColor}`}
       draggable={draggable}
-      onDrag={onDrag}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onPointerDown={handlePointerDown}

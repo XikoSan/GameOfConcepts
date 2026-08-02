@@ -1,0 +1,86 @@
+.drag-card-preview {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 56px;
+  height: 56px;
+  z-index: 2000;
+  pointer-events: none;
+  transform: translate3d(-9999px, -9999px, 0) translate(-50%, -50%);
+  will-change: transform;
+}
+
+.drag-card-preview-card {
+  width: 56px;
+  height: 56px;
+  padding: 4px;
+  box-sizing: border-box;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.1;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  animation: drag-preview-shrink 150ms ease-out both;
+}
+
+.drag-card-preview-card.player-blue {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.15), transparent 30%),
+    linear-gradient(145deg, #1265c1, #07376d);
+  border-color: rgba(82, 168, 255, 0.72);
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(45, 139, 255, 0.34);
+}
+
+.drag-card-preview-card.player-orange {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(145deg, #c97300, #673300);
+  border-color: rgba(255, 154, 24, 0.74);
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(255, 154, 24, 0.34);
+}
+
+.drag-card-preview-card.player-green {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.16), transparent 30%),
+    linear-gradient(145deg, #2f7c47, #12391f);
+  border-color: rgba(92, 178, 112, 0.72);
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(77, 165, 100, 0.34);
+}
+
+.drag-card-preview-card.player-purple {
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.16), transparent 30%),
+    linear-gradient(145deg, #614a9f, #2a214d);
+  border-color: rgba(165, 139, 224, 0.72);
+  box-shadow:
+    inset 0 0 16px rgba(0, 0, 0, 0.35),
+    0 0 14px rgba(141, 110, 208, 0.34);
+}
+
+@keyframes drag-preview-shrink {
+  from {
+    opacity: 0.88;
+    transform: scale(2.35);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

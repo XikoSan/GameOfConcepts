@@ -2,10 +2,16 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DictionaryModal } from './components/DictionaryModal';
+import { DragPreviewLayer } from './components/DragPreviewLayer';
 import { GameBoard } from './components/GameBoard';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
+import {
+  incrementCounter,
+  printPerformanceReport,
+  resetPerformanceReport,
+} from './debug/performanceDiagnostics';
 import { useGameState } from './hooks/useGameState';
 import { usePlayerIdentity } from './hooks/usePlayerIdentity';
 import {
@@ -160,9 +166,9 @@ const isRoomHost = (room: Room | null, playerId: string) =>
 
 interface DragPreview {
   cardName: RegularCardName;
+  initialX: number;
+  initialY: number;
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
-  x: number;
-  y: number;
 }
 
 type ActiveModal = 'new-game' | 'rules' | 'settings' | null;
@@ -173,6 +179,7 @@ const defaultInterfaceSettings = {
 };
 
 function App() {
+  incrementCounter('render:App');
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
   // localStorage playerId.
   const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
@@ -196,6 +203,7 @@ function App() {
   );
   const roomSubscriptionRef = useRef<RealtimeChannel | null>(null);
   const onlineRoomRef = useRef<Room | null>(null);
+  const activeCardDragRef = useRef(false);
   const {
     gameState,
     mode,
@@ -344,28 +352,28 @@ function App() {
   ) => {
     if (hasPendingDecision) return;
 
+    resetPerformanceReport();
+    incrementCounter('drag:start');
+    incrementCounter('dom:getBoundingClientRect:drag-card-start');
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX || rect.left + rect.width / 2;
     const y = event.clientY || rect.top + rect.height / 2;
 
+    activeCardDragRef.current = true;
     setSelectedCard(cardName);
     setDragPreview({
       cardName,
+      initialX: x,
+      initialY: y,
       playerColor,
-      x,
-      y,
     });
   };
 
-  const handleMoveCardDrag = (event: ReactDragEvent<HTMLDivElement>) => {
-    if (event.clientX === 0 && event.clientY === 0) return;
-
-    setDragPreview((preview) =>
-      preview ? { ...preview, x: event.clientX, y: event.clientY } : preview
-    );
-  };
-
   const handleCancelCardDrag = () => {
+    if (!activeCardDragRef.current) return;
+
+    activeCardDragRef.current = false;
+    incrementCounter('drag:cancel');
     setSelectedCard(null);
     setDragPreview(null);
   };
@@ -670,26 +678,21 @@ function App() {
   };
 
   useEffect(() => {
-    const updateDragPreviewPosition = (event: globalThis.DragEvent) => {
-      if (event.clientX === 0 && event.clientY === 0) return;
-
-      setDragPreview((preview) =>
-        preview ? { ...preview, x: event.clientX, y: event.clientY } : preview
-      );
-    };
-
     const clearDragState = () => {
+      if (!activeCardDragRef.current) return;
+
+      activeCardDragRef.current = false;
+      incrementCounter('drag:end');
       setSelectedCard(null);
       setDragPreview(null);
+      printPerformanceReport();
     };
 
-    window.addEventListener('dragover', updateDragPreviewPosition);
     window.addEventListener('dragend', clearDragState);
     window.addEventListener('drop', clearDragState);
     window.addEventListener('mouseup', clearDragState);
 
     return () => {
-      window.removeEventListener('dragover', updateDragPreviewPosition);
       window.removeEventListener('dragend', clearDragState);
       window.removeEventListener('drop', clearDragState);
       window.removeEventListener('mouseup', clearDragState);
@@ -1011,7 +1014,6 @@ function App() {
         className={className}
         displayName={handMeta.displayName}
         statusLabel={handMeta.statusLabel}
-        onMoveCardDrag={handleMoveCardDrag}
         onStartCardDrag={handleStartCardDrag}
         onCancelCardDrag={handleCancelCardDrag}
         onOpenDictionary={handleOpenDictionary}
@@ -1068,17 +1070,12 @@ function App() {
         </section>
       </main>
       {dragPreview && (
-        <div
-          className="drag-card-preview"
-          style={{
-            left: `${dragPreview.x}px`,
-            top: `${dragPreview.y}px`,
-          }}
-        >
-          <div className={`drag-card-preview-card player-${dragPreview.playerColor}`}>
-            {dragPreview.cardName}
-          </div>
-        </div>
+        <DragPreviewLayer
+          cardName={dragPreview.cardName}
+          initialX={dragPreview.initialX}
+          initialY={dragPreview.initialY}
+          playerColor={dragPreview.playerColor}
+        />
       )}
       {activeModal === 'new-game' && (
         <Modal onClose={closeOnlineModal} title="Онлайн игра">
