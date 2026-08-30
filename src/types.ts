@@ -210,6 +210,7 @@ export interface GameState {
   deck: RegularCardName[][];
   /** A running game owns a fixed deck snapshot; later catalog edits affect only new games. */
   deckSnapshot?: GameDeckSnapshot;
+  handRedrawUsedByPlayerId?: Record<number, boolean>;
   startCard: PlacedCard;
   lastPlacedCardId: string | null;
   pendingMove: PendingMove | null;

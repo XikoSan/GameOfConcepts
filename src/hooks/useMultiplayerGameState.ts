@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { applyGameAction } from '../gameActions';
+import { getHandRedrawAvailability } from '../game';
 import { getRoomById, updateRoomGameState } from '../services/roomService';
 import type {
   Coordinates,
@@ -230,7 +231,7 @@ function getActionBlockReason(
   localPlayerIndex: number | null,
   action: GameAction
 ): string | null {
-  if (room.status === 'finished' && action.type !== 'resetGame') {
+  if (room.status !== 'playing') {
     return `${action.type}: room is not playing`;
   }
 
@@ -283,6 +284,24 @@ function getActionBlockReason(
       return getPendingMovePlayerIndex(gameState.pendingMove) === localPlayerIndex
         ? null
         : `${action.type}: localPlayerIndex is not move author`;
+
+    case 'redrawHand': {
+      if ((room.players?.length ?? 0) < 2) {
+        return 'redrawHand: waiting for at least two players';
+      }
+      if (currentSeatIndex !== localPlayerIndex) {
+        return 'redrawHand: localPlayerIndex is not currentPlayerIndex';
+      }
+      if (action.playerIndex !== undefined && action.playerIndex !== localPlayerIndex) {
+        return 'redrawHand: action playerIndex does not match localPlayerIndex';
+      }
+
+      const availability = getHandRedrawAvailability(
+        { ...gameState, currentPlayerIndex: currentSeatIndex },
+        localPlayerIndex
+      );
+      return availability.canRedraw ? null : `redrawHand: ${availability.reason}`;
+    }
 
     case 'approveCross':
     case 'rejectCross':
@@ -630,6 +649,15 @@ export function useMultiplayerGameState({
     activePlayerIndex,
     placeCard: (cardName: RegularCardName, coordinates: Coordinates) => {
       void dispatchAction({ type: 'placeCard', cardName, coordinates });
+    },
+    redrawHand: () => {
+      if (localPlayerIndex === null) {
+        console.warn('[online action blocked]', 'redrawHand: localPlayerIndex is null');
+        reportError('Это действие недоступно для вашей роли.');
+        return;
+      }
+
+      void dispatchAction({ type: 'redrawHand', playerIndex: localPlayerIndex });
     },
     upsertSemanticEdge: (
       neighborCardInstanceId: string,

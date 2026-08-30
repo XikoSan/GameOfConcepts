@@ -420,7 +420,8 @@
 }
 
 .online-room-block,
-.online-room-state {
+.online-room-state,
+.online-lobby {
   display: grid;
   gap: 7px;
   padding: 8px 10px;
@@ -434,6 +435,120 @@
   color: #f2ddba;
   font-size: clamp(14px, 1vw, 17px);
   line-height: 1.2;
+}
+
+.online-lobby {
+  gap: 10px;
+}
+
+.online-lobby-header,
+.online-lobby-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.online-lobby-header div {
+  display: grid;
+  gap: 2px;
+}
+
+.online-lobby-header span,
+.online-lobby-settings h3 {
+  color: #b8aa98;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.online-lobby-header h3 {
+  margin: 0;
+  color: #f2ddba;
+  font-size: clamp(18px, 1.4vw, 22px);
+  line-height: 1;
+}
+
+.online-lobby-header strong {
+  color: #f6efe2;
+  font-size: 14px;
+}
+
+.online-lobby-players,
+.online-lobby-settings {
+  display: grid;
+  gap: 5px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(214, 174, 118, 0.11);
+}
+
+.online-lobby-player {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 4px 7px;
+  border: 1px solid rgba(214, 174, 118, 0.12);
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.online-lobby-player.empty {
+  border-style: dashed;
+  opacity: 0.7;
+}
+
+.online-lobby-player span {
+  color: #d39a4a;
+}
+
+.online-lobby-player.player-0 span {
+  color: #6ea6d4;
+}
+
+.online-lobby-player.player-1 span {
+  color: #d69a55;
+}
+
+.online-lobby-player.player-2 span {
+  color: #79c889;
+}
+
+.online-lobby-player.player-3 span {
+  color: #b89bea;
+}
+
+.online-lobby-player strong {
+  overflow: hidden;
+  color: #f6efe2;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.online-lobby-player small,
+.online-lobby-settings p,
+.online-lobby-actions p {
+  margin: 0;
+  color: #b8aa98;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.online-lobby-settings h3 {
+  margin: 0 0 1px;
+}
+
+.online-lobby-actions {
+  padding-top: 8px;
+  border-top: 1px solid rgba(214, 174, 118, 0.11);
+}
+
+.online-lobby-actions .action-button {
+  min-height: 32px;
+  padding: 0 12px;
 }
 
 .online-room-block p,

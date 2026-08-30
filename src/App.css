@@ -584,6 +584,51 @@
   filter: brightness(1.15);
 }
 
+.action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  filter: none;
+}
+
+.control-redraw-confirm {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(214, 174, 118, 0.2);
+  border-radius: 8px;
+  padding: 9px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.control-redraw-confirm p {
+  margin: 0;
+  color: #e6d8c2;
+  font-size: clamp(10px, 0.72vw, 12px);
+  line-height: 1.35;
+}
+
+.control-redraw-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.control-redraw-actions button {
+  border: 1px solid rgba(214, 174, 118, 0.24);
+  border-radius: 6px;
+  padding: 6px;
+  background: rgba(20, 24, 28, 0.84);
+  color: #f2e6d3;
+  font: inherit;
+  font-size: clamp(10px, 0.72vw, 12px);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.control-redraw-actions button:first-child {
+  border-color: rgba(194, 132, 41, 0.58);
+  background: rgba(91, 54, 12, 0.86);
+}
+
 .deck-select-field {
   display: grid;
   gap: 4px;

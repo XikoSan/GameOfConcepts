@@ -138,7 +138,7 @@ export function formatSemanticRelation(
   if (edge.relation.family === 'kind') return `${fromName} — вид ${toName}`;
   if (edge.relation.family === 'part') return `${fromName} — часть ${toName}`;
   if (edge.relation.family === 'cause') {
-    return `${fromName} может быть причиной ${toName}`;
+    return `${fromName} — причина ${toName}`;
   }
   if (edge.relation.family === 'property') return `${fromName} — свойство ${toName}`;
   return `${fromName} противоположна ${toName}`;

@@ -194,6 +194,15 @@ export function useLocalGameState(): GameController {
     voteOnPendingMove('reject');
   }, [voteOnPendingMove]);
 
+  const handleRedrawHand = useCallback(() => {
+    setGameState((prev) =>
+      applyGameAction(prev, {
+        type: 'redrawHand',
+        playerIndex: prev.currentPlayerIndex,
+      })
+    );
+  }, []);
+
   const handleApproveCross = useCallback(() => {
     setGameState((prev) => applyGameAction(prev, { type: 'approveCross' }));
   }, []);
@@ -218,6 +227,7 @@ export function useLocalGameState(): GameController {
     cancelPendingMove: handleCancelPendingMove,
     confirmCard: handleConfirmCard,
     returnCard: handleReturnCard,
+    redrawHand: handleRedrawHand,
     approveCross: handleApproveCross,
     rejectCross: handleRejectCross,
     resetGame,

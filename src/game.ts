@@ -48,6 +48,22 @@ const HAND_SIZE = 5;
 const SCORING_VERSION = 3;
 const SAME_NAME_PLACEMENT_WARNING = 'Нельзя ставить одинаковые понятия рядом.';
 
+export interface HandRedrawAvailability {
+  canRedraw: boolean;
+  reason?: string;
+}
+
+export function getRandomStartingPlayerIndex(
+  playerCount: number,
+  randomSource: () => number = Math.random
+): number {
+  const normalizedPlayerCount = Math.max(1, Math.floor(playerCount));
+  return Math.min(
+    normalizedPlayerCount - 1,
+    Math.floor(randomSource() * normalizedPlayerCount)
+  );
+}
+
 function shuffleCards(cards: RegularCardName[]): RegularCardName[] {
   const result = [...cards];
   for (let i = result.length - 1; i > 0; i--) {
@@ -86,9 +102,14 @@ export function createPlayerDeckFromSnapshot(
 
 export function initializeGame(
   playerCount = 2,
-  deckDefinition: DeckDefinition = MIXED_ALL_DECK
+  deckDefinition: DeckDefinition = MIXED_ALL_DECK,
+  startingPlayerIndex?: number
 ): GameState {
   const normalizedPlayerCount = Math.min(Math.max(playerCount, 2), 4);
+  const normalizedStartingPlayerIndex =
+    typeof startingPlayerIndex === 'number'
+      ? Math.min(Math.max(Math.floor(startingPlayerIndex), 0), normalizedPlayerCount - 1)
+      : getRandomStartingPlayerIndex(normalizedPlayerCount);
   const builtDeck = buildDeck(CARD_CATALOG, deckDefinition);
   const capacity = validateDeckCapacity(builtDeck.totalCards, 1, HAND_SIZE);
   if (!capacity.valid) {
@@ -121,7 +142,7 @@ export function initializeGame(
       [startCardKey]: startCard,
     },
     players,
-    currentPlayerIndex: 0,
+    currentPlayerIndex: normalizedStartingPlayerIndex,
     deck: decks,
     // A deck id is configuration; the snapshot is the immutable
     // card composition owned by the running game.
@@ -130,6 +151,9 @@ export function initializeGame(
       cardDefinitionIds: builtDeck.cardDefinitionIds,
       createdAt: new Date().toISOString(),
     },
+    handRedrawUsedByPlayerId: Object.fromEntries(
+      players.map((player) => [player.playerId, false])
+    ),
     startCard,
     lastPlacedCardId: startCard.id,
     pendingMove: null,
@@ -227,6 +251,70 @@ function drawToHand(
   }
 
   return newCards;
+}
+
+export function getHandRedrawAvailability(
+  gameState: GameState,
+  playerIndex: number
+): HandRedrawAvailability {
+  if (gameState.gameOver) return { canRedraw: false, reason: 'Партия завершена.' };
+  if (gameState.pendingMove || gameState.pendingCross) {
+    return {
+      canRedraw: false,
+      reason: 'Пересдача доступна только до розыгрыша карты.',
+    };
+  }
+  if (gameState.currentPlayerIndex !== playerIndex) {
+    return { canRedraw: false, reason: 'Пересдача доступна только в свой ход.' };
+  }
+  if (gameState.handRedrawUsedByPlayerId?.[playerIndex]) {
+    return { canRedraw: false, reason: 'Пересдача уже использована.' };
+  }
+
+  const currentHandSize = gameState.players[playerIndex]?.cards.length ?? 0;
+  const deckSize = gameState.deck[playerIndex]?.length ?? 0;
+
+  if (currentHandSize <= 0) {
+    return { canRedraw: false, reason: 'В руке нет карт для пересдачи.' };
+  }
+  if (deckSize < currentHandSize) {
+    return {
+      canRedraw: false,
+      reason: 'В колоде недостаточно карт для полной пересдачи.',
+    };
+  }
+
+  return { canRedraw: true };
+}
+
+export function redrawPlayerHand(
+  gameState: GameState,
+  playerIndex: number
+): GameState {
+  const availability = getHandRedrawAvailability(gameState, playerIndex);
+  if (!availability.canRedraw) return gameState;
+
+  const oldHand = gameState.players[playerIndex].cards;
+  const handSize = oldHand.length;
+  const currentDeck = gameState.deck[playerIndex];
+  const newHand = currentDeck.slice(0, handSize);
+  const remainingDeck = currentDeck.slice(handSize);
+  const nextDeckForPlayer = [...remainingDeck, ...oldHand];
+
+  return {
+    ...gameState,
+    players: gameState.players.map((player, index) =>
+      index === playerIndex ? { ...player, cards: newHand } : player
+    ),
+    deck: gameState.deck.map((deck, index) =>
+      index === playerIndex ? nextDeckForPlayer : deck
+    ),
+    handRedrawUsedByPlayerId: {
+      ...(gameState.handRedrawUsedByPlayerId ?? {}),
+      [playerIndex]: true,
+    },
+    log: [...gameState.log, `${getPlayerLabel(playerIndex)} пересдал руку.`],
+  };
 }
 
 function getSemanticEdges(gameState: GameState): SemanticEdge[] {

@@ -20,9 +20,10 @@ import {
   getAvailableRooms,
   getRoomById,
   joinRoom,
+  startRoomGame,
   subscribeToRoom,
 } from './services/roomService';
-import { initializeGame } from './game';
+import { getHandRedrawAvailability, initializeGame } from './game';
 import {
   getDeckDefinitionById,
   MIXED_ALL_DECK,
@@ -164,6 +165,10 @@ const getRoomList = (rooms: Room[], currentRoom: Room | null) => {
 const isRoomHost = (room: Room | null, playerId: string) =>
   Boolean(room && (room.host_player_id ?? room.player_1_id) === playerId);
 
+const getDeckDisplayName = (deckId?: string) =>
+  USER_SELECTABLE_DECKS.find((deckDefinition) => deckDefinition.id === deckId)?.name ??
+  MIXED_ALL_DECK.name;
+
 interface DragPreview {
   cardName: RegularCardName;
   initialX: number;
@@ -198,6 +203,7 @@ function App() {
   const [onlineDeckId, setOnlineDeckId] = useState(MIXED_ALL_DECK.id);
   const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
+  const [isRedrawConfirmOpen, setIsRedrawConfirmOpen] = useState(false);
   const [interfaceSettings, setInterfaceSettings] = useState(
     defaultInterfaceSettings
   );
@@ -217,6 +223,7 @@ function App() {
     cancelPendingMove,
     confirmCard,
     returnCard,
+    redrawHand,
     approveCross,
     rejectCross,
     resetGame,
@@ -231,7 +238,9 @@ function App() {
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
   const canControlPlayer = (playerIndex: number) =>
     mode === 'local' || localPlayerIndex === playerIndex;
-  const isOnlineTable = Boolean(onlineRoom);
+  const isOnlineGameStarted = onlineRoom?.status === 'playing';
+  const isOnlineTable = isOnlineGameStarted;
+  const canUseGameActions = !onlineRoom || isOnlineGameStarted;
   const bottomTablePlayerIndex: number | null = isOnlineTable
     ? localPlayerIndex
     : activePlayerIndex;
@@ -253,9 +262,26 @@ function App() {
       (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
   const roomList = getRoomList(availableRooms, onlineRoom);
   const onlinePlayers = getRoomPlayersForDisplay(onlineRoom);
+  const onlineMaxPlayers = onlineRoom?.max_players ?? maxPlayers;
   const localPlayers = getLocalPlayersForDisplay(gameState);
   const currentPlayerId = onlineRoom?.turn_order?.[onlineRoom.current_turn_index] ?? null;
   const isOnlineHost = isRoomHost(onlineRoom, playerId);
+  const activeHandRedrawAvailability = getHandRedrawAvailability(
+    { ...gameState, currentPlayerIndex: activePlayerIndex },
+    activePlayerIndex
+  );
+  const activeHandRedrawUsed =
+    gameState.handRedrawUsedByPlayerId?.[activePlayerIndex] ?? false;
+  const canUseHandRedraw =
+    canControlPlayer(activePlayerIndex) &&
+    canUseGameActions &&
+    !hasPendingDecision &&
+    !(onlineRoom && onlinePlayers.length < 2) &&
+    activeHandRedrawAvailability.canRedraw;
+  const handRedrawDisabledReason =
+    onlineRoom && onlinePlayers.length < 2
+      ? 'Пересдача доступна после начала онлайн-партии.'
+      : activeHandRedrawAvailability.reason;
   const activeScoreIndex =
     gameState.pendingMove?.semanticStatus === 'defining-relations'
       ? pendingMovePlayerIndex ?? activePlayerIndex
@@ -300,12 +326,22 @@ function App() {
   const handlePlaceCard = (cardName: RegularCardName, coordinates: Coordinates) => {
     if (!selectedCard || hasPendingDecision) return;
 
+    setIsRedrawConfirmOpen(false);
     placeCard(cardName, coordinates);
   };
 
   const handleOpenDictionary = (term: string) => {
     setDictionaryTerm(term);
     setIsDictionaryOpen(true);
+  };
+
+  const handleRedrawHand = () => {
+    if (activeCardDragRef.current) return;
+
+    setIsRedrawConfirmOpen(false);
+    redrawHand();
+    setSelectedCard(null);
+    setDragPreview(null);
   };
 
   const getPendingSemanticEdgeScore = (pendingEdgeId: string) =>
@@ -360,6 +396,7 @@ function App() {
     const y = event.clientY || rect.top + rect.height / 2;
 
     activeCardDragRef.current = true;
+    setIsRedrawConfirmOpen(false);
     setSelectedCard(cardName);
     setDragPreview({
       cardName,
@@ -521,6 +558,11 @@ function App() {
     roomSubscriptionRef.current?.unsubscribe();
     setOnlineRoom(room);
     setOnlineError(null);
+    if (room.status === 'playing') {
+      setActiveModal(null);
+    } else {
+      setActiveModal('new-game');
+    }
     roomSubscriptionRef.current = subscribeToRoom(room.id, (updatedRoom) => {
       console.log('[app room update]', {
         code: updatedRoom.code,
@@ -529,6 +571,9 @@ function App() {
         board: updatedRoom.game_state.board,
       });
       setOnlineRoom(updatedRoom);
+      if (updatedRoom.status === 'playing') {
+        setActiveModal(null);
+      }
     }, () => {
       void syncOnlineRoom('realtime status problem');
     }, () => {
@@ -596,7 +641,7 @@ function App() {
         hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
       });
       const deckDefinition = getDeckDefinitionById(onlineDeckId) ?? MIXED_ALL_DECK;
-      const initialGameState = initializeGame(maxPlayers, deckDefinition);
+      const initialGameState = initializeGame(maxPlayers, deckDefinition, 0);
       console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
       const room = await createRoom({
@@ -606,9 +651,6 @@ function App() {
         initialGameState,
       });
       handleRoomConnected(room);
-      // Modal visibility is controlled by explicit room actions; Realtime
-      // updates must not close the room browser unexpectedly.
-      closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       console.error('[create room error]', error);
@@ -641,7 +683,7 @@ function App() {
       }
 
       handleRoomConnected(room);
-      closeOnlineModal();
+      if (room.status === 'playing') closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       setOnlineError(
@@ -666,11 +708,41 @@ function App() {
         nickname,
       });
       handleRoomConnected(joinedRoom);
-      closeOnlineModal();
+      if (joinedRoom.status === 'playing') closeOnlineModal();
       void loadAvailableRooms();
     } catch (error) {
       setOnlineError(
         error instanceof Error ? error.message : 'Не удалось войти в комнату.'
+      );
+    } finally {
+      setIsOnlineLoading(false);
+    }
+  };
+
+  const handleStartOnlineGame = async () => {
+    if (!onlineRoom || !isOnlineHost) return;
+
+    const currentPlayers = getRoomPlayersForDisplay(onlineRoom);
+    if (currentPlayers.length !== (onlineRoom.max_players ?? 2)) {
+      setOnlineError(
+        `Нужно дождаться всех игроков: ${currentPlayers.length} / ${onlineRoom.max_players ?? 2}.`
+      );
+      return;
+    }
+
+    setIsOnlineLoading(true);
+    setOnlineError(null);
+
+    try {
+      const startedRoom = await startRoomGame({
+        roomId: onlineRoom.id,
+        playerId,
+      });
+      handleRoomConnected(startedRoom);
+      closeOnlineModal();
+    } catch (error) {
+      setOnlineError(
+        error instanceof Error ? error.message : 'Не удалось начать игру.'
       );
     } finally {
       setIsOnlineLoading(false);
@@ -722,6 +794,16 @@ function App() {
       window.clearInterval(pollingId);
     };
   }, [onlineRoom, syncOnlineRoom]);
+
+  useEffect(() => {
+    if (onlineRoom?.status !== 'playing' || activeModal !== 'new-game') return;
+
+    const closeTimer = window.setTimeout(() => {
+      setActiveModal(null);
+    }, 0);
+
+    return () => window.clearTimeout(closeTimer);
+  }, [activeModal, onlineRoom?.status]);
 
   useEffect(() => {
     if (!onlineRoom) return;
@@ -953,25 +1035,40 @@ function App() {
           <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('settings')}>
             Настройки
           </button>
+          <button
+            className="action-button action-button-quiet"
+            disabled={!canUseHandRedraw}
+            title={
+              canUseHandRedraw
+                ? 'Пересдать всю руку'
+                : activeHandRedrawUsed
+                  ? 'Пересдача уже использована.'
+                  : handRedrawDisabledReason
+            }
+            type="button"
+            onClick={() => setIsRedrawConfirmOpen(true)}
+          >
+            {activeHandRedrawUsed ? 'Пересдача использована' : 'Пересдать руку'}
+          </button>
+          {isRedrawConfirmOpen && canUseHandRedraw && (
+            <div className="control-redraw-confirm">
+              <p>Заменить всю руку? Пересдачу можно использовать один раз за партию.</p>
+              <div className="control-redraw-actions">
+                <button type="button" onClick={handleRedrawHand}>
+                  Пересдать
+                </button>
+                <button type="button" onClick={() => setIsRedrawConfirmOpen(false)}>
+                  Отмена
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </nav>
 
       {showScoreHint && !gameState.pendingMove && (
-        <section className="control-hint-card" aria-label="Памятка по очкам">
+        <section className="control-hint-card" aria-label="Памятка по типам связей">
           <h3>Памятка</h3>
-          <div className="control-hint-group">
-            <strong>Очки</strong>
-            <p>Связь: +1</p>
-            <p>Путь: ещё +1</p>
-            <p>Узел: ещё +1</p>
-            <p>Максимум за связь: +3</p>
-          </div>
-          <div className="control-hint-group">
-            <strong>База</strong>
-            <p>Одинаковые слова рядом — нельзя</p>
-            <p>Нужна минимум 1 связь</p>
-            <p>Голосование: ✓ принять / ↩ вернуть</p>
-          </div>
           <div className="control-hint-group">
             <strong>Типы связей</strong>
             <p>Вид</p>
@@ -994,6 +1091,12 @@ function App() {
     const deck = gameState.deck[playerIndex];
     if (!player || !deck) return null;
     const handMeta = getHandMeta(playerIndex);
+    const isControllableActiveHand =
+      !forceInactive &&
+      canUseGameActions &&
+      activePlayerIndex === playerIndex &&
+      !hasPendingDecision &&
+      canControlPlayer(playerIndex);
 
     return (
       <PlayerHand
@@ -1005,12 +1108,7 @@ function App() {
             ? activeSelectedCard
             : null
         }
-        isActive={
-          !forceInactive &&
-          activePlayerIndex === playerIndex &&
-          !hasPendingDecision &&
-          canControlPlayer(playerIndex)
-        }
+        isActive={isControllableActiveHand}
         className={className}
         displayName={handMeta.displayName}
         statusLabel={handMeta.statusLabel}
@@ -1060,7 +1158,7 @@ function App() {
                 <div className="board-section">
                   {renderBoard()}
                 </div>
-                {renderControlPanel()}
+                {renderControlPanel(true)}
               </div>
 
               {/* Local hot-seat shows one active hand so 2-4 players can pass the device around. */}
@@ -1080,6 +1178,74 @@ function App() {
       {activeModal === 'new-game' && (
         <Modal onClose={closeOnlineModal} title="Онлайн игра">
           <div className="new-game-modal">
+            {onlineRoom?.status === 'waiting' ? (
+              <section className="online-lobby">
+                <div className="online-lobby-header">
+                  <div>
+                    <span>Лобби</span>
+                    <h3>{onlineRoom.code}</h3>
+                  </div>
+                  <strong>{onlinePlayers.length} / {onlineMaxPlayers}</strong>
+                </div>
+
+                <div className="online-lobby-players">
+                  {Array.from({ length: onlineMaxPlayers }, (_, seatIndex) => {
+                    const player = onlinePlayers.find(
+                      (roomPlayer) => roomPlayer.seatIndex === seatIndex
+                    );
+
+                    return (
+                      <div
+                        className={`online-lobby-player ${player ? `player-${seatIndex}` : 'empty'}`}
+                        key={seatIndex}
+                      >
+                        <span aria-hidden="true">{player ? '●' : '○'}</span>
+                        <strong>
+                          {player?.nickname?.trim() || 'Ожидание игрока...'}
+                        </strong>
+                        {player?.isHost && <small>хост</small>}
+                        {player?.id === playerId && <small>вы</small>}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="online-lobby-settings">
+                  <h3>Параметры</h3>
+                  <p>Игроков: {onlineMaxPlayers}</p>
+                  <p>
+                    Сложность: {getDeckDisplayName(onlineRoom.game_state.deckSnapshot?.sourceDeckId)}
+                  </p>
+                </div>
+
+                <div className="online-lobby-actions">
+                  {isOnlineHost && onlinePlayers.length === onlineMaxPlayers ? (
+                    <button
+                      className="action-button action-button-primary"
+                      disabled={isOnlineLoading}
+                      type="button"
+                      onClick={() => void handleStartOnlineGame()}
+                    >
+                      Начать игру
+                    </button>
+                  ) : onlinePlayers.length < onlineMaxPlayers ? (
+                    <p>Ожидание игроков: {onlinePlayers.length} / {onlineMaxPlayers}</p>
+                  ) : (
+                    <p>Ожидание запуска игры хостом</p>
+                  )}
+                  {isOnlineHost && (
+                    <button
+                      className="action-button action-button-quiet"
+                      disabled={isOnlineLoading}
+                      type="button"
+                      onClick={() => void handleDeleteOnlineRoom()}
+                    >
+                      Удалить комнату
+                    </button>
+                  )}
+                </div>
+              </section>
+            ) : (
             <section className="online-room-block">
               <label className="online-profile-field" htmlFor="online-nickname">
                 <span>Никнейм</span>
@@ -1111,7 +1277,7 @@ function App() {
                   ))}
                 </div>
                 <label className="deck-select-field">
-                  <span>Колода</span>
+                  <span>Сложность</span>
                   <select
                     onChange={(event) => setOnlineDeckId(event.target.value)}
                     value={onlineDeckId}
@@ -1157,8 +1323,9 @@ function App() {
                     );
                     const listedMaxPlayers = room.max_players ?? 2;
                     const canDeleteListedRoom = isRoomHost(room, playerId);
+                    const isWaitingForPlayers = room.status === 'waiting';
                     const canJoinRoom =
-                      room.status !== 'finished' &&
+                      isWaitingForPlayers &&
                       listedRoomPlayers.length < listedMaxPlayers;
 
                     return (
@@ -1212,6 +1379,7 @@ function App() {
                 </div>
               )}
             </section>
+            )}
 
             {(onlineError || gameControllerError) && (
               <p className="online-room-error">{onlineError ?? gameControllerError}</p>

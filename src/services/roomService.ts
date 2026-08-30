@@ -1,6 +1,14 @@
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabaseClient';
-import { createPlayerDeckFromSnapshot, initializeGame } from '../game';
+import {
+  createPlayerDeckFromSnapshot,
+  getRandomStartingPlayerIndex,
+  initializeGame,
+} from '../game';
+import {
+  getDeckDefinitionById,
+  MIXED_ALL_DECK,
+} from '../data/deckDefinitions';
 import type { GameState } from '../game';
 import type { MaxPlayers, PlayerColor, Room, RoomPlayer } from '../types/room';
 
@@ -221,6 +229,52 @@ const getNextTurnOrder = (room: Room, players: RoomPlayer[], playerId: string) =
     : [...baseTurnOrder, playerId];
 };
 
+const getSeatIndexForTurnOrderPosition = (
+  players: RoomPlayer[],
+  turnOrder: string[],
+  turnIndex: number
+) => {
+  const playerId = turnOrder[turnIndex];
+  return players.find((player) => player.id === playerId)?.seatIndex ?? 0;
+};
+
+const assertValidStartSeats = (players: RoomPlayer[], maxPlayers: MaxPlayers) => {
+  const occupiedSeats = new Set<number>();
+
+  for (const player of players) {
+    if (
+      !Number.isInteger(player.seatIndex) ||
+      player.seatIndex < 0 ||
+      player.seatIndex >= maxPlayers ||
+      occupiedSeats.has(player.seatIndex)
+    ) {
+      throw new Error('Некорректные места игроков в комнате.');
+    }
+
+    occupiedSeats.add(player.seatIndex);
+  }
+};
+
+const getValidatedTurnOrder = (room: Room, players: RoomPlayer[]) => {
+  const playerIds = players.map((player) => player.id);
+  const playerIdSet = new Set(playerIds);
+  const turnOrder = room.turn_order.filter((id) => playerIdSet.has(id));
+
+  if (turnOrder.length !== new Set(turnOrder).size) {
+    throw new Error('Некорректная очередь ходов в комнате.');
+  }
+
+  if (turnOrder.length !== playerIds.length) {
+    throw new Error('Очередь ходов не соответствует участникам комнаты.');
+  }
+
+  if (playerIds.some((id) => !turnOrder.includes(id))) {
+    throw new Error('Очередь ходов не содержит всех игроков.');
+  }
+
+  return turnOrder;
+};
+
 export function generateRoomCode(): string {
   return Array.from({ length: ROOM_CODE_LENGTH }, () =>
     ROOM_CODE_ALPHABET[Math.floor(Math.random() * ROOM_CODE_ALPHABET.length)]
@@ -380,10 +434,13 @@ export async function createRoom({
     deckLength: initialGameState.deck.length,
     scoresLength: initialGameState.scores.length,
   });
-  const nextGameState = ensureGameStateCapacity(
-    initialGameState,
-    normalizedMaxPlayers
-  );
+  const nextGameState = {
+    ...ensureGameStateCapacity(initialGameState, normalizedMaxPlayers),
+    currentPlayerIndex: 0,
+    pendingMove: null,
+    pendingCross: null,
+    pendingTurnScore: null,
+  };
   console.debug('[capacity debug after create]', {
     maxPlayers: normalizedMaxPlayers,
     playersLength: nextGameState.players.length,
@@ -517,6 +574,10 @@ export async function joinRoom({
         : player
     );
   } else {
+    if (room.status !== 'waiting') {
+      throw new Error('Партия уже началась.');
+    }
+
     if (players.length >= maxPlayers) {
       throw new Error('Комната заполнена.');
     }
@@ -563,10 +624,8 @@ export async function joinRoom({
         ? { player_2_id: playerId, player_2_nickname: nickname }
         : {}),
       game_state: nextGameState,
-      status:
-        room.status === 'waiting' && nextPlayers.length >= 2
-          ? 'playing'
-          : room.status,
+      current_turn_index: room.current_turn_index,
+      status: room.status,
       updated_at: new Date().toISOString(),
     })
     .eq('id', room.id)
@@ -605,24 +664,37 @@ export async function startRoomGame({
     throw new Error('Партия уже началась.');
   }
 
-  if (players.length < 2) {
-    throw new Error('Нужно минимум 2 игрока.');
+  const maxPlayers = getRoomMaxPlayers(room);
+  if (players.length !== maxPlayers) {
+    throw new Error(`Нужно дождаться всех игроков: ${players.length} / ${maxPlayers}.`);
   }
 
-  const turnOrder = players.map((player) => player.id);
-  const gameState = initializeGame(players.length);
+  assertValidStartSeats(players, maxPlayers);
+  const turnOrder = getValidatedTurnOrder(room, players);
+  const startingTurnIndex = getRandomStartingPlayerIndex(turnOrder.length);
+  const startingSeatIndex = getSeatIndexForTurnOrderPosition(
+    players,
+    turnOrder,
+    startingTurnIndex
+  );
+  const deckDefinition =
+    getDeckDefinitionById(room.game_state.deckSnapshot?.sourceDeckId ?? '') ??
+    MIXED_ALL_DECK;
+  const gameState = initializeGame(maxPlayers, deckDefinition, startingSeatIndex);
 
   const { data, error } = await supabase
     .from('rooms')
     .update({
       game_state: gameState,
       turn_order: turnOrder,
-      current_turn_index: 0,
+      current_turn_index: startingTurnIndex,
       status: 'playing',
+      version: room.version + 1,
       updated_at: new Date().toISOString(),
     })
     .eq('id', room.id)
     .eq('status', 'waiting')
+    .eq('version', room.version)
     .select('*')
     .single<Room>();
 

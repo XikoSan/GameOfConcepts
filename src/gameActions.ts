@@ -5,6 +5,7 @@ import {
   placeCard,
   removePendingSemanticEdge,
   rejectPendingCross,
+  redrawPlayerHand,
   returnPendingCard,
   submitPendingSemanticMove,
   upsertPendingSemanticEdge,
@@ -26,6 +27,7 @@ export type GameAction =
     }
   | { type: 'confirmCard' }
   | { type: 'returnCard' }
+  | { type: 'redrawHand'; playerIndex?: number }
   | {
       type: 'upsertSemanticEdge';
       neighborCardInstanceId: string;
@@ -59,6 +61,12 @@ export function applyGameAction(
 
     case 'returnCard':
       return returnPendingCard(gameState);
+
+    case 'redrawHand':
+      return redrawPlayerHand(
+        gameState,
+        action.playerIndex ?? gameState.currentPlayerIndex
+      );
 
     case 'upsertSemanticEdge':
       return upsertPendingSemanticEdge(

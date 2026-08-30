@@ -27,6 +27,7 @@ export interface GameController {
   cancelPendingMove: () => void;
   confirmCard: () => void;
   returnCard: () => void;
+  redrawHand: () => void;
   approveCross: () => void;
   rejectCross: () => void;
   resetGame: (playerCount?: number, deckId?: string) => void;
