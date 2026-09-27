@@ -1,6 +1,7 @@
 import React, {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -35,6 +36,7 @@ import './GameBoard.css';
 
 interface GameBoardProps {
   gameState: GameState;
+  resetCameraSignal: number;
   selectedCard: RegularCardName | null;
   onPlaceCard: (cardName: RegularCardName, coordinates: Coordinates) => void;
   onFinishDrag: () => void;
@@ -92,16 +94,6 @@ const getCenteredCamera = (coordinates: Coordinates): CameraState => {
     offsetX: -center.x,
     offsetY: -center.y,
     zoom: MAX_ZOOM,
-  };
-};
-
-const getCameraCenterCoordinates = (camera: CameraState): Coordinates => {
-  const centerX = -camera.offsetX / camera.zoom;
-  const centerY = -camera.offsetY / camera.zoom;
-
-  return {
-    x: Math.round(centerX / CELL_SIZE + GRID_MIN),
-    y: Math.round(centerY / CELL_SIZE + GRID_MIN),
   };
 };
 
@@ -230,6 +222,7 @@ const getOccupiedOverlayRects = (
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
+  resetCameraSignal,
   selectedCard,
   onPlaceCard,
   onFinishDrag,
@@ -255,6 +248,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
   );
+  const [previousResetSignal, setPreviousResetSignal] = useState(resetCameraSignal);
+  if (previousResetSignal !== resetCameraSignal) {
+    setPreviousResetSignal(resetCameraSignal);
+    setCamera(getCenteredCamera(gameState.startCard.coordinates));
+  }
   const [viewport, setViewport] = useState<ViewportSize>({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
@@ -379,7 +377,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     });
   }, [viewport.height, viewport.width]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -414,14 +412,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       resizeObserver.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    console.log('Neutral start card coordinates:', gameState.startCard.coordinates);
-  }, [gameState.startCard.id, gameState.startCard.coordinates]);
-
-  useEffect(() => {
-    console.log('Camera center coordinates:', getCameraCenterCoordinates(camera));
-  }, [camera]);
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
@@ -482,6 +472,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     ? gameState.pendingCross.cardIds.join('|')
     : 'no-pending-cross';
   const boardCards = useMemo(() => Object.values(gameState.board), [gameState.board]);
+  // Keep occupied cells mounted so panning does not dismiss their popovers.
+  // Empty cells only need DOM nodes inside the viewport, plus two cells of overscan.
+  const visibleCells = useMemo(() => {
+    const step = CELL_SIZE * camera.zoom;
+    const left = viewport.width / 2 + camera.offsetX;
+    const top = viewport.height / 2 + camera.offsetY;
+    const minX = Math.max(GRID_MIN, GRID_MIN + Math.floor(-left / step) - 2);
+    const maxX = Math.min(GRID_MAX, GRID_MIN + Math.floor((viewport.width - left) / step) + 2);
+    const minY = Math.max(GRID_MIN, GRID_MIN + Math.floor(-top / step) - 2);
+    const maxY = Math.min(GRID_MAX, GRID_MIN + Math.floor((viewport.height - top) / step) + 2);
+    const cells = new Map<string, Coordinates>();
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let x = minX; x <= maxX; x += 1) cells.set(`${x},${y}`, { x, y });
+    }
+    for (const card of boardCards) {
+      const { x, y } = card.coordinates;
+      cells.set(`${x},${y}`, card.coordinates);
+    }
+    return [...cells.values()];
+  }, [camera, viewport, boardCards]);
   const pendingMove = gameState.pendingMove;
   const pendingCard = pendingMove
     ? boardCards.find((card) => card.id === pendingMove.cardId)
@@ -815,9 +825,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         className="game-board"
         style={boardStyle}
       >
-        {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, index) => {
-          const y = GRID_MIN + Math.floor(index / GRID_SIZE);
-          const x = GRID_MIN + (index % GRID_SIZE);
+        {visibleCells.map(({ x, y }) => {
           const key = `${x},${y}`;
           const placedCard = gameState.board[key];
           const coordinates = { x, y };
@@ -829,9 +837,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             Boolean(placedCard) && pendingCrossCardIds.has(placedCard.id);
           const isCrossPendingCenter = key === pendingCrossCenterKey;
 
+          const cellStyle = { gridColumn: x - GRID_MIN + 1, gridRow: y - GRID_MIN + 1 };
+          if (!placedCard) {
+            return (
+              <div
+                key={`${x}-${y}`}
+                style={cellStyle}
+                className={`cell empty ${showPlayableHighlights && selectedCard !== null ? 'highlighted' : ''} ${isPlayable ? 'playable' : ''}`}
+                onClick={() => handleCellClick(x, y)}
+              />
+            );
+          }
           return (
             <Cell
               key={`${x}-${y}`}
+              style={cellStyle}
               placedCard={placedCard}
               onCellClick={() => handleCellClick(x, y)}
               isHighlighted={showPlayableHighlights && selectedCard !== null}

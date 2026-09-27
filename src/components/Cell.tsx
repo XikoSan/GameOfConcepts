@@ -28,6 +28,7 @@ import './Cell.css';
 type PopoverStateMode = 'hidden' | 'tooltip' | 'pinning' | 'pinned';
 
 interface CellProps {
+  style?: CSSProperties;
   placedCard?: PlacedCard;
   onCellClick?: () => void;
   isHighlighted?: boolean;
@@ -145,6 +146,7 @@ const arePopoverPositionsEqual = (
 };
 
 export const Cell: React.FC<CellProps> = ({
+  style,
   placedCard,
   onCellClick,
   isHighlighted,
@@ -691,6 +693,7 @@ export const Cell: React.FC<CellProps> = ({
       } ${
         placedCard ? 'occupied' : 'empty'
       }`}
+      style={style}
       onClick={onCellClick}
     >
       {placedCard && (

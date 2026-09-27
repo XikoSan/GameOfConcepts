@@ -1,0 +1,301 @@
+/* Paper and graphite table: shared visual layer for local and online play. */
+.app-container {
+  --table-sidebar-width: 300px;
+  --table-paper: #eee7d5;
+  --table-panel: #292d2e;
+  --table-line: #45494a;
+  --table-gold: #b7a06c;
+  background: #202425;
+  color: #eeeede;
+}
+.app-container .game-table {
+  width: 100%; height: 100svh; padding: 12px; border: 0; border-radius: 0;
+  background: #202425; box-shadow: none;
+}
+.app-container .play-area { gap: 12px; }
+.table-status-bar { display: grid; grid-template-columns: minmax(0, 1fr) var(--table-sidebar-width); align-items: center; gap: 12px; min-height: 46px; }
+.table-players { display: flex; align-items: stretch; gap: 10px; min-width: 0; overflow-x: auto; }
+.app-container .table-players .score-row { flex: 1 1 0; display: flex; justify-content: space-between; gap: 10px; padding: 9px 12px; margin: 0; min-width: 0; background: #292d2e; border: 1px solid #44494a; box-shadow: none; }
+.app-container .table-players .active-score { background: #343a3b; border-color: #67634f; }
+.app-container .score-row small { border-color: #aa925d; color: #ead6a5; background: transparent; }
+.table-menu { display: flex; justify-content: flex-end; gap: 6px; }
+.app-container .table-menu button, .board-tools button, .app-container .hand-actions > button {
+  background: #303537; border: 1px solid #53595b; border-radius: 6px; color: #e9e8e3;
+  padding: 9px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap;
+}
+.table-workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) var(--table-sidebar-width); gap: 12px; }
+.table-center { min-width: 0; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.app-container .board-section { flex: 1; min-height: 0; min-width: 0; position: relative; }
+.turn-sidebar { text-align: left; min-height: 0; overflow-y: auto; background: #292d2e; border: 1px solid #44494a; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 16px; }
+.turn-overview h2 { margin: 7px 0 10px; font-size: 20px; font-weight: 600; color: #f2f0e9; }
+.turn-overview p, .table-reminder p { margin: 0; font-size: 14px; line-height: 1.6; color: #c5c7c3; }
+.table-eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #bdb8a9; }
+.table-reminder { border-top: 1px solid #45494a; padding-top: 16px; }
+.table-reminder h3 { font-size: 13px; color: #d8c695; margin: 0 0 8px; }
+.board-tools { position: absolute; bottom: 12px; left: 12px; right: 12px; pointer-events: none; display: flex; justify-content: flex-end; z-index: 40; }
+.board-tools button { pointer-events: auto; background: #313638ee; box-shadow: 0 2px 4px #0002; }
+.table-hand-tray { display: flex; align-items: center; gap: 12px; padding: 12px; background: #2b3236; border: 1px solid #464f52; border-radius: 8px; }
+.app-container .table-hand-tray .player-hand { flex: 1; min-width: 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.app-container .player-hand .player-plate { display: none; }
+.app-container .cards-container { flex-wrap: nowrap; overflow-x: auto; justify-content: safe center; padding: 4px 2px 8px; }
+.app-container .card { flex: 1 1 0; width: 0; min-width: 0; container-type: inline-size; height: 76px; min-height: 76px; padding: 12px 10px; font-size: 15px; font-weight: 600; text-shadow: none; border-radius: 6px; box-shadow: 0 2px 5px #0003; }
+.app-container .card::before, .app-container .card::after { display: none; }
+.app-container .card.player-blue, .app-container .card-in-cell.player-0 { background: #386b95; border-color: #6083a1; }
+.app-container .card.player-orange, .app-container .card-in-cell.player-1 { background: #98713e; border-color: #b59060; }
+.app-container .card.player-green, .app-container .card-in-cell.player-2 { background: #49765b; border-color: #78a486; }
+.app-container .card.player-purple, .app-container .card-in-cell.player-3 { background: #75648e; border-color: #a28db9; }
+.app-container .card.selected { outline: 2px solid #d0b474; outline-offset: 1px; }
+.app-container .deck-card-back { background: #40474a; border-color: #626b6d; box-shadow: 3px 3px 0 #202728, 5px 5px 0 #454b4d; }
+.hand-actions { position: relative; flex: 0 0 auto; }
+.hand-actions .control-redraw-confirm { position: absolute; bottom: calc(100% + 12px); right: 0; width: 240px; z-index: 100; padding: 14px; background: #292d2e; border: 1px solid #aa925d; box-shadow: 0 6px 20px #0005; }
+.app-container .game-board-container { padding: 0; background: var(--table-paper); border: 1px solid #c6bba3; border-radius: 7px; box-shadow: none; }
+.app-container .game-board-container::before, .app-container .game-board-container::after { display: none; }
+.app-container .game-board { background: #eee7d5; }
+.app-container .cell { border: 0; border-right: 1px solid #b9ad902e; border-bottom: 1px solid #b9ad902e; background: transparent; }
+.app-container .cell.empty:hover { background: #ffffff40; }
+.app-container .cell.playable { background: #d4e0ca; box-shadow: inset 0 0 0 1px #829475; }
+.app-container .cell.pending, .app-container .cell.relation-highlighted { box-shadow: inset 0 0 0 2px #bc9b55; }
+.app-container .cell.neutral { border-color: transparent; box-shadow: none; }
+.app-container .card-in-cell { border-radius: 5px; width: calc(100% - 2px); height: calc(100% - 2px); box-shadow: 0 2px 3px #0002; text-shadow: none; }
+.app-container .card-in-cell.player-neutral { background: #4b4c47; color: #f5f0df; border-color: #676960; }
+.app-container .semantic-move-panel { margin: 0; padding: 12px; background: #323738; border: 1px solid #484f4f; border-radius: 6px; box-shadow: none; }
+.app-container .control-panel { width: auto; background: #292d2e; box-shadow: none; border: 0; }
+.app-container .control-panel .control-title-section { display: none; }
+.app-container .control-panel .action-button { background: #393f40; border: 1px solid #565e5f; box-shadow: none; }
+.app-container .control-panel .action-button-primary { background: #8b7647; border-color: #baa16c; }
+.app-container button:focus-visible { outline: 2px solid #e5cd8e; outline-offset: 3px; }
+.app-container button:disabled { cursor: not-allowed; opacity: .5; }
+@media (max-width: 1100px) {
+  .app-container { --table-sidebar-width: 260px; }
+  .table-hand-tray { flex-wrap: nowrap; }
+  .hand-actions { margin-left: auto; }
+  .app-container .card { height: 64px; min-height: 64px; font-size: 14px; }
+}
+@media (max-width: 700px) {
+  .app-container .game-table { padding: 6px; }
+  .table-status-bar { grid-template-columns: 1fr; gap: 6px; }
+  .table-players { width: 100%; }
+  .table-menu { margin-left: auto; }
+  .table-workspace { display: flex; flex-direction: column; overflow-y: auto; }
+  .table-center { flex: 0 0 auto; min-height: 65svh; }
+  .app-container .board-section { min-height: 42svh; }
+  .turn-sidebar { flex: 0 0 auto; overflow: visible; }
+  .table-hand-tray { gap: 6px; padding: 8px; }
+  .app-container .card { min-height: 60px; }
+}
+
+.app-container .modal-window { background: #292d2e; border-color: #505553; box-shadow: 0 16px 48px #0006; }
+.app-container .score-row > span::before { box-shadow: none; }
+
+.app-container .turn-sidebar .control-panel { height: auto; flex: 0 0 auto; padding: 0; overflow: visible; border-radius: 0; }
+.app-container .turn-sidebar > * { flex-shrink: 0; }
+.app-container .turn-sidebar .panel-actions { gap: 16px; }
+
+.app-container .turn-sidebar .sidebar-log { display: flex; flex-direction: column; flex: 1 1 120px; min-height: 110px; border-top: 1px solid #45494a; padding-top: 16px; }
+.sidebar-log h3 { margin: 0 0 10px; font-size: 14px; font-weight: 600; color: #e9e8e3; }
+.sidebar-log > p { margin: 0; color: #b6b9b6; font-size: 13px; line-height: 1.5; }
+.app-container .sidebar-log .match-log { flex: 1 1 0; min-height: 0; max-height: none; overflow-y: auto; margin: 0; padding-left: 20px; padding-right: 4px; font-size: 13px; line-height: 1.5; scrollbar-width: thin; }
+.app-container .sidebar-log .match-log li { background: transparent; border: 0; border-bottom: 1px solid #45494a; border-radius: 0; padding: 8px 2px; }
+
+.board-tools .center-board-button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; }
+.table-reminder { margin-top: auto; }
+.table-reminder h4 { margin: 10px 0 5px; font-size: 12px; font-weight: 600; color: #e0ded6; }
+.table-reminder .reminder-relations { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; color: #c5c7c3; font-size: 13px; line-height: 1.4; }
+.table-reminder p { font-size: 12px; line-height: 1.5; }
+.table-reminder p + p { margin-top: 6px; }
+@media (max-width: 700px) {
+  .app-container .turn-sidebar .sidebar-log { flex: 0 0 180px; }
+}
+
+.app-container .table-players .score-row > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.app-container .table-players .score-row strong { flex-shrink: 0; }
+.table-reminder .reminder-score { margin-top: 10px; }
+.table-reminder .reminder-score h4 { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 0 0 4px; }
+.reminder-score h4 strong { color: #dbc184; white-space: nowrap; font-size: 13px; }
+.table-reminder .reminder-score-total { margin-top: 10px; color: #aaa; }
+
+/* Consistent spacing and aligned score columns in the compact reminder. */
+.table-reminder { padding-top: 14px; }
+.table-reminder > h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #e9e8e3; }
+.table-reminder > h4 { margin: 0 0 8px; font-size: 12px; color: #c5c7c3; }
+.table-reminder .reminder-relations { gap: 0; padding: 0 0 12px; }
+.table-reminder .reminder-relations li { padding: 3px 0; }
+.table-reminder .reminder-score { margin: 0; padding: 12px 0; border-top: 1px solid #45494a; }
+.table-reminder .reminder-score h4 { display: grid; grid-template-columns: minmax(0, 1fr) 64px; align-items: baseline; gap: 8px; margin: 0; font-size: 12px; color: #e9e8e3; }
+.table-reminder .reminder-score h4 strong { text-align: right; font-variant-numeric: tabular-nums; }
+.table-reminder .reminder-score p { margin: 6px 0 0; color: #b6b9b6; }
+.table-reminder .reminder-score-total { margin: 0; padding-top: 12px; border-top: 1px solid #45494a; font-size: 11px; line-height: 1.5; color: #b6b9b6; }
+
+/* Give the hand the full space between the deck and redraw control. */
+.app-container .table-hand-tray .hand-content,
+.app-container .table-hand-tray .hand-main-group { display: flex; flex: 1; min-width: 0; }
+.app-container .table-hand-tray .cards-container { flex: 1; width: 100%; justify-self: stretch; }
+.app-container .table-hand-tray .hidden-hand-card { flex: 1 1 0; min-width: 0; width: 0; height: 76px; }
+.app-container .card .card-title { font-size: clamp(12px, 10cqw, 24px); }
+.hand-actions { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.hand-redraw-caption { margin: 0; font-size: clamp(9px, 0.62vw, 10px); font-weight: 600; color: #d6cec2; white-space: nowrap; }
+.app-container .hand-actions > .hand-redraw-button {
+  display: grid; place-items: center;
+  width: 52px; height: 52px; min-height: 52px; padding: 0;
+  color: #e9e8e3; background: linear-gradient(#50595c, #3c4447);
+  border: 1px solid #6b7578; border-radius: 10px;
+  box-shadow: inset 0 1px 0 #ffffff26, 0 4px 0 #202729, 0 6px 8px #0004;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+.app-container .hand-redraw-button:not(:disabled):hover { border-color: #9aa5a8; }
+.app-container .hand-redraw-button:not(:disabled):active {
+  transform: translateY(3px);
+  box-shadow: inset 0 1px 3px #0004, 0 1px 0 #202729, 0 2px 3px #0003;
+}
+.hand-redraw-button svg { transition: transform 240ms ease; }
+.hand-redraw-button:not(:disabled):hover svg { transform: rotate(35deg); }
+.hand-redraw-button:not(:disabled):active svg { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) {
+  .app-container .hand-actions > .hand-redraw-button,
+  .hand-redraw-button svg { transition: none; }
+}
+@media (max-width: 700px) {
+  .app-container .table-hand-tray .cards-container { flex-wrap: wrap; }
+  .app-container .table-hand-tray .card,
+  .app-container .table-hand-tray .hidden-hand-card { flex: 1 1 80px; }
+}
+
+/* Matte graphite and brushed edges from the visual reference; layout stays above. */
+.app-container {
+  --table-panel: #282c2d;
+  --table-line: #505657;
+  --table-gold: #b5a06c;
+  --table-surface: linear-gradient(145deg, #ffffff04, #00000008), #282c2d;
+  --table-button: linear-gradient(180deg, #414749, #343a3c);
+  --table-button-shadow: inset 0 1px 0 #ffffff12, 0 2px 3px #0003;
+}
+.app-container .game-table { background: radial-gradient(ellipse at 35% 0, #303536, #232728 75%); }
+.app-container .turn-sidebar {
+  background: var(--table-surface); border-color: #484e4f;
+  box-shadow: inset 0 1px 0 #ffffff08, 0 2px 5px #0002;
+}
+.app-container .turn-sidebar .control-panel { background: transparent; }
+.app-container .table-hand-tray {
+  background: linear-gradient(180deg, #343e45, #293239);
+  border-color: #515c63; box-shadow: inset 0 1px 0 #ffffff0c, 0 2px 6px #0002;
+}
+.app-container .table-players .score-row {
+  background: var(--table-surface); border-color: #495051;
+  box-shadow: inset 0 1px 0 #ffffff08;
+}
+.app-container .table-players .active-score { background: linear-gradient(180deg, #3c4140, #313635); border-color: #93825a; }
+.app-container .score-row small {
+  background: linear-gradient(#b39b60, #897443); border-color: #bea56b; color: #252922;
+  box-shadow: inset 0 1px 0 #ffffff26;
+}
+.app-container .control-panel .action-button,
+.app-container .table-menu button,
+.app-container .board-tools button,
+.app-container .control-panel .max-players-picker button {
+  background: var(--table-button); border-color: #5b6265; border-radius: 6px;
+  color: #e8e9e6; font-weight: 500; text-shadow: 0 1px 1px #0004;
+  box-shadow: var(--table-button-shadow);
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+.app-container .control-panel .action-button-primary,
+.app-container .control-panel .max-players-picker button.active {
+  background: linear-gradient(180deg, #9b8654, #7b6b45); border-color: #b7a06c;
+  color: #faf5e8; box-shadow: inset 0 1px 0 #ffffff26, 0 2px 3px #0003;
+}
+.app-container .control-panel button:not(:disabled):hover,
+.app-container .table-menu button:not(:disabled):hover,
+.app-container .board-tools button:not(:disabled):hover {
+  border-color: #a1a69e; filter: none;
+  box-shadow: inset 0 1px 0 #ffffff20, 0 2px 4px #0004;
+}
+.app-container .control-panel button:not(:disabled):active,
+.app-container .table-menu button:not(:disabled):active,
+.app-container .board-tools button:not(:disabled):active {
+  transform: translateY(1px); box-shadow: inset 0 1px 3px #0004;
+}
+.app-container .control-panel .deck-select-field select {
+  background: linear-gradient(180deg, #222627, #2b3031); border-color: #61686a;
+  color: #e8e9e6; box-shadow: inset 0 1px 3px #0003; font-weight: 400;
+}
+.app-container .control-panel select option { background: #292e30; color: #e8e9e6; }
+.app-container .control-panel .action-group h2 { color: #bfc2bd; font-weight: 500; letter-spacing: .04em; }
+.app-container .control-panel .deck-select-field,
+.app-container .control-panel .max-players-picker { color: #d1d3ce; font-weight: 400; }
+.app-container .turn-sidebar .sidebar-log,
+.app-container .table-reminder,
+.app-container .table-reminder .reminder-score,
+.app-container .table-reminder .reminder-score-total {
+  border-top-color: var(--table-line); box-shadow: inset 0 1px 0 #ffffff04;
+}
+.app-container .sidebar-log .match-log li { border-bottom-color: #454b4c; }
+.app-container .table-reminder > h3,
+.app-container .sidebar-log h3 { color: #e3e5df; font-weight: 500; }
+.app-container .card,
+.app-container .card-in-cell {
+  background-image: linear-gradient(145deg, #ffffff0b, #0000000b);
+  box-shadow: inset 0 1px 0 #ffffff14, 0 2px 4px #0004;
+}
+.app-container .deck-card-back {
+  background: linear-gradient(145deg, #454c4e, #333a3d); border-color: #626b6e;
+  box-shadow: inset 0 1px 0 #ffffff14, 3px 3px 0 #202728, 5px 5px 0 #454b4d;
+}
+.app-container .game-board-container { border-color: #b8aa89; box-shadow: inset 0 0 0 1px #fff3, 0 2px 5px #0002; }
+.app-container .game-board { background: #eee6d0; }
+@media (prefers-reduced-motion: reduce) {
+  .app-container .control-panel button,
+  .app-container .table-menu button,
+  .app-container .board-tools button { transition: none; }
+}
+
+/* Two reminder topics, leaving the remaining sidebar height to the log. */
+.app-container .table-reminder { padding: 10px; border: 1px solid #ffffff12; border-radius: 7px; background: #ffffff04; box-shadow: inset 0 1px 0 #ffffff04; }
+.app-container .table-reminder > h3 { margin-bottom: 8px; font-size: 13px; }
+.app-container .table-reminder > h4 { margin: 0 0 4px; font-size: 11px; }
+.app-container .table-reminder .reminder-relations { padding-bottom: 8px; font-size: 12px; line-height: 1.35; }
+.app-container .table-reminder .reminder-relations li { padding: 1px 0; }
+.app-container .table-reminder .reminder-score { margin: 0; border: 0; box-shadow: none; padding: 2px 0; }
+.app-container .table-reminder .reminder-relations + .reminder-score { border-top: 1px solid var(--table-line); padding-top: 6px; }
+.app-container .table-reminder .reminder-score h4,
+.app-container .table-reminder .reminder-score h4 strong { font-size: 11px; }
+.app-container .table-reminder .reminder-score p { margin: 2px 0 0; font-size: 11px; line-height: 1.35; }
+.app-container .table-reminder .reminder-score-total { border: 0; box-shadow: none; margin-top: 4px; padding-top: 0; font-size: 10px; line-height: 1.35; }
+.app-container .turn-sidebar .sidebar-log { flex: 1 0 160px; min-height: 160px; }
+.app-container .sidebar-log .match-log { min-height: 112px; overflow-x: hidden; }
+.app-container .sidebar-log .match-log li { white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+.app-container .local-game-setup { display: grid; gap: 18px; padding: 0; background: transparent; }
+
+.app-container .modal-window:has(.local-game-setup) { width: min(520px, 100%); }
+.app-container .local-game-setup { width: 100%; max-width: none; gap: 22px; }
+.local-game-options { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: end; }
+.app-container .local-game-options .max-players-picker { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 0; border: 0; background: none; }
+.local-game-options .max-players-picker > span { grid-column: 1 / -1; text-align: left; }
+.app-container .local-game-options .max-players-picker button { width: 100%; height: 40px; }
+.app-container .local-game-options .deck-select-field { gap: 8px; text-align: left; font-size: 13px; }
+.app-container .local-game-options .deck-select-field select { height: 40px; width: 100%; }
+.local-player-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--table-line); min-width: 0; }
+.local-player-names legend { padding: 0 10px 0 0; color: #d1d3ce; font-size: 13px; }
+.local-player-name { display: grid; gap: 7px; min-width: 0; text-align: left; font-size: 12px; color: #c5c7c3; }
+.local-player-name > span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: #6083a1; }
+.local-player-name-1 > span::before { background: #b59060; }
+.local-player-name-2 > span::before { background: #78a486; }
+.local-player-name-3 > span::before { background: #a28db9; }
+.local-player-name input { box-sizing: border-box; width: 100%; min-width: 0; height: 42px; padding: 0 12px; border: 1px solid #61686a; border-radius: 6px; background: #222728; color: #e8e9e6; font: inherit; font-size: 14px; }
+.local-player-name input:focus-visible { outline: 2px solid var(--table-gold); outline-offset: 2px; }
+.app-container .local-game-setup > .action-button { width: 100%; min-height: 44px; }
+@media (max-width: 420px) { .local-game-options, .local-player-names { grid-template-columns: 1fr; gap: 14px; } }
+
+.app-container .table-reminder .reminder-score h4 { margin: 0; line-height: 1.4; }
+
+/* Reminder scaled by 15% within the existing sidebar width. */
+.app-container .table-reminder { padding: 11.5px; }
+.app-container .table-reminder > h3 { margin-bottom: 9.2px; font-size: 14.95px; }
+.app-container .table-reminder > h4 { margin-bottom: 4.6px; font-size: 12.65px; }
+.app-container .table-reminder .reminder-relations { padding-bottom: 9.2px; font-size: 13.8px; }
+.app-container .table-reminder .reminder-relations li { padding: 1.15px 0; }
+.app-container .table-reminder .reminder-score { padding: 2.3px 0; }
+.app-container .table-reminder .reminder-relations + .reminder-score { padding-top: 6.9px; }
+.app-container .table-reminder .reminder-score h4 { grid-template-columns: minmax(0, 1fr) 73.6px; gap: 9.2px; }
+.app-container .table-reminder .reminder-score h4,
+.app-container .table-reminder .reminder-score h4 strong { font-size: 12.65px; }
+.app-container .table-reminder .reminder-score p { margin-top: 2.3px; font-size: 12.65px; }
+.app-container .table-reminder .reminder-score-total { margin-top: 4.6px; font-size: 11.5px; }

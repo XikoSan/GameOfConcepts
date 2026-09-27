@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { incrementCounter } from '../debug/performanceDiagnostics';
 import './Card.css';
 
@@ -22,6 +22,29 @@ export const Card: React.FC<CardProps> = ({
   playerColor = 'blue',
 }) => {
   incrementCounter('render:HandCard');
+  const cardRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const title = titleRef.current;
+    if (!card || !title) return;
+    const fitTitle = () => {
+      title.style.fontSize = '';
+      const style = getComputedStyle(card);
+      const available = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const baseSize = parseFloat(getComputedStyle(title).fontSize);
+      if (available > 0 && title.scrollWidth > available) {
+        title.style.fontSize = `${baseSize * available / title.scrollWidth}px`;
+      }
+    };
+    const observer = new ResizeObserver(fitTitle);
+    observer.observe(card);
+    fitTitle();
+    void document.fonts.ready.then(() => { if (card.isConnected) fitTitle(); });
+    return () => observer.disconnect();
+  }, [cardName]);
+
   const didDragRecentlyRef = useRef(false);
   const dragResetTimeoutRef = useRef<number | null>(null);
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
@@ -77,6 +100,7 @@ export const Card: React.FC<CardProps> = ({
 
   return (
     <div
+      ref={cardRef}
       className={`card ${isSelected ? 'selected' : ''} player-${playerColor}`}
       draggable={draggable}
       onDragStart={handleDragStart}
@@ -84,7 +108,7 @@ export const Card: React.FC<CardProps> = ({
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
     >
-      <span className="card-title">{cardName}</span>
+      <span ref={titleRef} className="card-title">{cardName}</span>
     </div>
   );
 };

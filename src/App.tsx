@@ -29,7 +29,6 @@ import {
   MIXED_ALL_DECK,
   USER_SELECTABLE_DECKS,
 } from './data/deckDefinitions';
-import { createSemanticEdgeFromPending, formatSemanticRelation } from './scoring/semanticRelations';
 import type {
   Coordinates,
   GameState,
@@ -39,6 +38,7 @@ import type {
 } from './game';
 import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
+import './TableTheme.css';
 
 const getPlayerLabel = (playerId: number) => `Игрок ${playerId + 1}`;
 
@@ -115,10 +115,10 @@ const getRoomPlayersForDisplay = (room: Room | null): RoomPlayer[] => {
   return players;
 };
 
-const getLocalPlayersForDisplay = (gameState: GameState): RoomPlayer[] =>
+const getLocalPlayersForDisplay = (gameState: GameState, names: string[]): RoomPlayer[] =>
   gameState.players.map((player) => ({
     id: `local-${player.playerId}`,
-    nickname: `Игрок ${player.playerId + 1}`,
+    nickname: names[player.playerId] || `Игрок ${player.playerId + 1}`,
     seatIndex: player.playerId,
     color: playerColors[player.playerId] ?? 'blue',
     isHost: player.playerId === 0,
@@ -176,7 +176,7 @@ interface DragPreview {
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
 }
 
-type ActiveModal = 'new-game' | 'rules' | 'settings' | null;
+type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -199,6 +199,8 @@ function App() {
   const [isRoomListLoading, setIsRoomListLoading] = useState(false);
   const [onlineNickname, setOnlineNickname] = useState(savedNickname);
   const [maxPlayers, setMaxPlayers] = useState<MaxPlayers>(2);
+  const [localNameDrafts, setLocalNameDrafts] = useState<string[]>(['', '', '', '']);
+  const [localPlayerNames, setLocalPlayerNames] = useState<string[]>([]);
   const [localDeckId, setLocalDeckId] = useState(MIXED_ALL_DECK.id);
   const [onlineDeckId, setOnlineDeckId] = useState(MIXED_ALL_DECK.id);
   const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
@@ -263,7 +265,7 @@ function App() {
   const roomList = getRoomList(availableRooms, onlineRoom);
   const onlinePlayers = getRoomPlayersForDisplay(onlineRoom);
   const onlineMaxPlayers = onlineRoom?.max_players ?? maxPlayers;
-  const localPlayers = getLocalPlayersForDisplay(gameState);
+  const localPlayers = getLocalPlayersForDisplay(gameState, localPlayerNames);
   const currentPlayerId = onlineRoom?.turn_order?.[onlineRoom.current_turn_index] ?? null;
   const isOnlineHost = isRoomHost(onlineRoom, playerId);
   const activeHandRedrawAvailability = getHandRedrawAvailability(
@@ -344,25 +346,6 @@ function App() {
     setDragPreview(null);
   };
 
-  const getPendingSemanticEdgeScore = (pendingEdgeId: string) =>
-    pendingSemanticScore?.edges.find((edge) => edge.pendingEdgeId === pendingEdgeId);
-
-  const getSemanticEdgeLabel = (
-    edge: PendingSemanticEdge
-  ) => {
-    const pendingMove = gameState.pendingMove;
-    const pendingCard = pendingMove
-      ? Object.values(gameState.board).find((card) => card.id === pendingMove.cardId)
-      : null;
-    if (!pendingMove || !pendingCard) return 'Связь';
-
-    const semanticEdge = createSemanticEdgeFromPending(pendingMove, edge, pendingCard);
-    const namesById = new Map(
-      Object.values(gameState.board).map((card) => [card.id, card.cardName])
-    );
-    return formatSemanticRelation(semanticEdge, namesById);
-  };
-
   const getValidatedOnlineNickname = (): string | null => {
     const nickname = onlineNickname.trim();
 
@@ -420,6 +403,7 @@ function App() {
   };
 
   const handleConfirmNewGame = () => {
+    setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     resetGame(maxPlayers, localDeckId);
     setSelectedCard(null);
     setDragPreview(null);
@@ -428,6 +412,7 @@ function App() {
   };
 
   const handleStartLocalGame = () => {
+    setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     // TEMP(MVP): Выход из онлайн-комнаты пока только локальный, без удаления
     // комнаты из Supabase.
     roomSubscriptionRef.current?.unsubscribe();
@@ -448,7 +433,7 @@ function App() {
   const getHandMeta = (playerIndex: number) => {
     if (!onlineRoom) {
       return {
-        displayName: `Игрок ${playerIndex + 1}`,
+        displayName: localPlayerNames[playerIndex] || `Игрок ${playerIndex + 1}`,
         statusLabel: gameState.pendingMove
           ? 'Нужно решение'
           : activePlayerIndex === playerIndex
@@ -834,17 +819,8 @@ function App() {
     playerId,
   ]);
 
-  const renderPartyPanel = () => (
-    <aside className="side-panel party-panel" aria-label="Панель партии">
-      <section className="panel-section lobby-section">
-        <div className="panel-title-row">
-          <span className="panel-icon" aria-hidden="true">◇</span>
-          <h1>Лобби</h1>
-        </div>
-      </section>
-
-      <section className="panel-section players-score-section">
-        <h2>Игроки</h2>
+  const renderPlayers = () => (
+    <div className="table-players" aria-label="Игроки и счёт">
         {(onlineRoom ? onlinePlayers : localPlayers).map((player) => {
           const isActiveScore =
             currentPlayerId !== null
@@ -865,32 +841,13 @@ function App() {
             </div>
           );
         })}
-      </section>
-
-      <section className="panel-section log-section">
-        <h2>Лог партии</h2>
-        <div className="log-placeholder">
-          {gameState.log.length > 0 ? (
-            <ol className="match-log">
-              {gameState.log.map((event, index) => (
-                <li key={`${event}-${index}`}>{event}</li>
-              ))}
-            </ol>
-          ) : (
-            <>
-              <span className="log-icon" aria-hidden="true">✧</span>
-              <p>События партии появятся здесь.</p>
-              <small>Заглушка под будущий журнал ходов.</small>
-            </>
-          )}
-        </div>
-      </section>
-    </aside>
+    </div>
   );
 
   const renderBoard = () => (
     <GameBoard
-      key={`${gameState.startCard.id}-${resetCameraSignal}`}
+      key={gameState.startCard.id}
+      resetCameraSignal={resetCameraSignal}
       gameState={gameState}
       selectedCard={activeSelectedCard}
       onPlaceCard={handlePlaceCard}
@@ -905,7 +862,7 @@ function App() {
       onConfirmPendingMove={confirmCard}
       onReturnPendingMove={returnCard}
       canReviewPendingCross={canReviewPendingCross}
-      pendingCrossReviewerLabel={getPlayerLabel(activePlayerIndex)}
+      pendingCrossReviewerLabel={!onlineRoom ? localPlayerNames[activePlayerIndex] || getPlayerLabel(activePlayerIndex) : getPlayerLabel(activePlayerIndex)}
       onApprovePendingCross={approveCross}
       onRejectPendingCross={rejectCross}
       canEditSemanticMove={canEditSemanticMove}
@@ -918,98 +875,71 @@ function App() {
   );
 
   const renderSemanticMovePanel = () => {
-    if (!gameState.pendingMove) return null;
-
-    const isDefining = gameState.pendingMove.semanticStatus === 'defining-relations';
-    const isVoting = gameState.pendingMove.semanticStatus === 'voting';
-
+    if (gameState.pendingMove?.semanticStatus !== 'defining-relations') return null;
     return (
       <section className="semantic-move-panel" aria-label="Смысловые связи хода">
         <div className="semantic-move-header">
-          <h2>{isDefining ? 'Связи хода' : 'Голосование'}</h2>
+          <h2>Связи хода</h2>
           <strong>+{pendingSemanticScore?.total ?? 0}</strong>
         </div>
-        {isDefining && (
-          <p className="semantic-move-note">
-            {canEditSemanticMove
-              ? semanticSubmitHint
-              : 'Автор хода выбирает связи на поле.'}
-          </p>
-        )}
-        {isVoting && (
-          <div className="semantic-vote-summary">
-            {(gameState.pendingMove.semanticEdges ?? []).map((edge) => {
-              const score = getPendingSemanticEdgeScore(edge.id);
-              return (
-                <p key={edge.id}>
-                  {getSemanticEdgeLabel(edge)}
-                  <strong>+{score?.total ?? 1}</strong>
-                </p>
-              );
-            })}
-          </div>
-        )}
+        <p className="semantic-move-note">
+          {canEditSemanticMove ? semanticSubmitHint : 'Автор хода выбирает связи на поле.'}
+        </p>
       </section>
     );
   };
 
-  const renderControlPanel = (showScoreHint = false) => (
+  const renderHandActions = () => (<div className="hand-actions">
+          <button
+            className="action-button action-button-quiet hand-redraw-button"
+            aria-label={activeHandRedrawUsed ? "Пересдача использована" : "Пересдать руку"}
+            disabled={!canUseHandRedraw}
+            title={
+              canUseHandRedraw
+                ? 'Пересдать всю руку'
+                : activeHandRedrawUsed
+                  ? 'Пересдача уже использована.'
+                  : handRedrawDisabledReason
+            }
+            type="button"
+            onClick={() => setIsRedrawConfirmOpen(true)}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20 7v5h-5M4 17v-5h5" />
+              <path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17" />
+            </svg>
+          </button>
+          <p className="hand-redraw-caption">Пересдача руки</p>
+          {isRedrawConfirmOpen && canUseHandRedraw && (
+            <div className="control-redraw-confirm">
+              <p>Заменить всю руку? Пересдачу можно использовать один раз за партию.</p>
+              <div className="control-redraw-actions">
+                <button type="button" onClick={handleRedrawHand}>
+                  Пересдать
+                </button>
+                <button type="button" onClick={() => setIsRedrawConfirmOpen(false)}>
+                  Отмена
+                </button>
+              </div>
+            </div>
+          )}
+  </div>);
+
+  const renderControlPanel = () => (
     <aside className="side-panel control-panel" aria-label="Панель управления">
-      <section className="panel-section control-title-section">
-        <div className="panel-title-row">
-          <span className="panel-icon" aria-hidden="true">◇</span>
-          <h1>Управление</h1>
-        </div>
-      </section>
-
-      {renderSemanticMovePanel()}
-
       <nav className="panel-actions" aria-label="Действия">
         <section className="action-group action-group-primary" aria-label="Партия">
           <h2>Партия</h2>
           <button className="action-button action-button-primary" type="button" onClick={handleOpenNewGameModal}>
             Онлайн игра
           </button>
-          <button className="action-button action-button-secondary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
-            Начать локально
+          <button className="action-button action-button-secondary" type="button" onClick={() => setActiveModal('local-game')}>
+            Локальная игра
           </button>
-          {!onlineRoom && (
-            <>
-              <div className="max-players-picker" aria-label="Количество локальных игроков">
-                <span>Игроков</span>
-                {([2, 3, 4] as const).map((playersCount) => (
-                  <button
-                    className={maxPlayers === playersCount ? 'active' : ''}
-                    key={playersCount}
-                    onClick={() => setMaxPlayers(playersCount)}
-                    type="button"
-                  >
-                    {playersCount}
-                  </button>
-                ))}
-              </div>
-              <label className="deck-select-field">
-                <span>Колода</span>
-                <select
-                  onChange={(event) => setLocalDeckId(event.target.value)}
-                  value={localDeckId}
-                >
-                  {USER_SELECTABLE_DECKS.map((deckDefinition) => (
-                    <option key={deckDefinition.id} value={deckDefinition.id}>
-                      {deckDefinition.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
         </section>
 
-        <section className="action-group" aria-label="Инструменты">
+        {onlineRoom && <section className="action-group" aria-label="Инструменты">
           <h2>Инструменты</h2>
-          <button className="action-button action-button-subtle" type="button" onClick={handleResetCamera}>
-            Сброс позиции
-          </button>
           {onlineRoom && (
             <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
               Синхронизировать
@@ -1025,60 +955,12 @@ function App() {
               Удалить комнату
             </button>
           )}
-        </section>
+        </section>}
 
-        <section className="action-group" aria-label="Справка">
-          <h2>Справка</h2>
-          <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('rules')}>
-            Правила
-          </button>
-          <button className="action-button action-button-quiet" type="button" onClick={() => setActiveModal('settings')}>
-            Настройки
-          </button>
-          <button
-            className="action-button action-button-quiet"
-            disabled={!canUseHandRedraw}
-            title={
-              canUseHandRedraw
-                ? 'Пересдать всю руку'
-                : activeHandRedrawUsed
-                  ? 'Пересдача уже использована.'
-                  : handRedrawDisabledReason
-            }
-            type="button"
-            onClick={() => setIsRedrawConfirmOpen(true)}
-          >
-            {activeHandRedrawUsed ? 'Пересдача использована' : 'Пересдать руку'}
-          </button>
-          {isRedrawConfirmOpen && canUseHandRedraw && (
-            <div className="control-redraw-confirm">
-              <p>Заменить всю руку? Пересдачу можно использовать один раз за партию.</p>
-              <div className="control-redraw-actions">
-                <button type="button" onClick={handleRedrawHand}>
-                  Пересдать
-                </button>
-                <button type="button" onClick={() => setIsRedrawConfirmOpen(false)}>
-                  Отмена
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
+
       </nav>
 
-      {showScoreHint && !gameState.pendingMove && (
-        <section className="control-hint-card" aria-label="Памятка по типам связей">
-          <h3>Памятка</h3>
-          <div className="control-hint-group">
-            <strong>Типы связей</strong>
-            <p>Вид</p>
-            <p>Часть</p>
-            <p>Причина</p>
-            <p>Свойство</p>
-            <p>Противоположность</p>
-          </div>
-        </section>
-      )}
+
     </aside>
   );
 
@@ -1123,48 +1005,72 @@ function App() {
     <div className="app-container">
       <main className="game-table">
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
-          {isOnlineTable ? (
-            <div className="online-game-shell">
-              <header className="online-game-header">
-                <h1>Game of concepts</h1>
-              </header>
-
-              <div className="online-game-layout">
-                {renderPartyPanel()}
-
-                <div className="online-center-table">
-                  <div className="board-section board-section-online">
-                    {renderBoard()}
-                  </div>
-                  {/* Online renders only the local player's hand; opponent hands stay hidden in UI. */}
-                  {bottomTablePlayerIndex !== null &&
-                    renderPlayerHand(
-                      bottomTablePlayerIndex,
-                      'local-player-hand',
-                      onlinePlayers.length < 2
-                    )}
-                  {onlinePlayers.length < 2 && (
-                    <p className="online-waiting-note">Ожидание второго игрока</p>
-                  )}
+          <header className="table-status-bar">
+            {renderPlayers()}
+            <nav className="table-menu" aria-label="Меню игры">
+              <button type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
+              <button type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
+            </nav>
+          </header>
+          <div className="table-workspace">
+            <div className="table-center">
+              <div className="board-section">
+                {renderBoard()}
+                <div className="board-tools">
+                  <button className="center-board-button" type="button" onClick={handleResetCamera} aria-label="Центрировать поле" title="Центрировать поле">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                      <circle cx="12" cy="12" r="6" />
+                      <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
+                      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none" />
+                    </svg>
+                  </button>
                 </div>
-
-                {renderControlPanel(true)}
               </div>
+              <div className="table-hand-tray">
+                {/* Online keeps the local hand; hot-seat follows the active player. */}
+                {isOnlineTable
+                  ? bottomTablePlayerIndex !== null && renderPlayerHand(bottomTablePlayerIndex, undefined, onlinePlayers.length < 2)
+                  : renderPlayerHand(activePlayerIndex)}
+                {renderHandActions()}
+              </div>
+              {isOnlineTable && onlinePlayers.length < 2 && <p className="online-waiting-note">Ожидание второго игрока</p>}
             </div>
-          ) : (
-            <>
-              <div className="table-middle">
-                {renderPartyPanel()}
-                <div className="board-section">
-                  {renderBoard()}
+            <aside className="turn-sidebar" aria-label="Управление партией и ходом">
+              {renderControlPanel()}
+              {renderSemanticMovePanel()}
+              <section className="sidebar-log" aria-label="Лог партии">
+                <h3>Лог партии</h3>
+                {gameState.log.length > 0 ? (
+                  <ol className="match-log">
+                    {gameState.log.map((event, index) => <li key={`${index}-${event}`}>{onlineRoom ? event : event.replace(/Игрок ([1-4])(?!\d)/g, (label, number) => localPlayerNames[Number(number) - 1] || label)}</li>)}
+                  </ol>
+                ) : <p>События партии появятся здесь.</p>}
+              </section>
+              <section className="table-reminder" aria-label="Памятка">
+                <h3>Памятка</h3>
+                <h4>Типы связей</h4>
+                <ul className="reminder-relations">
+                  <li>Вид</li>
+                  <li>Часть</li>
+                  <li>Причина</li>
+                  <li>Свойство</li>
+                  <li>Противоположность</li>
+                </ul>
+                <div className="reminder-score">
+                  <h4><span>Принятая связь</span><strong>1 очко</strong></h4>
                 </div>
-                {renderControlPanel(true)}
-              </div>
-
-              {/* Local hot-seat shows one active hand so 2-4 players can pass the device around. */}
-              {renderPlayerHand(activePlayerIndex)}
-            </>
-          )}
+                <div className="reminder-score">
+                  <h4><span>Смысловой путь</span><strong>+1 очко</strong></h4>
+                  <p>Последовательность связей одного типа с согласованным направлением.</p>
+                </div>
+                <div className="reminder-score">
+                  <h4><span>Смысловой узел</span><strong>+1 очко</strong></h4>
+                  <p>Связи одного типа вокруг одного понятия, направленные все к центру или все от него.</p>
+                </div>
+                <p className="reminder-score-total">Бонусы складываются. До 3 очков за новую связь.</p>
+              </section>
+            </aside>
+          </div>
         </section>
       </main>
       {dragPreview && (
@@ -1174,6 +1080,60 @@ function App() {
           initialY={dragPreview.initialY}
           playerColor={dragPreview.playerColor}
         />
+      )}
+      {activeModal === 'local-game' && (
+        <Modal onClose={() => setActiveModal(null)} title="Локальная игра">
+          <div className="control-panel local-game-setup">
+            <div className="local-game-options">
+              <div className="max-players-picker" aria-label="Количество локальных игроков">
+                <span>Игроков</span>
+                {([2, 3, 4] as const).map((playersCount) => (
+                  <button
+                    className={maxPlayers === playersCount ? 'active' : ''}
+                    aria-pressed={maxPlayers === playersCount}
+                    key={playersCount}
+                    onClick={() => setMaxPlayers(playersCount)}
+                    type="button"
+                  >
+                    {playersCount}
+                  </button>
+                ))}
+              </div>
+              <label className="deck-select-field">
+                <span>Колода</span>
+                <select
+                  onChange={(event) => setLocalDeckId(event.target.value)}
+                  value={localDeckId}
+                >
+                  {USER_SELECTABLE_DECKS.map((deckDefinition) => (
+                    <option key={deckDefinition.id} value={deckDefinition.id}>
+                      {deckDefinition.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <fieldset className="local-player-names">
+              <legend>Имена игроков</legend>
+              {Array.from({ length: maxPlayers }, (_, index) => (
+                <label className={`local-player-name local-player-name-${index}`} key={index}>
+                  <span>Игрок {index + 1}</span>
+                  <input
+                    type="text"
+                    value={localNameDrafts[index]}
+                    placeholder={`Игрок ${index + 1}`}
+                    maxLength={24}
+                    autoComplete="off"
+                    onChange={(event) => setLocalNameDrafts((names) => names.map((name, seat) => seat === index ? event.target.value : name))}
+                  />
+                </label>
+              ))}
+            </fieldset>
+            <button className="action-button action-button-primary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
+              Начать партию
+            </button>
+          </div>
+        </Modal>
       )}
       {activeModal === 'new-game' && (
         <Modal onClose={closeOnlineModal} title="Онлайн игра">
@@ -1268,6 +1228,7 @@ function App() {
                   {([2, 3, 4] as const).map((playersCount) => (
                     <button
                       className={maxPlayers === playersCount ? 'active' : ''}
+                    aria-pressed={maxPlayers === playersCount}
                       key={playersCount}
                       onClick={() => setMaxPlayers(playersCount)}
                       type="button"
