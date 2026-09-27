@@ -1126,7 +1126,7 @@ function App() {
           {isOnlineTable ? (
             <div className="online-game-shell">
               <header className="online-game-header">
-                <h1>Цепочка размышлений</h1>
+                <h1>Game of concepts</h1>
               </header>
 
               <div className="online-game-layout">

@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
   rulesExamples,
-  rulesScoreSubsections,
   rulesSections,
   rulesTabs,
 } from '../rulesText';
@@ -16,8 +15,37 @@ function RulesExampleBlock({ id }: { id: RulesExampleId }) {
   if (!example) return null;
 
   return (
-    <figure className="rules-example">
-      {example.imageSrc ? (
+    <figure className={`rules-example rules-example--${id}`}>
+      {id === 'accepted-connection' && example.imageSrc ? (
+        <div className="rules-connection-scores">
+          <img alt={example.alt} src={example.imageSrc} />
+          <span className="rules-connection-score rules-connection-score--top" aria-label="Связь Государство — Общество: 1 очко">+1</span>
+          <span className="rules-connection-score rules-connection-score--bottom" aria-label="Связь Сотрудничество — Общество: 1 очко">+1</span>
+        </div>
+      ) : id === 'chain' && example.imageSrc ? (
+        <div className="rules-path-example">
+          <div className="rules-connection-scores">
+            <img alt={example.alt} src={example.imageSrc} />
+            <span className="rules-connection-score rules-connection-score--top" aria-label="Сотрудничество — причина общества: 1 очко">↑ +1</span>
+            <span className="rules-connection-score rules-connection-score--bottom" aria-label="Безопасность — причина сотрудничества: 2 очка, включая бонус пути">↑ +2</span>
+          </div>
+          <div className="rules-path-annotations">
+            <p>Сотрудничество — причина общества</p>
+            <p><strong>Новая связь</strong><br />Безопасность — причина сотрудничества</p>
+          </div>
+        </div>
+      ) : id === 'cross' && example.imageSrc ? (
+        <div className="rules-node-example">
+          <div className="rules-node-crop">
+            <img alt={example.alt} src={example.imageSrc} />
+            <span className="rules-node-mark rules-node-mark--top" aria-label="Безопасность — причина сотрудничества">↑</span>
+            <span className="rules-node-mark rules-node-mark--left" aria-label="Безопасность — причина власти: 2 очка">← +2</span>
+            <span className="rules-node-mark rules-node-mark--right" aria-label="Безопасность — причина языка: 2 очка">+2 →</span>
+            <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 2 очка">↓ +2</span>
+          </div>
+          <p>Безопасность — причина.<br />Окружающие понятия — следствия.</p>
+        </div>
+      ) : example.imageSrc ? (
         <img alt={example.alt} src={example.imageSrc} />
       ) : (
         <div className="rules-example-placeholder">Скриншот будет добавлен позже</div>
@@ -55,6 +83,14 @@ function RulesTable({ block }: { block: Extract<RulesBlock, { type: 'table' }> }
 function RulesBlockView({ block }: { block: RulesBlock }) {
   if (block.type === 'paragraph') return <p>{block.text}</p>;
 
+  if (block.type === 'steps') {
+    return (
+      <ol>
+        {block.items.map((item) => <li key={item}>{item}</li>)}
+      </ol>
+    );
+  }
+
   if (block.type === 'emphasis') {
     return <p className="rules-emphasis">{block.text}</p>;
   }
@@ -80,14 +116,8 @@ function RulesBlockView({ block }: { block: RulesBlock }) {
 
 export function RulesContent() {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [activeScoreSubsectionIndex, setActiveScoreSubsectionIndex] = useState(0);
   const activeTab = rulesTabs[activeTabIndex];
-  const activeScoreSubsection = rulesScoreSubsections[activeScoreSubsectionIndex];
-  const isScoringTab = activeTab.title === 'Подсчёт очков';
-  const activeSectionTitles =
-    isScoringTab
-      ? activeScoreSubsection.sectionTitles
-      : activeTab.sectionTitles;
+  const activeSectionTitles = activeTab.sectionTitles;
   const activeSections = useMemo(
     () =>
       rulesSections.filter((section) =>
@@ -112,37 +142,10 @@ export function RulesContent() {
         ))}
       </div>
 
-      <div className={`rules-body ${isScoringTab ? 'rules-body--scoring' : ''}`}>
-        <div
-          className={`rules-section-inner rules-active-panel ${
-            isScoringTab ? 'rules-active-panel--scoring' : ''
-          }`}
-          role="tabpanel"
-        >
-          {!isScoringTab && <h1>{activeTab.title}</h1>}
-          {isScoringTab && (
-            <div
-              className="rules-subtabs"
-              role="tablist"
-              aria-label="Подразделы подсчёта очков"
-            >
-              {rulesScoreSubsections.map((subsection, index) => (
-                <button
-                  aria-selected={index === activeScoreSubsectionIndex}
-                  className={index === activeScoreSubsectionIndex ? 'active' : ''}
-                  key={subsection.title}
-                  onClick={() => setActiveScoreSubsectionIndex(index)}
-                  role="tab"
-                  type="button"
-                >
-                  {subsection.title}
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="rules-body">
+        <div className="rules-section-inner rules-active-panel" role="tabpanel">
           {activeSections.map((section) => (
             <section className="rules-section" key={section.title}>
-              <h2>{section.title}</h2>
               {section.blocks.map((block, index) => (
                 <RulesBlockView
                   block={block}
