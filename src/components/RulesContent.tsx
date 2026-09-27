@@ -38,12 +38,13 @@ function RulesExampleBlock({ id }: { id: RulesExampleId }) {
         <div className="rules-node-example">
           <div className="rules-node-crop">
             <img alt={example.alt} src={example.imageSrc} />
-            <span className="rules-node-mark rules-node-mark--top" aria-label="Безопасность — причина сотрудничества">↑</span>
-            <span className="rules-node-mark rules-node-mark--left" aria-label="Безопасность — причина власти: 2 очка">← +2</span>
-            <span className="rules-node-mark rules-node-mark--right" aria-label="Безопасность — причина языка: 2 очка">+2 →</span>
-            <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 2 очка">↓ +2</span>
+            <span className="rules-node-mark rules-node-mark--left" aria-label="Безопасность — причина власти: 2 очка">+2</span>
+            <span className="rules-node-mark rules-node-mark--right" aria-label="Безопасность — причина языка: 2 очка">+2</span>
+            <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 2 очка">+2</span>
           </div>
-          <p>Безопасность — причина.<br />Окружающие понятия — следствия.</p>
+          <div className="rules-node-annotations">
+            <p>Безопасность — причина.<br />Окружающие понятия — следствия.<br />Карта в центре может быть вашей, чужой или нейтральной.</p>
+          </div>
         </div>
       ) : example.imageSrc ? (
         <img alt={example.alt} src={example.imageSrc} />
@@ -82,6 +83,22 @@ function RulesTable({ block }: { block: Extract<RulesBlock, { type: 'table' }> }
 
 function RulesBlockView({ block }: { block: RulesBlock }) {
   if (block.type === 'paragraph') return <p>{block.text}</p>;
+
+  if (block.type === 'details') {
+    return (
+      <section className="rules-subsection">
+        <h4>{block.title}</h4>
+        <div className="rules-subsection-body">
+          {block.blocks.map((nestedBlock, index) => (
+            <RulesBlockView
+              block={nestedBlock}
+              key={`${block.title}-${nestedBlock.type}-${index}`}
+            />
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   if (block.type === 'steps') {
     return (
@@ -127,35 +144,43 @@ export function RulesContent() {
   );
   return (
     <div className="rules-content">
-      <div className="rules-tabs" role="tablist" aria-label="Разделы правил">
-        {rulesTabs.map((tab, index) => (
-          <button
-            aria-selected={index === activeTabIndex}
-            className={index === activeTabIndex ? 'active' : ''}
-            key={tab.title}
-            onClick={() => setActiveTabIndex(index)}
-            role="tab"
-            type="button"
-          >
-            {tab.title}
-          </button>
-        ))}
-      </div>
-
-      <div className="rules-body">
-        <div className="rules-section-inner rules-active-panel" role="tabpanel">
-          {activeSections.map((section) => (
-            <section className="rules-section" key={section.title}>
-              {section.blocks.map((block, index) => (
-                <RulesBlockView
-                  block={block}
-                  key={`${section.title}-${block.type}-${index}`}
-                />
-              ))}
-            </section>
+      <aside className="rules-sidebar" aria-label="Навигация по правилам">
+        <p className="rules-sidebar-label">Разделы</p>
+        <div className="rules-tabs" role="tablist" aria-label="Разделы правил">
+          {rulesTabs.map((tab, index) => (
+            <button
+              aria-selected={index === activeTabIndex}
+              className={index === activeTabIndex ? 'active' : ''}
+              key={tab.title}
+              onClick={() => setActiveTabIndex(index)}
+              role="tab"
+              type="button"
+            >
+              <span className="rules-tab-title">{tab.title}</span>
+            </button>
           ))}
         </div>
-      </div>
+      </aside>
+
+      <main className="rules-main" role="tabpanel" aria-label={activeTab.title}>
+        <div className="rules-body">
+          <div className="rules-section-inner rules-active-panel">
+            {activeSections.map((section) => (
+              <section className="rules-section" key={section.title}>
+                {activeSections.length > 1 && (
+                  <h2 className="rules-section-title">{section.title}</h2>
+                )}
+                {section.blocks.map((block, index) => (
+                  <RulesBlockView
+                    block={block}
+                    key={`${section.title}-${block.type}-${index}`}
+                  />
+                ))}
+              </section>
+            ))}
+          </div>
+        </div>
+      </main>
 
     </div>
   );
