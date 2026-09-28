@@ -1,0 +1,5101 @@
+{
+  "status": "open hypotheses; no game relation taxonomy or accepted graph",
+  "words": [
+    "Семья",
+    "Общество",
+    "Государство",
+    "Власть",
+    "Закон",
+    "Правило",
+    "Норма",
+    "Образование",
+    "Наука",
+    "Культура",
+    "Традиция",
+    "Религия",
+    "Искусство",
+    "Язык",
+    "Информация",
+    "Знание",
+    "Память",
+    "Общение",
+    "Исследование",
+    "Доказательство",
+    "Технология",
+    "Изобретение",
+    "Организация",
+    "Команда",
+    "Рынок",
+    "Деньги",
+    "Труд",
+    "Профессия",
+    "Производство",
+    "Торговля",
+    "Конкуренция",
+    "Сотрудничество",
+    "Конфликт",
+    "Договор",
+    "Доверие",
+    "Репутация",
+    "Ответственность",
+    "Решение",
+    "Риск",
+    "Безопасность"
+  ],
+  "observations": [
+    {
+      "id": "M03-001",
+      "a": "Семья",
+      "b": "Образование",
+      "explanation": "Семья передаёт ребёнку первые знания и поддерживает его образование.",
+      "condition": "Поддержка семьи неодинакова; это распространённый пример, не свойство каждой семьи.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-002",
+      "a": "Семья",
+      "b": "Традиция",
+      "explanation": "В семье передают традиции между поколениями.",
+      "condition": "Не всякая традиция семейная.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-003",
+      "a": "Общество",
+      "b": "Культура",
+      "explanation": "Культура сохраняет и передаёт принятые в обществе способы жизни.",
+      "condition": "Культура и общество не тождественны.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-004",
+      "a": "Общество",
+      "b": "Норма",
+      "explanation": "Люди в обществе поддерживают нормы взаимного поведения.",
+      "condition": "Общество не является единым человеком, который издаёт приказ.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-005",
+      "a": "Государство",
+      "b": "Закон",
+      "explanation": "Государство устанавливает правовые законы.",
+      "condition": "Закон здесь нормативный акт, не закон природы.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-006",
+      "a": "Государство",
+      "b": "Власть",
+      "explanation": "Государство осуществляет публичную власть.",
+      "condition": "Власть — возможность определять действия, не название учреждения.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-007",
+      "a": "Власть",
+      "b": "Решение",
+      "explanation": "Власть позволяет сделать решение обязательным для других.",
+      "condition": "Только в пределах полномочий и фактической возможности исполнения.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-008",
+      "a": "Власть",
+      "b": "Конфликт",
+      "explanation": "Участники могут бороться за власть, вступая в конфликт.",
+      "condition": "Нужно назвать предмет столкновения; власть не всегда ведёт к конфликту.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-009",
+      "a": "Закон",
+      "b": "Ответственность",
+      "explanation": "Закон устанавливает ответственность за определённые действия.",
+      "condition": "Ответственность правовая, а не качество характера.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-010",
+      "a": "Закон",
+      "b": "Торговля",
+      "explanation": "Закон определяет допустимые условия торговли.",
+      "condition": "Нормы о торговле, не любой закон.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-011",
+      "a": "Правило",
+      "b": "Организация",
+      "explanation": "Организация устанавливает внутренние правила работы.",
+      "condition": "Организация — объединение, а не процесс упорядочивания.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-012",
+      "a": "Правило",
+      "b": "Конкуренция",
+      "explanation": "Правила ограничивают допустимые способы конкуренции.",
+      "condition": "Соперничество возможно и вне явно записанных правил.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-013",
+      "a": "Норма",
+      "b": "Традиция",
+      "explanation": "Традиция может закреплять норму поведения.",
+      "condition": "Практика и требование различаются; не все традиции обязательны.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-014",
+      "a": "Норма",
+      "b": "Правило",
+      "explanation": "Социальная норма выражает принятое правило поведения.",
+      "condition": "Норма не количественный норматив.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-015",
+      "a": "Образование",
+      "b": "Профессия",
+      "explanation": "Образование готовит человека к освоению профессии.",
+      "condition": "Не всякое образование профессиональное; подготовка не гарантирует трудоустройства.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-016",
+      "a": "Образование",
+      "b": "Знание",
+      "explanation": "В процессе образования люди приобретают знания.",
+      "condition": "Результат обучения может быть неполным.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-017",
+      "a": "Наука",
+      "b": "Исследование",
+      "explanation": "Наука получает новое знание посредством исследований.",
+      "condition": "Исследования бывают и вне науки.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-018",
+      "a": "Наука",
+      "b": "Доказательство",
+      "explanation": "В науке обосновывают выводы доказательствами.",
+      "condition": "Формальная доказанность и эмпирическая поддержка не одно и то же.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-019",
+      "a": "Культура",
+      "b": "Язык",
+      "explanation": "Язык выражает и передаёт культурные значения.",
+      "condition": "Не всё содержание культуры выражается словами.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-020",
+      "a": "Культура",
+      "b": "Искусство",
+      "explanation": "Искусство представляет одну из областей культуры.",
+      "condition": "Искусство здесь деятельность и формы выражения.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-021",
+      "a": "Традиция",
+      "b": "Религия",
+      "explanation": "Религиозная традиция передаёт верования и практики.",
+      "condition": "Только религиозная традиция; существуют светские.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-022",
+      "a": "Традиция",
+      "b": "Образование",
+      "explanation": "Образование передаёт часть традиций общества.",
+      "condition": "Не всякая передача традиции является организованным образованием.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-023",
+      "a": "Религия",
+      "b": "Норма",
+      "explanation": "Религиозные предписания задают нормы поведения последователей.",
+      "condition": "Содержание зависит от конкретной религии.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-024",
+      "a": "Религия",
+      "b": "Искусство",
+      "explanation": "Религиозные сюжеты выражаются в художественных произведениях.",
+      "condition": "Изображение содержания, а не доказательство его истинности.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-025",
+      "a": "Искусство",
+      "b": "Общение",
+      "explanation": "Через искусство человек выражает переживание другим людям.",
+      "condition": "Не всякое произведение адресовано конкретному собеседнику.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-026",
+      "a": "Искусство",
+      "b": "Труд",
+      "explanation": "Создание художественного произведения требует труда.",
+      "condition": "Связь с процессом создания, не с готовым предметом.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-027",
+      "a": "Язык",
+      "b": "Общение",
+      "explanation": "Люди используют язык для общения.",
+      "condition": "Возможно невербальное общение.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-028",
+      "a": "Язык",
+      "b": "Информация",
+      "explanation": "На языке можно закодировать и передать информацию.",
+      "condition": "Информация бывает неязыковой.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-029",
+      "a": "Информация",
+      "b": "Знание",
+      "explanation": "Осмысленные и усвоенные сведения могут стать знанием.",
+      "condition": "Не любые сведения истинны и не всякая передача означает усвоение.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-030",
+      "a": "Информация",
+      "b": "Решение",
+      "explanation": "При выборе решения учитывают информацию об условиях.",
+      "condition": "Информация может быть неполной или ложной.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-031",
+      "a": "Знание",
+      "b": "Технология",
+      "explanation": "Знания воплощают в способах выполнения технологических операций.",
+      "condition": "Технология — способ, не устройство.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-032",
+      "a": "Знание",
+      "b": "Профессия",
+      "explanation": "Владение профессией предполагает освоение специальных знаний.",
+      "condition": "Практические навыки не сводятся к знаниям.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-033",
+      "a": "Память",
+      "b": "Знание",
+      "explanation": "Память позволяет сохранять приобретённые знания.",
+      "condition": "Не все сохранённые сведения являются знанием.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-034",
+      "a": "Память",
+      "b": "Традиция",
+      "explanation": "Личная память участников поддерживает передачу традиции.",
+      "condition": "Не переключаться на общественную или компьютерную память.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-035",
+      "a": "Общение",
+      "b": "Сотрудничество",
+      "explanation": "Участники согласуют совместные действия в общении.",
+      "condition": "Общение может сопровождать и соперничество.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-036",
+      "a": "Общение",
+      "b": "Доверие",
+      "explanation": "Открытое общение может укреплять доверие.",
+      "condition": "Обман или враждебный разговор могут его разрушать.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-037",
+      "a": "Исследование",
+      "b": "Информация",
+      "explanation": "Исследование собирает и уточняет информацию о предмете.",
+      "condition": "Не любая информация добыта исследованием.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-038",
+      "a": "Исследование",
+      "b": "Изобретение",
+      "explanation": "Техническое исследование может привести к изобретению.",
+      "condition": "Изобретение — результат; не всякое исследование техническое или успешное.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-039",
+      "a": "Доказательство",
+      "b": "Доверие",
+      "explanation": "Убедительное доказательство может повысить доверие к утверждению.",
+      "condition": "Уже зафиксированное значение доверия к участнику нужно расширить или разделить; не принимать незаметно.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-040",
+      "a": "Доказательство",
+      "b": "Решение",
+      "explanation": "Обоснование исходного утверждения учитывают при выборе решения.",
+      "condition": "Нужно указать проверяемую предпосылку; не любое доказательство относится к любому решению.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-041",
+      "a": "Технология",
+      "b": "Производство",
+      "explanation": "Технология описывает способ осуществления производства.",
+      "condition": "Есть технологии непроизводственных процессов.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-042",
+      "a": "Технология",
+      "b": "Изобретение",
+      "explanation": "Изобретение может предложить новую технологию.",
+      "condition": "Не каждое изобретение является способом: оно может быть устройством.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-043",
+      "a": "Изобретение",
+      "b": "Труд",
+      "explanation": "Техническое изобретение может уменьшить затраты труда.",
+      "condition": "Нужен обычный пример, а не обещание пользы любого изобретения.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-044",
+      "a": "Изобретение",
+      "b": "Деньги",
+      "explanation": "Разработку изобретения могут финансировать деньгами.",
+      "condition": "Необходим промежуточный процесс разработки; проверить, приемлема ли такая развёртка для игры.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-045",
+      "a": "Организация",
+      "b": "Команда",
+      "explanation": "Рабочая команда может быть подразделением организации.",
+      "condition": "Не каждая команда формально входит в организацию.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-046",
+      "a": "Организация",
+      "b": "Производство",
+      "explanation": "Организация может управлять производством продукции.",
+      "condition": "Только производственная организация; другие занимаются иными делами.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-047",
+      "a": "Команда",
+      "b": "Ответственность",
+      "explanation": "В команде распределяют ответственность за выполнение задач.",
+      "condition": "Обязанность отвечать за задачи, не личное качество.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-048",
+      "a": "Команда",
+      "b": "Сотрудничество",
+      "explanation": "Команда действует посредством сотрудничества участников.",
+      "condition": "Фактическое взаимодействие может нарушаться.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-049",
+      "a": "Рынок",
+      "b": "Торговля",
+      "explanation": "На рынке совершаются торговые обмены.",
+      "condition": "Рынок — система отношений, не только место.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-050",
+      "a": "Рынок",
+      "b": "Конкуренция",
+      "explanation": "Участники рынка могут конкурировать за покупателей.",
+      "condition": "Монополия ограничивает конкуренцию.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-051",
+      "a": "Деньги",
+      "b": "Торговля",
+      "explanation": "Деньгами оплачивают приобретение товара.",
+      "condition": "Торговля возможна и в форме бартера.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-052",
+      "a": "Деньги",
+      "b": "Труд",
+      "explanation": "Деньги могут служить вознаграждением за труд.",
+      "condition": "Бывает неоплачиваемый труд; деньги сами по себе не создаются любой работой.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-053",
+      "a": "Труд",
+      "b": "Производство",
+      "explanation": "Производство организует труд для создания продукции.",
+      "condition": "Труд не ограничивается производством вещей.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-054",
+      "a": "Труд",
+      "b": "Профессия",
+      "explanation": "Профессия определяет специализацию трудовой деятельности.",
+      "condition": "Профессия не равна конкретному рабочему действию.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-055",
+      "a": "Профессия",
+      "b": "Ответственность",
+      "explanation": "Профессиональные обязанности определяют, за что отвечает специалист.",
+      "condition": "Содержание зависит от профессии.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-056",
+      "a": "Профессия",
+      "b": "Репутация",
+      "explanation": "Результаты профессиональной деятельности формируют репутацию специалиста.",
+      "condition": "Упомянут отсутствующий специалист; оценить допустимость этой конкретизации.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-057",
+      "a": "Производство",
+      "b": "Риск",
+      "explanation": "В производстве возможен риск неблагоприятного исхода.",
+      "condition": "Нужно указать угрозу, а не объявлять любое производство опасным.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-058",
+      "a": "Производство",
+      "b": "Безопасность",
+      "explanation": "При организации производства обеспечивают защищённость работников от угроз.",
+      "condition": "Безопасность — состояние, меры её обеспечения не отдельная карта.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-059",
+      "a": "Торговля",
+      "b": "Договор",
+      "explanation": "Условия торговли закрепляют договором.",
+      "condition": "Не всякая сделка оформляется отдельным письменным документом.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-060",
+      "a": "Торговля",
+      "b": "Доверие",
+      "explanation": "Доверие к продавцу облегчает торговую сделку.",
+      "condition": "Покупка возможна и без личного доверия, при гарантиях.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-061",
+      "a": "Конкуренция",
+      "b": "Сотрудничество",
+      "explanation": "Те же участники могут соперничать в одной задаче и сотрудничать в другой.",
+      "condition": "Это совместимость в разных отношениях, а не безусловная противоположность.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-062",
+      "a": "Конкуренция",
+      "b": "Изобретение",
+      "explanation": "Соперничество может побуждать создавать изобретения.",
+      "condition": "Мотивация, а не непосредственное производство результата.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-063",
+      "a": "Сотрудничество",
+      "b": "Конфликт",
+      "explanation": "Конфликт может нарушить сотрудничество.",
+      "condition": "Локальный спор не обязательно прекращает совместную деятельность.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-064",
+      "a": "Сотрудничество",
+      "b": "Договор",
+      "explanation": "Договор закрепляет условия сотрудничества.",
+      "condition": "Сотрудничество бывает без формального договора.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-065",
+      "a": "Конфликт",
+      "b": "Общение",
+      "explanation": "Обсуждение разногласий может смягчить конфликт.",
+      "condition": "Не всякое общение разрешает конфликт.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-066",
+      "a": "Конфликт",
+      "b": "Решение",
+      "explanation": "Решение одной стороны может обострить конфликт.",
+      "condition": "Нужна связь решения со спорными интересами, а не случайная история.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-067",
+      "a": "Договор",
+      "b": "Ответственность",
+      "explanation": "Договор распределяет обязательства и ответственность сторон.",
+      "condition": "В пределах допустимых законом условий.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-068",
+      "a": "Договор",
+      "b": "Закон",
+      "explanation": "Закон ограничивает допустимое содержание договора.",
+      "condition": "Нормативный акт, не закон природы.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-069",
+      "a": "Доверие",
+      "b": "Репутация",
+      "explanation": "Положительная репутация может служить основанием доверия.",
+      "condition": "Отрицательная репутация даёт другой эффект.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-070",
+      "a": "Доверие",
+      "b": "Риск",
+      "explanation": "Доверяющий участник принимает риск ненадёжности партнёра.",
+      "condition": "Доверие не устраняет вероятность неблагоприятного исхода.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-071",
+      "a": "Репутация",
+      "b": "Информация",
+      "explanation": "Информация о прошлых действиях меняет репутацию.",
+      "condition": "Она может улучшаться или ухудшаться; сведения бывают ложными.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-072",
+      "a": "Репутация",
+      "b": "Ответственность",
+      "explanation": "Выполнение обязательств влияет на репутацию.",
+      "condition": "Влияет исполнение обязанности, а не слово «ответственность» само по себе.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-073",
+      "a": "Ответственность",
+      "b": "Власть",
+      "explanation": "Власть и ответственность могут распределяться между разными участниками.",
+      "condition": "Нормативное требование соответствия не означает, что оно всегда соблюдается.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-074",
+      "a": "Ответственность",
+      "b": "Решение",
+      "explanation": "Участник может отвечать за последствия принятого решения.",
+      "condition": "Нужно определить, чьё решение и какие обязательства.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-075",
+      "a": "Решение",
+      "b": "Риск",
+      "explanation": "При выборе действия оценивают риск его последствий.",
+      "condition": "Оценка может быть ошибочной; риск не равен самому решению.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-076",
+      "a": "Решение",
+      "b": "Закон",
+      "explanation": "Закон ограничивает допустимые варианты решения.",
+      "condition": "Решение о действии, не судебный акт как отдельное значение.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-077",
+      "a": "Риск",
+      "b": "Безопасность",
+      "explanation": "Обеспечение безопасности связано с уменьшением риска угроз.",
+      "condition": "Уменьшение риска не означает его полное отсутствие.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-078",
+      "a": "Риск",
+      "b": "Деньги",
+      "explanation": "Передавая деньги, участник может рисковать потерять их.",
+      "condition": "Нужна обычная ситуация сделки, риск не свойство денежного знака.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-079",
+      "a": "Безопасность",
+      "b": "Государство",
+      "explanation": "Государство принимает меры для обеспечения безопасности.",
+      "condition": "Это функция и практика, а не гарантированное состояние всех граждан.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-080",
+      "a": "Безопасность",
+      "b": "Доверие",
+      "explanation": "Чувство защищённости может облегчать доверие.",
+      "condition": "Нужно отделить объективную защищённость от её субъективного ощущения.",
+      "phase": "targeted-pilot",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-081",
+      "a": "Информация",
+      "b": "Конфликт",
+      "explanation": "Новые сведения о действиях другой стороны могут обострить или смягчить конфликт.",
+      "condition": "Эффект зависит от содержания информации; нельзя заранее выбрать знак влияния.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-082",
+      "a": "Конкуренция",
+      "b": "Память",
+      "explanation": "В состязании на запоминание сравнивают возможности памяти участников.",
+      "condition": "Узкий специально добавленный сценарий; не считать общей связью конкуренции и памяти.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-083",
+      "a": "Общество",
+      "b": "Репутация",
+      "explanation": "Репутация складывается из оценок, распространяющихся среди людей в обществе.",
+      "condition": "Общество не единый оценивающий субъект.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-084",
+      "a": "Доверие",
+      "b": "Команда",
+      "explanation": "Взаимное доверие облегчает согласование действий команды.",
+      "condition": "Не любая команда основана на доверии.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-085",
+      "a": "Доверие",
+      "b": "Договор",
+      "explanation": "Договор может заменить часть личного доверия формальными гарантиями.",
+      "condition": "Договор также может выражать доверие; это не безусловные противоположности.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-086",
+      "a": "Норма",
+      "b": "Репутация",
+      "explanation": "Соблюдение принятых норм влияет на репутацию.",
+      "condition": "Нужно указать оценивающую группу; нормы групп могут различаться.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-087",
+      "a": "Закон",
+      "b": "Норма",
+      "explanation": "Нормативный закон закрепляет правовые нормы.",
+      "condition": "Не всякая социальная норма правовая; акт и правило не одно и то же.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-088",
+      "a": "Торговля",
+      "b": "Традиция",
+      "explanation": "Традиция торга задаёт привычный порядок торгового взаимодействия.",
+      "condition": "Один культурный пример, не универсальное свойство торговли.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-089",
+      "a": "Изобретение",
+      "b": "Риск",
+      "explanation": "Применение нового технического решения может создавать новые риски.",
+      "condition": "Введён процесс применения; оценить допустимость такой развёртки.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-090",
+      "a": "Профессия",
+      "b": "Риск",
+      "explanation": "Некоторые профессии предполагают характерные риски деятельности.",
+      "condition": "Нужно назвать угрозу; профессии сильно различаются.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-091",
+      "a": "Общество",
+      "b": "Ответственность",
+      "explanation": "В обществе распределяются обязанности отвечать за последствия действий.",
+      "condition": "Слишком широкое утверждение без конкретного механизма; не считать автоматически убедительной игровой связью.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-092",
+      "a": "Доказательство",
+      "b": "Образование",
+      "explanation": "В образовании учат строить и проверять доказательства.",
+      "condition": "Это отношение предмета обучения; не утверждение, что образование всегда доказательство чего-либо.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-093",
+      "a": "Государство",
+      "b": "Традиция",
+      "explanation": "Государство может официально поддерживать определённые традиции.",
+      "condition": "Зависит от государственной политики; не обязательная связь.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-094",
+      "a": "Знание",
+      "b": "Религия",
+      "explanation": "Религиозные представления могут рассматриваться последователями как знание.",
+      "condition": "Зависит от критерия знания; сильный риск спора о значении, а не о связи.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-095",
+      "a": "Организация",
+      "b": "Религия",
+      "explanation": "Религиозная организация объединяет участников религиозной практики.",
+      "condition": "Религия и организация не одно понятие; нужен конкретный контекст объединения.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    },
+    {
+      "id": "M03-096",
+      "a": "Искусство",
+      "b": "Конкуренция",
+      "explanation": "На художественном конкурсе авторы соперничают за признание.",
+      "condition": "Сценарий конкурса добавлен отдельно; нельзя выводить необходимую конкуренцию из искусства.",
+      "phase": "random-pair-check",
+      "origin": "assistant-hypothesis",
+      "open_code": null,
+      "proposed_game_type": null,
+      "accepted_for_graph": false
+    }
+  ],
+  "pair_coverage": [
+    {
+      "a": "Безопасность",
+      "b": "Власть",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Государство",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Деньги",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Доверие",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Договор",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Доказательство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Закон",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Производство",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Безопасность",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Государство",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Власть",
+      "b": "Деньги",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Доверие",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Договор",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Доказательство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Закон",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Конфликт",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Власть",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Ответственность",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Власть",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Власть",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Власть",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Деньги",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Доверие",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Договор",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Доказательство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Закон",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Государство",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Государство",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Государство",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Доверие",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Договор",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Доказательство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Закон",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Изобретение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Деньги",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Деньги",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Торговля",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Деньги",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Деньги",
+      "b": "Труд",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Деньги",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Договор",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Доказательство",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Закон",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Команда",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Общение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Торговля",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доверие",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доверие",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Доказательство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Закон",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Договор",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Ответственность",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Договор",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Сотрудничество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Договор",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Торговля",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Договор",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Договор",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Закон",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Наука",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Образование",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Доказательство",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Знание",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Норма",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Закон",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Ответственность",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Закон",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Закон",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Торговля",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Закон",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Закон",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Изобретение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Информация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Образование",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Память",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Профессия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Религия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Технология",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Знание",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Знание",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Информация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Исследование",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Конкуренция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Технология",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Труд",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Изобретение",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Искусство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Исследование",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Информация",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Конфликт",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Информация",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Информация",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Информация",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Информация",
+      "b": "Язык",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Исследование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Конкуренция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Культура",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Общение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Религия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Искусство",
+      "b": "Труд",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Искусство",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Команда",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Наука",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Исследование",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Исследование",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Конкуренция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Организация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Команда",
+      "b": "Ответственность",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Команда",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Сотрудничество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Команда",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Команда",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Конфликт",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Память",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Правило",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Рынок",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Сотрудничество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конкуренция",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Культура",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Общение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Сотрудничество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Конфликт",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Наука",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Общество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Культура",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Культура",
+      "b": "Язык",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Наука",
+      "b": "Норма",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Наука",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Образование",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Общество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Норма",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Правило",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Норма",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Религия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Норма",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Норма",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Норма",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Норма",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Общение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Профессия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Образование",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Семья",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Образование",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Образование",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Образование",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Общество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Сотрудничество",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Общение",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общение",
+      "b": "Язык",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Общество",
+      "b": "Организация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Ответственность",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Общество",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Общество",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Общество",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Ответственность",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Правило",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Организация",
+      "b": "Производство",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Организация",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Религия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Организация",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Организация",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Память",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Профессия",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Решение",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Ответственность",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Правило",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Память",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Память",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Производство",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Правило",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Профессия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Производство",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Технология",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Производство",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Производство",
+      "b": "Труд",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Производство",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Религия",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Репутация",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Профессия",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Профессия",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Профессия",
+      "b": "Труд",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Профессия",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Репутация",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Религия",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Религия",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Решение",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Риск",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Репутация",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Риск",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Решение",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Решение",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Рынок",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Риск",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Семья",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Торговля",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Рынок",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Рынок",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Семья",
+      "b": "Сотрудничество",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Семья",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Семья",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Семья",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Семья",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Семья",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Сотрудничество",
+      "b": "Технология",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Сотрудничество",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Сотрудничество",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Сотрудничество",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Сотрудничество",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Технология",
+      "b": "Торговля",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Технология",
+      "b": "Традиция",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Технология",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Технология",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Торговля",
+      "b": "Традиция",
+      "status": "hypothesis-recorded"
+    },
+    {
+      "a": "Торговля",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Торговля",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Традиция",
+      "b": "Труд",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Традиция",
+      "b": "Язык",
+      "status": "not-reviewed"
+    },
+    {
+      "a": "Труд",
+      "b": "Язык",
+      "status": "not-reviewed"
+    }
+  ]
+}

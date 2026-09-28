@@ -1,0 +1,315 @@
+[
+  {
+    "word": "Семья",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A1%D0%B5%D0%BC%D1%8C%D1%8F",
+    "checked_at": "2026-09-28T16:20:00.378521+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Семья",
+    "extract": "Семья́ — социальный институт, являющийся базовой ячейкой общества, характеризующийся следующими признаками:добровольность вступления в брак;\nобщность быта у членов семьи;\nвступление в брачные отношения;\nстремление к рождению детей, их социализации и воспитанию.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%A1%D0%B5%D0%BC%D1%8C%D1%8F"
+  },
+  {
+    "word": "Общество",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9E%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:00.379181+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Общество",
+    "extract": "О́бщество, со́циум — человеческая общность, специфику которой представляют отношения людей между собой, их формы взаимодействия и объединения. Общество является предметом изучения социологии, а также истории и политологии.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9E%D0%B1%D1%89%D0%B5%D1%81%D1%82%D0%B2%D0%BE"
+  },
+  {
+    "word": "Государство",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:00.379601+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Государство",
+    "extract": "Госуда́рство — политическая форма устройства общества на определённой территории, суверенная форма публичной власти, обладающая аппаратом управления и принуждения, обеспечивающие длительное существование социально-экономических отношений как внутри данного общества, так и с окружающим миром.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%93%D0%BE%D1%81%D1%83%D0%B4%D0%B0%D1%80%D1%81%D1%82%D0%B2%D0%BE"
+  },
+  {
+    "word": "Власть",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%92%D0%BB%D0%B0%D1%81%D1%82%D1%8C",
+    "checked_at": "2026-09-28T16:20:00.380152+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Власть",
+    "extract": "Власть — авторитет, обладающий возможностью подчинять своей воле, управлять или распоряжаться действиями других людей. Термин имеет множество нюансов и различий в различных научных областях от социологии до политологии.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%92%D0%BB%D0%B0%D1%81%D1%82%D1%8C"
+  },
+  {
+    "word": "Закон",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%97%D0%B0%D0%BA%D0%BE%D0%BD",
+    "checked_at": "2026-09-28T16:20:00.848313+00:00",
+    "status": "fetched",
+    "page_type": "disambiguation",
+    "title": "Закон",
+    "extract": "Зако́н может означать:Закон в философии — объективные связи явлений и событий.\nЗакон в праве — нормативно-правовой акт, принимаемый законодательным органом государства.\nЗакон в науке — повторяемая связь явлений.\nЗакон — устав скаутов.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%97%D0%B0%D0%BA%D0%BE%D0%BD"
+  },
+  {
+    "word": "Правило",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%BE",
+    "checked_at": "2026-09-28T16:20:00.853583+00:00",
+    "status": "fetched",
+    "page_type": "disambiguation",
+    "title": "Правило",
+    "extract": "Слово пра́ви́ло в зависимости от ударения и контекста может обозначать следующее:Пра́вилоПра́вило — требование подстроиться под/ соблюдать некие условия всеми участниками какого-либо действия, за выполнение которого предусмотрено поощрение, за невыполнение — наказание.\nПравила дорожного движения\nПра́вило — предопределенность связи между входным и выходным сигналом .\nПравила устройства электроустановок\nПра́вила — действие или определённая последовательность ряда действий, обеспечивающих стабильность применения наиболее эффективного, по сравнению с ранее применяемыми, метода для достижения намеченной цели, решения поставленной задачи или выполнения определённой функции.\nСвод правил\nПра́вило — дебютный студийный альбом российского хип-хоп-исполнителя Pharaoh.Прави́лоПрави́ло — русский синоним судового руля.\nПрави́ло — алюминиевый инструмент прямой вытянутой формы длиной несколько метров для измерения плоскости. Используется в различных видах строительных работ.\nПрави́ло — тренажёр для коррекции функциональных биомеханических нарушений опорно-двигательного аппарата.\nПрави́ло — описывает действие в рамках соблюдения принципов.\nПравило, Василий Григорьевич — российский футболист, футбольный судья.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%BE"
+  },
+  {
+    "word": "Норма",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9D%D0%BE%D1%80%D0%BC%D0%B0",
+    "checked_at": "2026-09-28T16:20:00.853903+00:00",
+    "status": "fetched",
+    "page_type": "disambiguation",
+    "title": "Норма",
+    "extract": "Но́рма, может означать:Термин для обозначения некоего эталона, образца, правила:\nНорма (оценка) — правило или предписание, действующее в определённой сфере и требующее своего выполнения и соблюдения.\nНорма (характеристика) — термин для обозначения некоторой характеристики — допустимого диапазона, усреднённой или среднестатистической величины.\nНорма (медицина) — состояние динамического равновесия между биопсихосоциальными параметрами деятельности человека и аналогичными параметрами окружающей его среды.\nРяд специфических терминов в различных науках:\nНорма (математика) — функционал, заданный на векторном пространстве и обобщающий понятие длины вектора или абсолютного значения числа.\nНорма — определяемое особым образом отображение элементов конечного расширения поля в исходное поле.\nНорма — пересечение нормализаторов всех подгрупп данной группы.\nНорма (экономика) — размер планового расхода ресурса на расчётную единицу.\nИмя собственное:\nНорма — женское имя.\nНазвания:\n«Норма» — опера Винченцо Беллини.\n«Норма» — роман Владимира Сорокина.\n«Норма» — эстонский футбольный клуб из Таллина.\n«Norma» — эстонская компания, производитель ремней безопасности для автомобилей.\n«Norma» — шведская компания, производитель боеприпасов.\n«Normaal» — голландская фермер-рок-группа.\n(555) Норма — астероид, открытый в 1905 году.\nНорма — российское издательство, специализирующееся на юридической литературе.\nНорма — статуя, установленная в медицинском музее Кливленда, созданная гинекологом д-р Робертом Л. Дикинсоном и его помощником Абрамом Белски для демонстрации «идеальных» женских форм по результатам измерения 15 тыс. молодых взрослых женщин.\nРяд топонимов:\nНорма — село, Балтасинский район, Татарстан, Россия.\nНорма (Лацио) — коммуна в Италии.\nНорма — река в Свердловской и Тюменской областях России.\nЯзыковая норма",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9D%D0%BE%D1%80%D0%BC%D0%B0"
+  },
+  {
+    "word": "Образование",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9E%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:00.854121+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Образование",
+    "extract": "Образова́ние — система воспитания и обучения личности, а также совокупность приобретаемых знаний, умений, навыков, ценностных установок, функций, опыта деятельности и компетенций.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9E%D0%B1%D1%80%D0%B0%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5"
+  },
+  {
+    "word": "Наука",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9D%D0%B0%D1%83%D0%BA%D0%B0",
+    "checked_at": "2026-09-28T16:20:01.388208+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Наука",
+    "extract": "Нау́ка — деятельность, направленная на выработку и систематизацию объективных знаний о действительности посредством научного метода.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9D%D0%B0%D1%83%D0%BA%D0%B0"
+  },
+  {
+    "word": "Культура",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9A%D1%83%D0%BB%D1%8C%D1%82%D1%83%D1%80%D0%B0",
+    "checked_at": "2026-09-28T16:20:01.395623+00:00",
+    "status": "fetched",
+    "page_type": "standard",
+    "title": "Культура",
+    "extract": "Культу́ра — сложившиеся у людей ценности, нормы, обычаи, верования и обряды, знания и умения, техника и технологии, способы мышления, деятельности, взаимодействия и коммуникации. Предмет изучения философии, культурологии, истории, социологии, искусствознания, лингвистики (этнолингвистики), политологии, этнологии, психологии, экономики, педагогики.",
+    "url": "https://ru.wikipedia.org/wiki/%D0%9A%D1%83%D0%BB%D1%8C%D1%82%D1%83%D1%80%D0%B0"
+  },
+  {
+    "word": "Традиция",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A2%D1%80%D0%B0%D0%B4%D0%B8%D1%86%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:01.751978+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Религия",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A0%D0%B5%D0%BB%D0%B8%D0%B3%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:01.881356+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Искусство",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%98%D1%81%D0%BA%D1%83%D1%81%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:01.889254+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Язык",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%AF%D0%B7%D1%8B%D0%BA",
+    "checked_at": "2026-09-28T16:20:02.175585+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Информация",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:02.181923+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Знание",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%97%D0%BD%D0%B0%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:02.329108+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Память",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9F%D0%B0%D0%BC%D1%8F%D1%82%D1%8C",
+    "checked_at": "2026-09-28T16:20:02.333261+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Общение",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9E%D0%B1%D1%89%D0%B5%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:02.578244+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Исследование",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%98%D1%81%D1%81%D0%BB%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:02.594204+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Доказательство",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%94%D0%BE%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:02.732176+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Технология",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A2%D0%B5%D1%85%D0%BD%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:02.769943+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Изобретение",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%98%D0%B7%D0%BE%D0%B1%D1%80%D0%B5%D1%82%D0%B5%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:02.999218+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Организация",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9E%D1%80%D0%B3%D0%B0%D0%BD%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:02.999485+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Команда",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9A%D0%BE%D0%BC%D0%B0%D0%BD%D0%B4%D0%B0",
+    "checked_at": "2026-09-28T16:20:03.148992+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Рынок",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A0%D1%8B%D0%BD%D0%BE%D0%BA",
+    "checked_at": "2026-09-28T16:20:03.175174+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Деньги",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%94%D0%B5%D0%BD%D1%8C%D0%B3%D0%B8",
+    "checked_at": "2026-09-28T16:20:03.413772+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Труд",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A2%D1%80%D1%83%D0%B4",
+    "checked_at": "2026-09-28T16:20:03.422527+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Профессия",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9F%D1%80%D0%BE%D1%84%D0%B5%D1%81%D1%81%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:03.570014+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Производство",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9F%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:03.574375+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Торговля",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A2%D0%BE%D1%80%D0%B3%D0%BE%D0%B2%D0%BB%D1%8F",
+    "checked_at": "2026-09-28T16:20:03.846649+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Конкуренция",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9A%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%86%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:03.989907+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Сотрудничество",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A1%D0%BE%D1%82%D1%80%D1%83%D0%B4%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%BE",
+    "checked_at": "2026-09-28T16:20:04.054870+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Конфликт",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9A%D0%BE%D0%BD%D1%84%D0%BB%D0%B8%D0%BA%D1%82",
+    "checked_at": "2026-09-28T16:20:04.105795+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Договор",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%94%D0%BE%D0%B3%D0%BE%D0%B2%D0%BE%D1%80",
+    "checked_at": "2026-09-28T16:20:04.252727+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Доверие",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%94%D0%BE%D0%B2%D0%B5%D1%80%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:04.402826+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Репутация",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A0%D0%B5%D0%BF%D1%83%D1%82%D0%B0%D1%86%D0%B8%D1%8F",
+    "checked_at": "2026-09-28T16:20:04.447166+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Ответственность",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%9E%D1%82%D0%B2%D0%B5%D1%82%D1%81%D1%82%D0%B2%D0%B5%D0%BD%D0%BD%D0%BE%D1%81%D1%82%D1%8C",
+    "checked_at": "2026-09-28T16:20:04.567587+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Решение",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A0%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5",
+    "checked_at": "2026-09-28T16:20:04.683608+00:00",
+    "status": "fetched",
+    "page_type": "disambiguation",
+    "title": "Решение",
+    "extract": "Реше́ние — многозначное слово. Может соотноситься со следующими понятиями:",
+    "url": "https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D1%88%D0%B5%D0%BD%D0%B8%D0%B5"
+  },
+  {
+    "word": "Риск",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%A0%D0%B8%D1%81%D0%BA",
+    "checked_at": "2026-09-28T16:20:04.878891+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  },
+  {
+    "word": "Безопасность",
+    "requested_url": "https://ru.wikipedia.org/api/rest_v1/page/summary/%D0%91%D0%B5%D0%B7%D0%BE%D0%BF%D0%B0%D1%81%D0%BD%D0%BE%D1%81%D1%82%D1%8C",
+    "checked_at": "2026-09-28T16:20:04.997468+00:00",
+    "status": "fetch_error",
+    "error": "HTTP Error 429: Too Many Requests"
+  }
+]
