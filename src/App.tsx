@@ -56,7 +56,7 @@ const getPendingMoveVoteState = (
   pendingMove: PendingMove | null,
   playerId: string
 ) => {
-  if (!pendingMove?.requiredVoters) {
+  if (pendingMove?.semanticStatus !== 'voting' || !pendingMove.requiredVoters) {
     return {
       canVote: false,
       acceptedCount: 0,
@@ -266,7 +266,7 @@ function App() {
   const pendingMovePlayerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
   const pendingMoveReviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
   const showPendingWaitBadge =
-    Boolean(gameState.pendingMove) &&
+    gameState.pendingMove?.semanticStatus === 'voting' &&
     !canReviewPendingMove &&
     (mode === 'multiplayer' ||
       (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
@@ -463,7 +463,9 @@ function App() {
     let statusLabel = 'Ожидает';
 
     if (gameState.pendingMove && isPendingAuthor) {
-      statusLabel = 'Ожидаем голоса';
+      statusLabel = gameState.pendingMove.semanticStatus === 'defining-relations'
+        ? 'Выбор связей'
+        : 'Ожидаем голоса';
     } else if (gameState.pendingMove && pendingMoveVoteState.canVote) {
       statusLabel = 'Нужно решение';
     } else if (activePlayerIndex === playerIndex && !hasPendingDecision) {

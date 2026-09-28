@@ -759,7 +759,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     ? getCellViewportRect(pendingCard.coordinates)
     : null;
   const pendingActionsRect =
-    pendingActionsAnchorRect && boardViewportRect
+    canEditSemanticMove && pendingActionsAnchorRect && boardViewportRect
       ? (() => {
           const startTime = startMeasure();
           incrementCounter('overlay:pending-position-calculated');
@@ -948,6 +948,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           })}
       </div>
       {pendingCard &&
+        canEditSemanticMove &&
         pendingMove?.semanticStatus === 'defining-relations' &&
         pendingActionsRect &&
         createPortal(
