@@ -59,7 +59,8 @@ interface CellProps {
 
 const getFontSize = (cardName: string) => {
   if (cardName.length <= 5) return 10;
-  if (cardName.length <= 10) return 9;
+  if (cardName.length <= 8) return 9;
+  if (cardName.length <= 10) return 7.5;
   return 8;
 };
 

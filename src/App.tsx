@@ -8,6 +8,7 @@ import { MatchLogEntry } from './components/MatchLogEntry';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
+import { Tutorial } from './components/Tutorial';
 import {
   incrementCounter,
   printPerformanceReport,
@@ -177,7 +178,7 @@ interface DragPreview {
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
 }
 
-type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | null;
+type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -1036,6 +1037,7 @@ function App() {
           <header className="table-status-bar">
             {renderPlayers()}
             <nav className="table-menu" aria-label="Меню игры">
+              <button type="button" onClick={() => setActiveModal('tutorial')}>Обучение</button>
               <button type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
               <button type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
             </nav>
@@ -1379,6 +1381,7 @@ function App() {
           </div>
         </Modal>
       )}
+      {activeModal === 'tutorial' && <Tutorial onClose={() => setActiveModal(null)} />}
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">
           <RulesContent deckSnapshot={gameState.deckSnapshot} />

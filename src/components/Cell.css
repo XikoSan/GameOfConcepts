@@ -365,3 +365,6 @@
   border-color: rgba(223, 165, 86, 0.7);
   box-shadow: 0 0 10px rgba(223, 165, 86, 0.18);
 }
+
+/* Keep long concept names readable when automatic hyphenation is unavailable. */
+.card-in-cell .card-title { overflow-wrap: anywhere; }

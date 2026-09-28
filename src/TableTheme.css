@@ -18,7 +18,8 @@
 .app-container .table-players .score-row { flex: 1 1 0; display: flex; justify-content: space-between; gap: 10px; padding: 9px 12px; margin: 0; min-width: 0; background: #292d2e; border: 1px solid #44494a; box-shadow: none; }
 .app-container .table-players .active-score { background: #343a3b; border-color: #67634f; }
 .app-container .score-row small { border-color: #aa925d; color: #ead6a5; background: transparent; }
-.table-menu { display: flex; justify-content: flex-end; gap: 6px; }
+.table-menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.app-container .table-menu > button { min-width: 0; padding-inline: 6px; }
 .app-container .table-menu button, .board-tools button, .app-container .hand-actions > button {
   background: #303537; border: 1px solid #53595b; border-radius: 6px; color: #e9e8e3;
   padding: 9px 12px; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap;
@@ -75,7 +76,7 @@
   .app-container .game-table { padding: 6px; }
   .table-status-bar { grid-template-columns: 1fr; gap: 6px; }
   .table-players { width: 100%; }
-  .table-menu { margin-left: auto; }
+  .table-menu { margin-left: 0; }
   .table-workspace { display: flex; flex-direction: column; overflow-y: auto; }
   .table-center { flex: 0 0 auto; min-height: 65svh; }
   .app-container .board-section { min-height: 42svh; }
