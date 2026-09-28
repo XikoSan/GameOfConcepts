@@ -4,6 +4,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DictionaryModal } from './components/DictionaryModal';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
 import { GameBoard } from './components/GameBoard';
+import { MatchLogEntry } from './components/MatchLogEntry';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
@@ -24,9 +25,10 @@ import {
   subscribeToRoom,
 } from './services/roomService';
 import { getHandRedrawAvailability, initializeGame } from './game';
+import { getRelationPresets, getRelationFamilyLabel, isSymmetricRelation } from './scoring/semanticRelations';
 import {
   getDeckDefinitionById,
-  MIXED_ALL_DECK,
+  DEFAULT_DECK,
   USER_SELECTABLE_DECKS,
 } from './data/deckDefinitions';
 import type {
@@ -166,8 +168,7 @@ const isRoomHost = (room: Room | null, playerId: string) =>
   Boolean(room && (room.host_player_id ?? room.player_1_id) === playerId);
 
 const getDeckDisplayName = (deckId?: string) =>
-  USER_SELECTABLE_DECKS.find((deckDefinition) => deckDefinition.id === deckId)?.name ??
-  MIXED_ALL_DECK.name;
+  getDeckDefinitionById(deckId ?? '')?.name ?? DEFAULT_DECK.name;
 
 interface DragPreview {
   cardName: RegularCardName;
@@ -201,8 +202,8 @@ function App() {
   const [maxPlayers, setMaxPlayers] = useState<MaxPlayers>(2);
   const [localNameDrafts, setLocalNameDrafts] = useState<string[]>(['', '', '', '']);
   const [localPlayerNames, setLocalPlayerNames] = useState<string[]>([]);
-  const [localDeckId, setLocalDeckId] = useState(MIXED_ALL_DECK.id);
-  const [onlineDeckId, setOnlineDeckId] = useState(MIXED_ALL_DECK.id);
+  const [localDeckId, setLocalDeckId] = useState(DEFAULT_DECK.id);
+  const [onlineDeckId, setOnlineDeckId] = useState(DEFAULT_DECK.id);
   const [dictionaryTerm, setDictionaryTerm] = useState<string | null>(null);
   const [isDictionaryOpen, setIsDictionaryOpen] = useState(false);
   const [isRedrawConfirmOpen, setIsRedrawConfirmOpen] = useState(false);
@@ -212,6 +213,7 @@ function App() {
   const roomSubscriptionRef = useRef<RealtimeChannel | null>(null);
   const onlineRoomRef = useRef<Room | null>(null);
   const activeCardDragRef = useRef(false);
+  const matchLogRef = useRef<HTMLOListElement>(null);
   const {
     gameState,
     mode,
@@ -236,6 +238,12 @@ function App() {
     onError: setOnlineError,
     onRoomUpdate: setOnlineRoom,
   });
+  const latestLogEntry = gameState.log.at(-1);
+  useEffect(() => {
+    const log = matchLogRef.current;
+    if (log) log.scrollTop = log.scrollHeight;
+  }, [gameState.log.length, latestLogEntry]);
+
   const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
   const canControlPlayer = (playerIndex: number) =>
@@ -312,7 +320,7 @@ function App() {
       (localPlayerIndex !== null && pendingMovePlayerIndex === localPlayerIndex));
   const isPendingEdgeComplete = (edge: PendingSemanticEdge) =>
     Boolean(edge.relation) &&
-    (edge.relation.family === 'opposite' || Boolean(edge.direction));
+    (isSymmetricRelation(edge.relation) || Boolean(edge.direction));
   const canSubmitRelations =
     canEditSemanticMove &&
     pendingSemanticEdges.length > 0 &&
@@ -625,7 +633,7 @@ function App() {
         hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
         hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
       });
-      const deckDefinition = getDeckDefinitionById(onlineDeckId) ?? MIXED_ALL_DECK;
+      const deckDefinition = getDeckDefinitionById(onlineDeckId) ?? DEFAULT_DECK;
       const initialGameState = initializeGame(maxPlayers, deckDefinition, 0);
       console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
@@ -819,6 +827,16 @@ function App() {
     playerId,
   ]);
 
+  const lastGains = new Map<number, number>();
+  for (let index = gameState.log.length - 1; index >= 0; index -= 1) {
+    const score = gameState.logDetails?.[index]?.score;
+    const legacy = score ? null : /^Игрок (\d+) сыграл «(.+)»\. .*\+(\d+)\.$/.exec(gameState.log[index]);
+    const seat = score?.playerId ?? (legacy ? Number(legacy[1]) - 1 : null);
+    if (seat !== null && !lastGains.has(seat)) {
+      lastGains.set(seat, score?.totalGained ?? Number(legacy?.[3]));
+    }
+  }
+
   const renderPlayers = () => (
     <div className="table-players" aria-label="Игроки и счёт">
         {(onlineRoom ? onlinePlayers : localPlayers).map((player) => {
@@ -832,12 +850,20 @@ function App() {
               className={`score-row player-score-${player.color} ${isActiveScore ? 'active-score' : ''}`}
               key={player.id}
             >
-              <span>
-                {player.nickname}
-                {onlineRoom && player.id === playerId && <small>вы</small>}
-                {isActiveScore && <small>{scoreStateLabel}</small>}
-              </span>
-              <strong>{getSeatScore(player.seatIndex)}</strong>
+              <div className="player-score-content">
+                <div className="player-score-points">
+                  <strong className="player-score-total" title="Общий счёт">{getSeatScore(player.seatIndex)}</strong>
+                  {(lastGains.get(player.seatIndex) ?? 0) > 0 && (
+                    <span className="player-score-gain" title="Очки за последний принятый ход">
+                      +{lastGains.get(player.seatIndex)}
+                    </span>
+                  )}
+                </div>
+                <div className="player-score-identity">
+                  <span className="player-score-name" title={player.nickname}>{player.nickname}</span>
+                  {isActiveScore && <small className="player-score-status">{scoreStateLabel}</small>}
+                </div>
+              </div>
             </div>
           );
         })}
@@ -1041,8 +1067,8 @@ function App() {
               <section className="sidebar-log" aria-label="Лог партии">
                 <h3>Лог партии</h3>
                 {gameState.log.length > 0 ? (
-                  <ol className="match-log">
-                    {gameState.log.map((event, index) => <li key={`${index}-${event}`}>{onlineRoom ? event : event.replace(/Игрок ([1-4])(?!\d)/g, (label, number) => localPlayerNames[Number(number) - 1] || label)}</li>)}
+                  <ol className="match-log" ref={matchLogRef}>
+                    {gameState.log.map((event, index) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
                   </ol>
                 ) : <p>События партии появятся здесь.</p>}
               </section>
@@ -1050,11 +1076,9 @@ function App() {
                 <h3>Памятка</h3>
                 <h4>Типы связей</h4>
                 <ul className="reminder-relations">
-                  <li>Вид</li>
-                  <li>Часть</li>
-                  <li>Причина</li>
-                  <li>Свойство</li>
-                  <li>Противоположность</li>
+                  {getRelationPresets(gameState.deckSnapshot).map((relation) => (
+                    <li key={relation.family}>{getRelationFamilyLabel(relation.family)}</li>
+                  ))}
                 </ul>
                 <div className="reminder-score">
                   <h4><span>Принятая связь</span><strong>1 очко</strong></h4>
@@ -1355,7 +1379,7 @@ function App() {
       )}
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">
-          <RulesContent />
+          <RulesContent deckSnapshot={gameState.deckSnapshot} />
         </Modal>
       )}
       {activeModal === 'settings' && (

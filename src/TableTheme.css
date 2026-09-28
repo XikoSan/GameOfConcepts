@@ -299,3 +299,44 @@
 .app-container .table-reminder .reminder-score h4 strong { font-size: 12.65px; }
 .app-container .table-reminder .reminder-score p { margin-top: 2.3px; font-size: 12.65px; }
 .app-container .table-reminder .reminder-score-total { margin-top: 4.6px; font-size: 11.5px; }
+
+.app-container .sidebar-log .match-log { list-style: none; padding-left: 0; }
+.log-move-entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; align-items: baseline; gap: 8px; width: 100%; padding: 2px 0; border: 0; background: transparent; color: #e3e5df; font: inherit; text-align: left; cursor: pointer; }
+.log-move-entry:hover { background: #ffffff08; }
+.log-player, .log-card { overflow-wrap: anywhere; min-width: 0; }
+.log-player { color: #b4cce0; }
+.log-player-1 { color: #dec391; }.log-player-2 { color: #acd3b7; }.log-player-3 { color: #d2bde7; }
+.log-move-entry strong, .log-detail-popover footer strong, .log-edge-detail b { color: #dbc184; white-space: nowrap; }
+.log-service-entry { color: #aeb4b1; font-size: 12px; }
+.log-detail-popover { position: fixed; z-index: 3100; box-sizing: border-box; width: min(340px, calc(100vw - 24px)); max-height: min(420px, 65vh); overflow-y: auto; padding: 14px; border: 1px solid #62675f; border-radius: 8px; background: #292e2f; box-shadow: 0 8px 24px #0006; color: #e3e5df; font-size: 13px; line-height: 1.5; }
+.log-detail-popover header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.log-detail-popover header strong { overflow-wrap: anywhere; }
+.log-detail-popover button { border: 0; background: transparent; color: #ddd; font-size: 20px; cursor: pointer; }
+.log-edge-detail { margin-top: 12px; }
+.log-edge-detail p { margin: 0 0 3px; }
+.log-edge-detail small { display: flex; gap: 6px; color: #b6bcb8; }.log-edge-detail b { margin-left: auto; }
+.log-detail-popover footer { display: flex; justify-content: space-between; margin-top: 12px; padding-top: 8px; border-top: 1px solid #505657; }
+
+/* Scale player information with the available width of each seat. */
+.app-container .table-players .score-row { container-type: inline-size; padding: 9px 8px; }
+.player-score-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: clamp(4px, 2cqw, 10px); width: 100%; min-width: 0; min-height: 24px; }
+.app-container .player-score-content .player-score-name { display: block; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: clamp(11px, 5cqw, 15px); }
+.app-container .player-score-content .player-score-name::before { display: inline-block; width: clamp(6px, 3cqw, 10px); height: clamp(6px, 3cqw, 10px); margin-right: clamp(4px, 2cqw, 8px); vertical-align: baseline; box-shadow: none; }
+.app-container .player-score-content .player-score-status { flex-shrink: 0; padding: 2px clamp(3px, 1.5cqw, 6px); font-size: clamp(7px, 3.5cqw, 9px); }
+.app-container .player-score-content .player-score-gain { flex-shrink: 0; color: #dbc184; font-size: clamp(10px, 4.5cqw, 13px); font-variant-numeric: tabular-nums; }
+.app-container .player-score-content .player-score-gain::before { content: none; }
+.app-container .player-score-content .player-score-total { font-size: clamp(13px, 6cqw, 18px); font-variant-numeric: tabular-nums; }
+
+.player-score-points, .player-score-identity { display: flex; align-items: center; gap: clamp(3px, 1.5cqw, 8px); min-width: 0; }
+.player-score-identity { grid-column: 1; grid-row: 1; justify-content: flex-start; }
+.player-score-points { grid-column: 2; grid-row: 1; justify-content: flex-end; }
+.player-score-points .player-score-total { order: 2; }
+.app-container .player-score-identity .player-score-name { flex: 0 1 auto; }
+
+@container (max-width: 280px) {
+  .player-score-content { grid-template-columns: minmax(0, 1fr) auto; gap: 5px; }
+  .player-score-identity { gap: 4px; }
+  .app-container .player-score-content .player-score-name { font-size: clamp(10px, 4cqw, 12px); }
+  .app-container .player-score-content .player-score-name::before { width: 6px; height: 6px; margin-right: 4px; }
+  .app-container .player-score-content .player-score-status { padding: 2px 3px; font-size: 7px; }
+}

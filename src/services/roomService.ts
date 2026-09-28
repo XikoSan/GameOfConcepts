@@ -7,7 +7,7 @@ import {
 } from '../game';
 import {
   getDeckDefinitionById,
-  MIXED_ALL_DECK,
+  DEFAULT_DECK,
 } from '../data/deckDefinitions';
 import type { GameState } from '../game';
 import type { MaxPlayers, PlayerColor, Room, RoomPlayer } from '../types/room';
@@ -679,8 +679,8 @@ export async function startRoomGame({
   );
   const deckDefinition =
     getDeckDefinitionById(room.game_state.deckSnapshot?.sourceDeckId ?? '') ??
-    MIXED_ALL_DECK;
-  const gameState = initializeGame(maxPlayers, deckDefinition, startingSeatIndex);
+    DEFAULT_DECK;
+  const gameState = initializeGame(maxPlayers, deckDefinition, startingSeatIndex, room.game_state.deckSnapshot);
 
   const { data, error } = await supabase
     .from('rooms')

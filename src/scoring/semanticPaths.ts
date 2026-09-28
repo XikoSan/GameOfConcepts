@@ -1,6 +1,6 @@
 import type { BoardState } from './types';
 import type { SemanticEdge } from '../types';
-import { getBoardKey, getPathConnectivitySignature } from './semanticRelations';
+import { getBoardKey, getPathConnectivitySignature, isSymmetricRelation } from './semanticRelations';
 
 const getCardOwner = (board: BoardState, cardId: string): number | null | undefined =>
   Object.values(board).find((card) => card.id === cardId)?.playerId;
@@ -24,7 +24,7 @@ const getSharedCardForSequence = (
   edge: SemanticEdge,
   candidateEdge: SemanticEdge
 ): string | null => {
-  if (edge.relation.family === 'opposite') {
+  if (isSymmetricRelation(edge.relation)) {
     const edgeCardIds = [edge.fromCardInstanceId, edge.toCardInstanceId];
     return (
       edgeCardIds.find(

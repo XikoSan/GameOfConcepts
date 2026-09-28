@@ -3,8 +3,9 @@ import {
   CARD_CATALOG,
   START_CARD_CATALOG,
   getCardDefinitionIdByName,
+  type CardDefinition,
 } from './data/cardCatalog';
-import { MIXED_ALL_DECK, type DeckDefinition } from './data/deckDefinitions';
+import { DEFAULT_DECK, type DeckDefinition } from './data/deckDefinitions';
 import { buildDeck, validateDeckCapacity } from './decks/deckBuilder';
 import type {
   CardName,
@@ -23,7 +24,7 @@ import type {
   TurnScoreResult,
 } from './types';
 import { calculateSemanticMoveScore } from './scoring/calculateSemanticMoveScore';
-import { createSemanticEdgeFromPending } from './scoring/semanticRelations';
+import { createSemanticEdgeFromPending, formatSemanticRelation, getRelationPresets, isRelationAllowed } from './scoring/semanticRelations';
 
 export { CARD_NAMES, START_CARD_NAMES };
 export type {
@@ -73,11 +74,16 @@ function shuffleCards(cards: RegularCardName[]): RegularCardName[] {
   return result;
 }
 
-function getCardNamesByDefinitionIds(cardDefinitionIds: readonly string[]) {
-  const cardsById = new Map(CARD_CATALOG.map((card) => [card.id, card.name]));
-  return cardDefinitionIds
-    .map((cardId) => cardsById.get(cardId))
-    .filter((cardName): cardName is RegularCardName => Boolean(cardName));
+function getSnapshotCards(
+  snapshot: NonNullable<GameState['deckSnapshot']>,
+  fallbackCatalog: readonly CardDefinition[] = CARD_CATALOG
+): CardDefinition[] {
+  const cardsById = new Map((snapshot.cards ?? fallbackCatalog).map((card) => [card.id, card]));
+  return snapshot.cardDefinitionIds.map((id) => {
+    const card = cardsById.get(id);
+    if (!card) throw new Error(`Карта «${id}» из сохранённой колоды недоступна.`);
+    return { ...card };
+  });
 }
 
 export function createPlayerDeckFromSnapshot(
@@ -88,7 +94,7 @@ export function createPlayerDeckFromSnapshot(
 
   // Joining players receive a deck from the room snapshot,
   // not from the client's current catalog.
-  const cardNames = getCardNamesByDefinitionIds(deckSnapshot.cardDefinitionIds);
+  const cardNames = getSnapshotCards(deckSnapshot).map((card) => card.name);
   if (cardNames.length < HAND_SIZE) return null;
 
   const deck = shuffleCards(cardNames);
@@ -102,20 +108,39 @@ export function createPlayerDeckFromSnapshot(
 
 export function initializeGame(
   playerCount = 2,
-  deckDefinition: DeckDefinition = MIXED_ALL_DECK,
-  startingPlayerIndex?: number
+  deckDefinition: DeckDefinition = DEFAULT_DECK,
+  startingPlayerIndex?: number,
+  existingSnapshot?: GameState['deckSnapshot']
 ): GameState {
   const normalizedPlayerCount = Math.min(Math.max(playerCount, 2), 4);
   const normalizedStartingPlayerIndex =
     typeof startingPlayerIndex === 'number'
       ? Math.min(Math.max(Math.floor(startingPlayerIndex), 0), normalizedPlayerCount - 1)
       : getRandomStartingPlayerIndex(normalizedPlayerCount);
-  const builtDeck = buildDeck(CARD_CATALOG, deckDefinition);
-  const capacity = validateDeckCapacity(builtDeck.totalCards, 1, HAND_SIZE);
+  const cards = existingSnapshot
+    ? getSnapshotCards(existingSnapshot, deckDefinition.catalog ?? CARD_CATALOG)
+    : buildDeck(CARD_CATALOG, deckDefinition).cards;
+  const neutralCards = (existingSnapshot?.neutralCards ?? deckDefinition.neutralCards ?? START_CARD_CATALOG)
+    .filter((card) => card.enabled !== false);
+  if (!neutralCards.length) throw new Error('В выбранной колоде нет нейтральных карт.');
+  const relationFamilies = existingSnapshot?.relationFamilies ?? deckDefinition.relationFamilies ??
+    getRelationPresets().map((relation) => relation.family);
+  const snapshot = {
+    sourceDeckId: existingSnapshot?.sourceDeckId ?? deckDefinition.id,
+    cardDefinitionIds: cards.map((card) => card.id),
+    cards: cards.map((card) => ({ ...card })),
+    neutralCards: neutralCards.map((card) => ({ ...card })),
+    relationFamilies: [...relationFamilies],
+    createdAt: existingSnapshot?.createdAt ?? new Date().toISOString(),
+  };
+  if (!relationFamilies.length || getRelationPresets(snapshot).length !== relationFamilies.length) {
+    throw new Error('Набор связей выбранной колоды недоступен.');
+  }
+  const capacity = validateDeckCapacity(cards.length, 1, HAND_SIZE);
   if (!capacity.valid) {
     throw new Error(capacity.message);
   }
-  const deckTemplate = builtDeck.cards.map((card) => card.name);
+  const deckTemplate = cards.map((card) => card.name);
   // Hands, decks, scores, and card ownership are all indexed by this stable seat count.
   const decks = Array.from({ length: normalizedPlayerCount }, () =>
     shuffleCards(deckTemplate)
@@ -124,11 +149,11 @@ export function initializeGame(
     playerId,
     cards: deck.splice(0, HAND_SIZE),
   }));
-  const startCardName =
-    START_CARD_NAMES[Math.floor(Math.random() * START_CARD_NAMES.length)];
+  const startDefinition = neutralCards[Math.floor(Math.random() * neutralCards.length)];
+  const startCardName = startDefinition.name;
   const startCard: PlacedCard = {
     id: `start_card_${Date.now()}_${Math.random()}`,
-    definitionId: getCardDefinitionIdByName(startCardName, START_CARD_CATALOG),
+    definitionId: startDefinition.id,
     cardName: startCardName,
     coordinates: BOARD_CENTER,
     playerId: null,
@@ -146,11 +171,7 @@ export function initializeGame(
     deck: decks,
     // A deck id is configuration; the snapshot is the immutable
     // card composition owned by the running game.
-    deckSnapshot: {
-      sourceDeckId: deckDefinition.id,
-      cardDefinitionIds: builtDeck.cardDefinitionIds,
-      createdAt: new Date().toISOString(),
-    },
+    deckSnapshot: snapshot,
     handRedrawUsedByPlayerId: Object.fromEntries(
       players.map((player) => [player.playerId, false])
     ),
@@ -390,6 +411,8 @@ export function upsertPendingSemanticEdge(
 ): GameState {
   if (!gameState.pendingMove) return gameState;
   if (gameState.pendingMove.semanticStatus === 'voting') return gameState;
+  if (!isRelationAllowed(relation, gameState.deckSnapshot)) return gameState;
+  if (direction !== 'new-to-neighbor' && direction !== 'neighbor-to-new') return gameState;
 
   const neighbor = getPhysicalSemanticNeighbors(gameState).find(
     (card) => card.id === neighborCardInstanceId
@@ -453,6 +476,10 @@ export function removePendingSemanticEdge(
 export function submitPendingSemanticMove(gameState: GameState): GameState {
   if (!gameState.pendingMove) return gameState;
   if (!gameState.pendingMove.semanticEdges?.length) return gameState;
+  if (!gameState.pendingMove.semanticEdges.every((edge) =>
+    isRelationAllowed(edge.relation, gameState.deckSnapshot) &&
+    (edge.direction === 'new-to-neighbor' || edge.direction === 'neighbor-to-new')
+  )) return gameState;
 
   const scorePreview = getPendingScorePreview(gameState, gameState.pendingMove);
   if (scorePreview.total <= 0) return gameState;
@@ -515,7 +542,7 @@ export function placeCard(
 
   const placedCard: PlacedCard = {
     id: `card_${Date.now()}_${Math.random()}`,
-    definitionId: getCardDefinitionIdByName(cardName),
+    definitionId: getCardDefinitionIdByName(cardName, gameState.deckSnapshot?.cards ?? CARD_CATALOG),
     cardName,
     coordinates,
     playerId: gameState.currentPlayerIndex,
@@ -570,6 +597,10 @@ export function confirmPendingCard(gameState: GameState): GameState {
   if (!gameState.pendingMove) return gameState;
   if (gameState.pendingMove.semanticStatus !== 'voting') return gameState;
   if (!gameState.pendingMove.semanticEdges?.length) return gameState;
+  if (!gameState.pendingMove.semanticEdges.every((edge) =>
+    isRelationAllowed(edge.relation, gameState.deckSnapshot) &&
+    (edge.direction === 'new-to-neighbor' || edge.direction === 'neighbor-to-new')
+  )) return gameState;
 
   const { cardId, cardName } = gameState.pendingMove;
   const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
@@ -646,6 +677,15 @@ export function confirmPendingCard(gameState: GameState): GameState {
     scores: nextScores,
     currentPlayerIndex: reviewerIndex,
     log: [...gameState.log, formatTurnScoreLog(turnScore)],
+    logDetails: {
+      ...gameState.logDetails,
+      [gameState.log.length]: {
+        score: turnScore,
+        relations: acceptedSemanticEdges.map((edge) => formatSemanticRelation(
+          edge, new Map(Object.values(newBoard).map((card) => [card.id, card.cardName]))
+        )),
+      },
+    },
   };
 }
 

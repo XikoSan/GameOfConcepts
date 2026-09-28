@@ -48,7 +48,13 @@ export type RelationFamily =
   | 'part'
   | 'cause'
   | 'property'
-  | 'opposite';
+  | 'opposite'
+  | 'characteristic'
+  | 'contrast'
+  | 'variety'
+  | 'helps'
+  | 'causes'
+  | 'regulates';
 
 export type DirectedRelationRole =
   | 'kind'
@@ -58,7 +64,13 @@ export type DirectedRelationRole =
   | 'cause'
   | 'effect'
   | 'property'
-  | 'property-bearer';
+  | 'property-bearer'
+  | 'bearer'
+  | 'characteristic'
+  | 'helper'
+  | 'helped'
+  | 'regulator'
+  | 'regulated';
 
 export type SemanticRelation =
   | {
@@ -84,7 +96,13 @@ export type SemanticRelation =
   | {
       family: 'opposite';
       symmetric: true;
-    };
+    }
+  | { family: 'contrast'; symmetric: true }
+  | { family: 'characteristic'; fromRole: 'bearer'; toRole: 'characteristic' }
+  | { family: 'variety'; fromRole: 'kind'; toRole: 'general' }
+  | { family: 'helps'; fromRole: 'helper'; toRole: 'helped' }
+  | { family: 'causes'; fromRole: 'cause'; toRole: 'effect' }
+  | { family: 'regulates'; fromRole: 'regulator'; toRole: 'regulated' };
 
 export interface PendingSemanticEdge {
   id: string;
@@ -188,6 +206,9 @@ export interface TurnScoreResult {
 export interface GameDeckSnapshot {
   sourceDeckId: string;
   cardDefinitionIds: string[];
+  cards?: CardDefinition[];
+  neutralCards?: CardDefinition[];
+  relationFamilies?: RelationFamily[];
   createdAt?: string;
 }
 
@@ -221,6 +242,8 @@ export interface GameState {
   scoringVersion?: 3;
   scores: number[];
   log: string[];
+  /** Score snapshots keyed by log index; optional for existing saved rooms. */
+  logDetails?: Record<number, { score: TurnScoreResult; relations: string[] }>;
   gameOver: boolean;
 }
 

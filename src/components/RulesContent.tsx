@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import {
   rulesExamples,
-  rulesSections,
+  getRulesSectionsForDeck,
   rulesTabs,
 } from '../rulesText';
+import type { GameDeckSnapshot } from '../types';
 import type { RulesBlock, RulesExampleId } from '../rulesText';
 
 const getExampleById = (id: RulesExampleId) =>
@@ -131,16 +132,16 @@ function RulesBlockView({ block }: { block: RulesBlock }) {
   return <RulesExampleBlock id={block.id} />;
 }
 
-export function RulesContent() {
+export function RulesContent({ deckSnapshot }: { deckSnapshot?: GameDeckSnapshot }) {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   const activeTab = rulesTabs[activeTabIndex];
   const activeSectionTitles = activeTab.sectionTitles;
   const activeSections = useMemo(
     () =>
-      rulesSections.filter((section) =>
+      getRulesSectionsForDeck(Boolean(deckSnapshot?.relationFamilies?.includes('helps')), deckSnapshot?.neutralCards?.map((card) => card.name)).filter((section) =>
         activeSectionTitles.includes(section.title)
       ),
-    [activeSectionTitles]
+    [activeSectionTitles, deckSnapshot]
   );
   return (
     <div className="rules-content">

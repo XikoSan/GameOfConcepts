@@ -1,5 +1,6 @@
 import type {
   Coordinates,
+  GameDeckSnapshot,
   PendingMove,
   PendingSemanticEdge,
   PlacedCard,
@@ -14,6 +15,12 @@ export const RELATION_FAMILY_LABELS: Record<RelationFamily, string> = {
   cause: 'Причина',
   property: 'Свойство',
   opposite: 'Противоположность',
+  characteristic: 'Характеристика',
+  contrast: 'Противопоставление',
+  variety: 'Разновидность',
+  helps: 'Помогает',
+  causes: 'Вызывает',
+  regulates: 'Регулирует',
 };
 
 export const RELATION_PRESETS: SemanticRelation[] = [
@@ -24,6 +31,38 @@ export const RELATION_PRESETS: SemanticRelation[] = [
   { family: 'opposite', symmetric: true },
 ];
 
+export const ALL_RELATION_PRESETS: readonly SemanticRelation[] = [
+  ...RELATION_PRESETS,
+  { family: 'characteristic', fromRole: 'bearer', toRole: 'characteristic' },
+  { family: 'contrast', symmetric: true },
+  { family: 'variety', fromRole: 'kind', toRole: 'general' },
+  { family: 'helps', fromRole: 'helper', toRole: 'helped' },
+  { family: 'causes', fromRole: 'cause', toRole: 'effect' },
+  { family: 'regulates', fromRole: 'regulator', toRole: 'regulated' },
+];
+
+export function isSymmetricRelation(
+  relation: SemanticRelation
+): relation is Extract<SemanticRelation, { symmetric: true }> {
+  return relation.family === 'opposite' || relation.family === 'contrast';
+}
+
+export function getRelationPresets(snapshot?: GameDeckSnapshot): readonly SemanticRelation[] {
+  if (!snapshot?.relationFamilies) return RELATION_PRESETS;
+  return snapshot.relationFamilies.flatMap((family) => {
+    const preset = ALL_RELATION_PRESETS.find((relation) => relation.family === family);
+    return preset ? [preset] : [];
+  });
+}
+
+export function isRelationAllowed(relation: SemanticRelation, snapshot?: GameDeckSnapshot): boolean {
+  const preset = getRelationPresets(snapshot).find((item) => item.family === relation.family);
+  if (!preset) return false;
+  if (isSymmetricRelation(preset)) return isSymmetricRelation(relation) && relation.symmetric === true;
+  return !isSymmetricRelation(relation) &&
+    relation.fromRole === preset.fromRole && relation.toRole === preset.toRole;
+}
+
 const ROLE_LABELS: Record<string, string> = {
   kind: 'вид',
   general: 'общее',
@@ -33,6 +72,12 @@ const ROLE_LABELS: Record<string, string> = {
   effect: 'следствие',
   property: 'свойство',
   'property-bearer': 'карта',
+  bearer: 'понятие',
+  characteristic: 'характеристика',
+  helper: 'помогает',
+  helped: 'получает помощь',
+  regulator: 'задаёт порядок',
+  regulated: 'регулируется',
 };
 
 export function getRelationFamilyLabel(family: RelationFamily): string {
@@ -44,6 +89,11 @@ export function getRelationRoleLabel(role: string): string {
 }
 
 export function getRelationDirectionQuestion(family: RelationFamily): string {
+  if (family === 'characteristic') return 'Какое понятие описываем?';
+  if (family === 'variety') return 'Что является разновидностью?';
+  if (family === 'helps') return 'Что помогает?';
+  if (family === 'causes') return 'Что вызывает другое?';
+  if (family === 'regulates') return 'Что задаёт порядок или ограничения?';
   if (family === 'kind') return 'Что является видом?';
   if (family === 'part') return 'Что является частью?';
   if (family === 'cause') return 'Что является причиной?';
@@ -52,7 +102,7 @@ export function getRelationDirectionQuestion(family: RelationFamily): string {
 }
 
 export function getPathConnectivitySignature(edge: SemanticEdge): string {
-  if (edge.relation.family === 'opposite') return 'opposite:symmetric';
+  if (isSymmetricRelation(edge.relation)) return `${edge.relation.family}:symmetric`;
 
   return `${edge.relation.family}:${edge.relation.fromRole}->${edge.relation.toRole}`;
 }
@@ -68,7 +118,7 @@ export function getNodeConnectivitySignature(
     return null;
   }
 
-  if (edge.relation.family === 'opposite') return 'opposite:center=opposite:outer=opposite';
+  if (isSymmetricRelation(edge.relation)) return `${edge.relation.family}:symmetric-node`;
 
   const centerRole =
     edge.fromCardInstanceId === centerCardInstanceId
@@ -135,6 +185,12 @@ export function formatSemanticRelation(
 ): string {
   const fromName = namesById.get(edge.fromCardInstanceId) ?? 'Карта';
   const toName = namesById.get(edge.toCardInstanceId) ?? 'Карта';
+  if (edge.relation.family === 'characteristic') return `«${toName}» — характеристика понятия «${fromName}»`;
+  if (edge.relation.family === 'contrast') return `«${fromName}» противопоставлено «${toName}»`;
+  if (edge.relation.family === 'variety') return `«${fromName}» — разновидность «${toName}»`;
+  if (edge.relation.family === 'helps') return `«${fromName}» помогает: «${toName}»`;
+  if (edge.relation.family === 'causes') return `«${fromName}» вызывает «${toName}»`;
+  if (edge.relation.family === 'regulates') return `«${fromName}» регулирует: «${toName}»`;
   if (edge.relation.family === 'kind') return `${fromName} — вид ${toName}`;
   if (edge.relation.family === 'part') return `${fromName} — часть ${toName}`;
   if (edge.relation.family === 'cause') {
@@ -162,7 +218,7 @@ export function formatRelationForCard(
   const fullText = formatSemanticRelation(edge, namesById);
   const familyLabel = getRelationFamilyLabel(edge.relation.family);
 
-  if (edge.relation.family === 'opposite') {
+  if (isSymmetricRelation(edge.relation)) {
     const otherCardId =
       edge.fromCardInstanceId === cardInstanceId
         ? edge.toCardInstanceId

@@ -125,6 +125,7 @@ export function validateDeckDefinition(
   definition: DeckDefinition,
   catalog: readonly CardDefinition[]
 ): DeckValidationIssue[] {
+  catalog = definition.catalog ?? catalog;
   const issues: DeckValidationIssue[] = [];
   const enabledCardsById = new Map(
     getEnabledCards(catalog).map((card) => [card.id, card])
@@ -280,6 +281,7 @@ export function buildDeck(
   definition: DeckDefinition,
   options?: BuildDeckOptions
 ): BuiltDeck {
+  catalog = definition.catalog ?? catalog;
   assertValidDeck(definition, catalog);
 
   const enabledCards = getEnabledCards(catalog);

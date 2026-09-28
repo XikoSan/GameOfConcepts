@@ -23,7 +23,7 @@ import type {
   SemanticEdge,
   SemanticRelation,
 } from '../game';
-import { formatRelationForCard } from '../scoring/semanticRelations';
+import { formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
 import { Cell } from './Cell';
 import { SemanticRelationPopover } from './SemanticRelationPopover';
 import {
@@ -113,7 +113,7 @@ const getRelationIndicator = (
   edge?: PendingSemanticEdge
 ) => {
   if (!edge) return '+';
-  if (edge.relation.family === 'opposite') return '↔';
+  if (isSymmetricRelation(edge.relation)) return '↔';
 
   const fromPending = edge.direction === 'new-to-neighbor';
   const deltaX = neighbor.coordinates.x - pendingCard.coordinates.x;
@@ -984,6 +984,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         relationEditorRect &&
         createPortal(
           <SemanticRelationPopover
+            relationPresets={getRelationPresets(gameState.deckSnapshot)}
             neighborCard={activeRelationNeighbor}
             pendingCard={pendingCard}
             position={relationEditorRect}

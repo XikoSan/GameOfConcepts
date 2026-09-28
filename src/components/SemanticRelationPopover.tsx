@@ -8,7 +8,7 @@ import type {
 } from '../game';
 import type { RelationFamily, SemanticEdgeScore } from '../types';
 import {
-  RELATION_PRESETS,
+  isSymmetricRelation,
   formatSemanticRelation,
   getRelationDirectionQuestion,
   getRelationFamilyLabel,
@@ -17,6 +17,7 @@ import './SemanticRelationPopover.css';
 
 interface SemanticRelationPopoverProps {
   pendingCard: PlacedCard;
+  relationPresets: readonly SemanticRelation[];
   neighborCard: PlacedCard;
   selectedEdge?: PendingSemanticEdge;
   selectedScore?: SemanticEdgeScore;
@@ -33,11 +34,9 @@ interface SemanticRelationPopoverProps {
   ) => void;
 }
 
-const getRelationByFamily = (family: RelationFamily) =>
-  RELATION_PRESETS.find((relation) => relation.family === family) ?? RELATION_PRESETS[0];
-
 export function SemanticRelationPopover({
   pendingCard,
+  relationPresets,
   neighborCard,
   selectedEdge,
   selectedScore,
@@ -55,13 +54,13 @@ export function SemanticRelationPopover({
   );
   const [sourceCardId, setSourceCardId] = useState<string | null>(() => {
     if (!selectedEdge) return null;
-    if (selectedEdge.relation.family === 'opposite') return pendingCard.id;
+    if (isSymmetricRelation(selectedEdge.relation)) return pendingCard.id;
     return selectedEdge.direction === 'new-to-neighbor'
       ? pendingCard.id
       : neighborCard.id;
   });
-  const selectedRelation = selectedFamily ? getRelationByFamily(selectedFamily) : null;
-  const isOpposite = selectedRelation?.family === 'opposite';
+  const selectedRelation = relationPresets.find((relation) => relation.family === selectedFamily) ?? null;
+  const isOpposite = selectedRelation ? isSymmetricRelation(selectedRelation) : false;
   const direction =
     sourceCardId === neighborCard.id ? 'neighbor-to-new' : 'new-to-neighbor';
   const isReady = Boolean(selectedRelation && (isOpposite || sourceCardId));
@@ -129,12 +128,12 @@ export function SemanticRelationPopover({
 
   const handleFamilySelect = (family: RelationFamily) => {
     setSelectedFamily(family);
-    setSourceCardId(family === 'opposite' ? pendingCard.id : null);
+    setSourceCardId((family === 'opposite' || family === 'contrast') ? pendingCard.id : null);
   };
 
   const handleSave = () => {
     if (!selectedRelation || !isReady) return;
-    onSave(selectedRelation, selectedRelation.family === 'opposite' ? 'new-to-neighbor' : direction);
+    onSave(selectedRelation, isSymmetricRelation(selectedRelation) ? 'new-to-neighbor' : direction);
   };
 
   return (
@@ -158,7 +157,7 @@ export function SemanticRelationPopover({
           role="group"
           aria-label={`Тип связи между ${pendingCard.cardName} и ${neighborCard.cardName}`}
         >
-          {RELATION_PRESETS.map((relation) => (
+          {relationPresets.map((relation) => (
             <button
               aria-pressed={selectedFamily === relation.family}
               className={selectedFamily === relation.family ? 'active' : ''}

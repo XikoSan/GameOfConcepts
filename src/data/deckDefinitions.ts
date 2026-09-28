@@ -1,4 +1,6 @@
-import type { CardDifficulty } from './cardCatalog';
+import type { CardDefinition, CardDifficulty } from './cardCatalog';
+import type { RelationFamily } from '../types';
+import { EVERYDAY_CARD_CATALOG, EVERYDAY_PLAY_CARD_IDS, EVERYDAY_NEUTRAL_CARDS } from './everydayCatalog';
 
 export type DeckKind = 'preset' | 'custom';
 
@@ -33,6 +35,9 @@ export interface DeckDefinition {
   description?: string;
   source: DeckSource;
   enabled?: boolean;
+  catalog?: readonly CardDefinition[];
+  neutralCards?: readonly CardDefinition[];
+  relationFamilies?: readonly RelationFamily[];
 }
 
 // Values are relative weights, not fixed counts or required percentages.
@@ -82,19 +87,34 @@ export const MIXED_ALL_DECK: DeckDefinition = {
   },
 };
 
+export const EVERYDAY_DECK: DeckDefinition = {
+  id: 'everyday',
+  name: 'Повседневные понятия',
+  kind: 'preset',
+  description: '40 игровых понятий, 8 нейтральных карт и шесть типов связей.',
+  source: { type: 'custom', cardIds: EVERYDAY_PLAY_CARD_IDS },
+  catalog: EVERYDAY_CARD_CATALOG,
+  neutralCards: EVERYDAY_NEUTRAL_CARDS,
+  relationFamilies: ['characteristic', 'contrast', 'variety', 'helps', 'causes', 'regulates'],
+};
+
 // Standard difficulty decks are derived from catalog metadata;
 // their size must never be duplicated as a constant.
 export const USER_SELECTABLE_DECKS: readonly DeckDefinition[] = [
   EASY_DECK,
+  EVERYDAY_DECK,
   MEDIUM_DECK,
   HARD_DECK,
-  MIXED_ALL_DECK,
 ];
+
+export const DEFAULT_DECK = EVERYDAY_DECK;
 
 // Custom decks reference stable definition ids so catalog metadata
 // can change without duplicating full card objects.
 export const DECK_DEFINITIONS: readonly DeckDefinition[] = [
   ...USER_SELECTABLE_DECKS,
+  // Preserve the definition for existing room snapshots.
+  MIXED_ALL_DECK,
   {
     id: 'mixed-50',
     name: 'Смешанная 50',
