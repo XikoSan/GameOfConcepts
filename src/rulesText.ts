@@ -273,16 +273,6 @@ export const rulesTabs: RulesTab[] = [
   },
 ];
 
-// Only this deck uses the new wording and direction of the characteristic relation.
-export const everydayConnectionTypeRules: ConnectionTypeRule[] = [
-  { title: 'Характеристика', definition: 'Одно понятие описывается другим. Сначала выберите понятие, которое описываете; стрелка идёт от него к характеристике.', examples: ['«Рисование» → «Аккуратность»: аккуратность характеризует выполнение рисунка.'] },
-  { title: 'Противопоставление', definition: 'Понятия противопоставлены по одному признаку. Направление не выбирается.', examples: ['«Усталость» ↔ «Бодрость».'] },
-  { title: 'Разновидность', definition: 'Первое понятие является видом второго. Не путайте разновидность с частью или общей темой.', examples: ['«Поддержка» — разновидность «Помощи».'] },
-  { title: 'Помогает', definition: 'Первое понятие облегчает действие или достижение, обозначенное вторым. Помощь не гарантирует результат.', examples: ['«Внимание» помогает: «Чтение».'] },
-  { title: 'Вызывает', definition: 'Первое понятие может приводить к появлению второго. Объясните понятную ситуацию, в которой это происходит.', examples: ['Длительное «Движение» вызывает «Усталость».'] },
-  { title: 'Регулирует', definition: 'Первое понятие задаёт порядок, допуск или ограничения действия, обозначенного вторым.', examples: ['«Правило» регулирует: «Игра».'] },
-];
-
 export function getRulesSectionsForDeck(everyday: boolean, neutralNames: readonly string[] = []): RulesSection[] {
   if (!everyday) return rulesSections;
   const replaceBlock = (block: RulesBlock): RulesBlock => {
@@ -305,19 +295,7 @@ export function getRulesSectionsForDeck(everyday: boolean, neutralNames: readonl
     return block;
   };
   return rulesSections.map((section) => {
-    if (section.title === 'Связи') return {
-      title: section.title,
-      blocks: [
-        { type: 'card', text: 'В колоде «Повседневные понятия» используются шесть типов связей. Связь выбирается на поле между новой картой и её соседом по стороне.' },
-        { type: 'paragraph', text: 'Для каждого соседа связь выбирается отдельно. У всех типов, кроме «Противопоставления», укажите направление. Предварительный текст показывает, как будет прочитана связь.' },
-        { type: 'paragraph', text: 'Для хода нужна минимум одна обоснованная и принятая связь. Список возможных пар не ограничен готовыми примерами: решение принимают игроки.' },
-        ...everydayConnectionTypeRules.flatMap((rule): RulesBlock[] => [
-          { type: 'emphasis', text: rule.title },
-          { type: 'paragraph', text: rule.definition },
-          { type: 'list', items: rule.examples },
-        ]),
-      ] as RulesBlock[],
-    };
+    if (section.title === 'Связи' || section.title === 'Подсчёт очков') return section;
     const blocks = section.blocks.map(replaceBlock);
     if (section.title === 'Подготовка') blocks.push({
       type: 'card',
