@@ -1,0 +1,896 @@
+{
+  "60": {
+    "main": {
+      "pairs": 135,
+      "components": [
+        60
+      ],
+      "min_degree": 1,
+      "median_degree": 4.0,
+      "types": {
+        "Вызывает": 7,
+        "Помогает": 75,
+        "Противопоставление": 7,
+        "Разновидность": 10,
+        "Регулирует": 12,
+        "Характеристика": 36
+      },
+      "initial_mean": 0.3152544661624839,
+      "initial_min": 0.08333333333333337,
+      "initial_max": 0.8011525013585982,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "main",
+          "runs": 360,
+          "seed": 48293,
+          "reached_40": 16,
+          "stopped_before_40": 344,
+          "ever_no_move_before_redraw": 360,
+          "snapshots": {
+            "1": {
+              "reached": 360,
+              "share_reached": 1.0,
+              "has_move": 0.3138888888888889,
+              "mean_playable": 0.37777777777777777
+            },
+            "5": {
+              "reached": 120,
+              "share_reached": 0.3333333333333333,
+              "has_move": 0.7916666666666666,
+              "mean_playable": 1.3666666666666667
+            },
+            "10": {
+              "reached": 78,
+              "share_reached": 0.21666666666666667,
+              "has_move": 0.8589743589743589,
+              "mean_playable": 1.641025641025641
+            },
+            "20": {
+              "reached": 39,
+              "share_reached": 0.10833333333333334,
+              "has_move": 0.8461538461538461,
+              "mean_playable": 1.794871794871795
+            },
+            "40": {
+              "reached": 16,
+              "share_reached": 0.044444444444444446,
+              "has_move": 1.0,
+              "mean_playable": 2.375
+            }
+          },
+          "stops_by_board_size": {
+            "1": 170,
+            "2": 28,
+            "3": 32,
+            "4": 10,
+            "5": 13,
+            "6": 7,
+            "7": 11,
+            "8": 7,
+            "9": 4,
+            "10": 4,
+            "11": 8,
+            "12": 5,
+            "13": 4,
+            "14": 5,
+            "15": 4,
+            "16": 2,
+            "17": 3,
+            "18": 3,
+            "19": 1,
+            "20": 3,
+            "21": 2,
+            "22": 3,
+            "23": 1,
+            "24": 2,
+            "26": 1,
+            "27": 2,
+            "28": 1,
+            "29": 1,
+            "30": 1,
+            "31": 1,
+            "32": 1,
+            "33": 2,
+            "35": 1,
+            "36": 1
+          }
+        },
+        {
+          "players": 4,
+          "mode": "main",
+          "runs": 360,
+          "seed": 48295,
+          "reached_40": 66,
+          "stopped_before_40": 294,
+          "ever_no_move_before_redraw": 354,
+          "snapshots": {
+            "1": {
+              "reached": 360,
+              "share_reached": 1.0,
+              "has_move": 0.3111111111111111,
+              "mean_playable": 0.37222222222222223
+            },
+            "5": {
+              "reached": 139,
+              "share_reached": 0.3861111111111111,
+              "has_move": 0.8201438848920863,
+              "mean_playable": 1.6115107913669064
+            },
+            "10": {
+              "reached": 114,
+              "share_reached": 0.31666666666666665,
+              "has_move": 0.8859649122807017,
+              "mean_playable": 1.9035087719298245
+            },
+            "20": {
+              "reached": 89,
+              "share_reached": 0.24722222222222223,
+              "has_move": 0.9550561797752809,
+              "mean_playable": 2.4157303370786516
+            },
+            "40": {
+              "reached": 66,
+              "share_reached": 0.18333333333333332,
+              "has_move": 1.0,
+              "mean_playable": 2.5757575757575757
+            }
+          },
+          "stops_by_board_size": {
+            "1": 183,
+            "2": 24,
+            "3": 5,
+            "4": 9,
+            "5": 11,
+            "6": 4,
+            "7": 1,
+            "8": 3,
+            "9": 6,
+            "10": 9,
+            "11": 1,
+            "12": 1,
+            "13": 2,
+            "14": 2,
+            "15": 3,
+            "16": 2,
+            "17": 2,
+            "18": 2,
+            "19": 1,
+            "21": 2,
+            "22": 4,
+            "23": 2,
+            "24": 1,
+            "25": 1,
+            "26": 3,
+            "28": 2,
+            "31": 1,
+            "33": 2,
+            "34": 2,
+            "35": 1,
+            "36": 1,
+            "38": 1
+          }
+        }
+      ]
+    },
+    "with_conditions": {
+      "pairs": 154,
+      "components": [
+        60
+      ],
+      "min_degree": 1,
+      "median_degree": 4.5,
+      "types": {
+        "Вызывает": 12,
+        "Помогает": 80,
+        "Противопоставление": 7,
+        "Разновидность": 17,
+        "Регулирует": 14,
+        "Характеристика": 36
+      },
+      "initial_mean": 0.3554586715180705,
+      "initial_min": 0.08333333333333337,
+      "initial_max": 0.8011525013585982,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "with_conditions",
+          "runs": 360,
+          "seed": 48293,
+          "reached_40": 40,
+          "stopped_before_40": 320,
+          "ever_no_move_before_redraw": 352,
+          "snapshots": {
+            "1": {
+              "reached": 360,
+              "share_reached": 1.0,
+              "has_move": 0.38055555555555554,
+              "mean_playable": 0.4527777777777778
+            },
+            "5": {
+              "reached": 133,
+              "share_reached": 0.36944444444444446,
+              "has_move": 0.7969924812030075,
+              "mean_playable": 1.443609022556391
+            },
+            "10": {
+              "reached": 89,
+              "share_reached": 0.24722222222222223,
+              "has_move": 0.8426966292134831,
+              "mean_playable": 1.7415730337078652
+            },
+            "20": {
+              "reached": 56,
+              "share_reached": 0.15555555555555556,
+              "has_move": 0.9464285714285714,
+              "mean_playable": 2.4107142857142856
+            },
+            "40": {
+              "reached": 40,
+              "share_reached": 0.1111111111111111,
+              "has_move": 1.0,
+              "mean_playable": 2.975
+            }
+          },
+          "stops_by_board_size": {
+            "1": 147,
+            "2": 30,
+            "3": 35,
+            "4": 15,
+            "5": 16,
+            "6": 8,
+            "7": 6,
+            "8": 5,
+            "9": 9,
+            "10": 3,
+            "11": 6,
+            "12": 2,
+            "13": 4,
+            "14": 3,
+            "15": 5,
+            "16": 2,
+            "17": 3,
+            "18": 3,
+            "19": 2,
+            "20": 1,
+            "21": 1,
+            "23": 2,
+            "25": 2,
+            "28": 2,
+            "29": 1,
+            "30": 2,
+            "31": 1,
+            "32": 1,
+            "36": 1,
+            "37": 1,
+            "39": 1
+          }
+        },
+        {
+          "players": 4,
+          "mode": "with_conditions",
+          "runs": 360,
+          "seed": 48295,
+          "reached_40": 98,
+          "stopped_before_40": 262,
+          "ever_no_move_before_redraw": 348,
+          "snapshots": {
+            "1": {
+              "reached": 360,
+              "share_reached": 1.0,
+              "has_move": 0.375,
+              "mean_playable": 0.4583333333333333
+            },
+            "5": {
+              "reached": 158,
+              "share_reached": 0.4388888888888889,
+              "has_move": 0.8924050632911392,
+              "mean_playable": 1.8291139240506329
+            },
+            "10": {
+              "reached": 129,
+              "share_reached": 0.35833333333333334,
+              "has_move": 0.9457364341085271,
+              "mean_playable": 2.0852713178294575
+            },
+            "20": {
+              "reached": 109,
+              "share_reached": 0.30277777777777776,
+              "has_move": 0.963302752293578,
+              "mean_playable": 2.596330275229358
+            },
+            "40": {
+              "reached": 98,
+              "share_reached": 0.2722222222222222,
+              "has_move": 0.9897959183673469,
+              "mean_playable": 3.1020408163265305
+            }
+          },
+          "stops_by_board_size": {
+            "1": 139,
+            "2": 35,
+            "3": 18,
+            "4": 10,
+            "5": 10,
+            "6": 9,
+            "7": 3,
+            "8": 1,
+            "9": 6,
+            "10": 4,
+            "11": 4,
+            "13": 7,
+            "14": 1,
+            "15": 2,
+            "16": 1,
+            "19": 1,
+            "20": 2,
+            "21": 1,
+            "22": 2,
+            "27": 1,
+            "29": 1,
+            "33": 3,
+            "34": 1
+          }
+        }
+      ]
+    }
+  },
+  "48": {
+    "main": {
+      "pairs": 123,
+      "components": [
+        48
+      ],
+      "min_degree": 2,
+      "median_degree": 5.0,
+      "types": {
+        "Вызывает": 7,
+        "Помогает": 72,
+        "Противопоставление": 4,
+        "Разновидность": 5,
+        "Регулирует": 11,
+        "Характеристика": 35
+      },
+      "initial_mean": 0.42772986718479894,
+      "initial_min": 0.19946808510638303,
+      "initial_max": 0.8613937711995067,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "main",
+          "runs": 288,
+          "seed": 48293,
+          "reached_40": 93,
+          "stopped_before_40": 195,
+          "ever_no_move_before_redraw": 266,
+          "snapshots": {
+            "1": {
+              "reached": 288,
+              "share_reached": 1.0,
+              "has_move": 0.3888888888888889,
+              "mean_playable": 0.4861111111111111
+            },
+            "5": {
+              "reached": 152,
+              "share_reached": 0.5277777777777778,
+              "has_move": 0.8355263157894737,
+              "mean_playable": 1.6644736842105263
+            },
+            "10": {
+              "reached": 122,
+              "share_reached": 0.4236111111111111,
+              "has_move": 0.9180327868852459,
+              "mean_playable": 2.057377049180328
+            },
+            "20": {
+              "reached": 102,
+              "share_reached": 0.3541666666666667,
+              "has_move": 0.9803921568627451,
+              "mean_playable": 2.7450980392156863
+            },
+            "40": {
+              "reached": 93,
+              "share_reached": 0.3229166666666667,
+              "has_move": 1.0,
+              "mean_playable": 3.3870967741935485
+            }
+          },
+          "stops_by_board_size": {
+            "1": 93,
+            "2": 11,
+            "3": 21,
+            "4": 11,
+            "5": 11,
+            "6": 4,
+            "7": 8,
+            "8": 3,
+            "9": 4,
+            "10": 4,
+            "11": 4,
+            "12": 2,
+            "13": 2,
+            "15": 4,
+            "16": 1,
+            "18": 1,
+            "19": 2,
+            "21": 2,
+            "23": 1,
+            "25": 1,
+            "26": 1,
+            "30": 1,
+            "35": 2,
+            "37": 1
+          }
+        },
+        {
+          "players": 4,
+          "mode": "main",
+          "runs": 288,
+          "seed": 48295,
+          "reached_40": 130,
+          "stopped_before_40": 158,
+          "ever_no_move_before_redraw": 249,
+          "snapshots": {
+            "1": {
+              "reached": 288,
+              "share_reached": 1.0,
+              "has_move": 0.4340277777777778,
+              "mean_playable": 0.5243055555555556
+            },
+            "5": {
+              "reached": 168,
+              "share_reached": 0.5833333333333334,
+              "has_move": 0.8988095238095238,
+              "mean_playable": 1.9226190476190477
+            },
+            "10": {
+              "reached": 145,
+              "share_reached": 0.5034722222222222,
+              "has_move": 0.9655172413793104,
+              "mean_playable": 2.296551724137931
+            },
+            "20": {
+              "reached": 133,
+              "share_reached": 0.4618055555555556,
+              "has_move": 0.9849624060150376,
+              "mean_playable": 2.9849624060150375
+            },
+            "40": {
+              "reached": 130,
+              "share_reached": 0.4513888888888889,
+              "has_move": 1.0,
+              "mean_playable": 3.7
+            }
+          },
+          "stops_by_board_size": {
+            "1": 87,
+            "2": 20,
+            "3": 11,
+            "4": 2,
+            "5": 5,
+            "6": 9,
+            "7": 5,
+            "8": 2,
+            "9": 2,
+            "10": 2,
+            "11": 1,
+            "12": 2,
+            "13": 2,
+            "14": 3,
+            "17": 1,
+            "18": 1,
+            "24": 1,
+            "26": 1,
+            "36": 1
+          }
+        }
+      ]
+    },
+    "with_conditions": {
+      "pairs": 130,
+      "components": [
+        48
+      ],
+      "min_degree": 2,
+      "median_degree": 5.0,
+      "types": {
+        "Вызывает": 8,
+        "Помогает": 72,
+        "Противопоставление": 4,
+        "Разновидность": 11,
+        "Регулирует": 11,
+        "Характеристика": 35
+      },
+      "initial_mean": 0.44651291719616765,
+      "initial_min": 0.19946808510638303,
+      "initial_max": 0.8613937711995067,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "with_conditions",
+          "runs": 288,
+          "seed": 48293,
+          "reached_40": 101,
+          "stopped_before_40": 187,
+          "ever_no_move_before_redraw": 257,
+          "snapshots": {
+            "1": {
+              "reached": 288,
+              "share_reached": 1.0,
+              "has_move": 0.4548611111111111,
+              "mean_playable": 0.5763888888888888
+            },
+            "5": {
+              "reached": 149,
+              "share_reached": 0.5173611111111112,
+              "has_move": 0.8523489932885906,
+              "mean_playable": 1.7315436241610738
+            },
+            "10": {
+              "reached": 118,
+              "share_reached": 0.4097222222222222,
+              "has_move": 0.9830508474576272,
+              "mean_playable": 2.2966101694915255
+            },
+            "20": {
+              "reached": 105,
+              "share_reached": 0.3645833333333333,
+              "has_move": 0.9714285714285714,
+              "mean_playable": 2.9047619047619047
+            },
+            "40": {
+              "reached": 101,
+              "share_reached": 0.3506944444444444,
+              "has_move": 1.0,
+              "mean_playable": 3.603960396039604
+            }
+          },
+          "stops_by_board_size": {
+            "1": 98,
+            "2": 15,
+            "3": 20,
+            "4": 6,
+            "5": 9,
+            "6": 3,
+            "7": 7,
+            "8": 9,
+            "9": 3,
+            "10": 1,
+            "11": 2,
+            "12": 3,
+            "13": 2,
+            "14": 1,
+            "16": 2,
+            "18": 1,
+            "19": 1,
+            "20": 1,
+            "21": 1,
+            "27": 2
+          }
+        },
+        {
+          "players": 4,
+          "mode": "with_conditions",
+          "runs": 288,
+          "seed": 48295,
+          "reached_40": 142,
+          "stopped_before_40": 146,
+          "ever_no_move_before_redraw": 252,
+          "snapshots": {
+            "1": {
+              "reached": 288,
+              "share_reached": 1.0,
+              "has_move": 0.4409722222222222,
+              "mean_playable": 0.5590277777777778
+            },
+            "5": {
+              "reached": 170,
+              "share_reached": 0.5902777777777778,
+              "has_move": 0.888235294117647,
+              "mean_playable": 1.8647058823529412
+            },
+            "10": {
+              "reached": 150,
+              "share_reached": 0.5208333333333334,
+              "has_move": 0.94,
+              "mean_playable": 2.4066666666666667
+            },
+            "20": {
+              "reached": 144,
+              "share_reached": 0.5,
+              "has_move": 0.9930555555555556,
+              "mean_playable": 3.076388888888889
+            },
+            "40": {
+              "reached": 142,
+              "share_reached": 0.4930555555555556,
+              "has_move": 1.0,
+              "mean_playable": 3.7746478873239435
+            }
+          },
+          "stops_by_board_size": {
+            "1": 102,
+            "2": 5,
+            "3": 9,
+            "4": 2,
+            "5": 9,
+            "6": 6,
+            "7": 3,
+            "9": 2,
+            "10": 2,
+            "11": 2,
+            "14": 1,
+            "15": 1,
+            "24": 1,
+            "31": 1
+          }
+        }
+      ]
+    }
+  },
+  "40": {
+    "main": {
+      "pairs": 108,
+      "components": [
+        40
+      ],
+      "min_degree": 3,
+      "median_degree": 5.0,
+      "types": {
+        "Вызывает": 4,
+        "Помогает": 67,
+        "Противопоставление": 2,
+        "Разновидность": 3,
+        "Регулирует": 5,
+        "Характеристика": 35
+      },
+      "initial_mean": 0.5150103798130113,
+      "initial_min": 0.33755060728744934,
+      "initial_max": 0.9192563008352482,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "main",
+          "runs": 240,
+          "seed": 48293,
+          "reached_40": 136,
+          "stopped_before_40": 104,
+          "ever_no_move_before_redraw": 193,
+          "snapshots": {
+            "1": {
+              "reached": 240,
+              "share_reached": 1.0,
+              "has_move": 0.5333333333333333,
+              "mean_playable": 0.6625
+            },
+            "5": {
+              "reached": 163,
+              "share_reached": 0.6791666666666667,
+              "has_move": 0.901840490797546,
+              "mean_playable": 2
+            },
+            "10": {
+              "reached": 146,
+              "share_reached": 0.6083333333333333,
+              "has_move": 0.9863013698630136,
+              "mean_playable": 2.595890410958904
+            },
+            "20": {
+              "reached": 138,
+              "share_reached": 0.575,
+              "has_move": 0.9927536231884058,
+              "mean_playable": 3.253623188405797
+            },
+            "40": {
+              "reached": 136,
+              "share_reached": 0.5666666666666667,
+              "has_move": 1.0,
+              "mean_playable": 4.477941176470588
+            }
+          },
+          "stops_by_board_size": {
+            "1": 52,
+            "2": 8,
+            "3": 11,
+            "4": 6,
+            "5": 7,
+            "6": 2,
+            "7": 5,
+            "8": 1,
+            "9": 2,
+            "10": 1,
+            "11": 3,
+            "13": 2,
+            "14": 1,
+            "18": 1,
+            "20": 1,
+            "22": 1
+          }
+        },
+        {
+          "players": 4,
+          "mode": "main",
+          "runs": 240,
+          "seed": 48295,
+          "reached_40": 156,
+          "stopped_before_40": 84,
+          "ever_no_move_before_redraw": 179,
+          "snapshots": {
+            "1": {
+              "reached": 240,
+              "share_reached": 1.0,
+              "has_move": 0.525,
+              "mean_playable": 0.675
+            },
+            "5": {
+              "reached": 178,
+              "share_reached": 0.7416666666666667,
+              "has_move": 0.8876404494382022,
+              "mean_playable": 2.1741573033707864
+            },
+            "10": {
+              "reached": 160,
+              "share_reached": 0.6666666666666666,
+              "has_move": 1.0,
+              "mean_playable": 2.98125
+            },
+            "20": {
+              "reached": 159,
+              "share_reached": 0.6625,
+              "has_move": 1.0,
+              "mean_playable": 3.6792452830188678
+            },
+            "40": {
+              "reached": 156,
+              "share_reached": 0.65,
+              "has_move": 1.0,
+              "mean_playable": 4.294871794871795
+            }
+          },
+          "stops_by_board_size": {
+            "1": 52,
+            "2": 6,
+            "3": 3,
+            "4": 1,
+            "5": 9,
+            "6": 4,
+            "7": 1,
+            "9": 4,
+            "14": 1,
+            "21": 2,
+            "30": 1
+          }
+        }
+      ]
+    },
+    "with_conditions": {
+      "pairs": 113,
+      "components": [
+        40
+      ],
+      "min_degree": 3,
+      "median_degree": 5.5,
+      "types": {
+        "Вызывает": 4,
+        "Помогает": 67,
+        "Противопоставление": 2,
+        "Разновидность": 8,
+        "Регулирует": 5,
+        "Характеристика": 35
+      },
+      "initial_mean": 0.5314681204483837,
+      "initial_min": 0.33755060728744934,
+      "initial_max": 0.9192563008352482,
+      "runs": [
+        {
+          "players": 2,
+          "mode": "with_conditions",
+          "runs": 240,
+          "seed": 48293,
+          "reached_40": 141,
+          "stopped_before_40": 99,
+          "ever_no_move_before_redraw": 184,
+          "snapshots": {
+            "1": {
+              "reached": 240,
+              "share_reached": 1.0,
+              "has_move": 0.5541666666666667,
+              "mean_playable": 0.7416666666666667
+            },
+            "5": {
+              "reached": 165,
+              "share_reached": 0.6875,
+              "has_move": 0.896969696969697,
+              "mean_playable": 2.2
+            },
+            "10": {
+              "reached": 146,
+              "share_reached": 0.6083333333333333,
+              "has_move": 0.9794520547945206,
+              "mean_playable": 2.828767123287671
+            },
+            "20": {
+              "reached": 141,
+              "share_reached": 0.5875,
+              "has_move": 0.9929078014184397,
+              "mean_playable": 3.5460992907801416
+            },
+            "40": {
+              "reached": 141,
+              "share_reached": 0.5875,
+              "has_move": 1.0,
+              "mean_playable": 4.48936170212766
+            }
+          },
+          "stops_by_board_size": {
+            "1": 50,
+            "2": 6,
+            "3": 15,
+            "4": 4,
+            "5": 9,
+            "7": 4,
+            "8": 4,
+            "9": 2,
+            "11": 2,
+            "13": 2,
+            "19": 1
+          }
+        },
+        {
+          "players": 4,
+          "mode": "with_conditions",
+          "runs": 240,
+          "seed": 48295,
+          "reached_40": 162,
+          "stopped_before_40": 78,
+          "ever_no_move_before_redraw": 168,
+          "snapshots": {
+            "1": {
+              "reached": 240,
+              "share_reached": 1.0,
+              "has_move": 0.5125,
+              "mean_playable": 0.7166666666666667
+            },
+            "5": {
+              "reached": 172,
+              "share_reached": 0.7166666666666667,
+              "has_move": 0.9418604651162791,
+              "mean_playable": 2.296511627906977
+            },
+            "10": {
+              "reached": 166,
+              "share_reached": 0.6916666666666667,
+              "has_move": 0.9939759036144579,
+              "mean_playable": 3.036144578313253
+            },
+            "20": {
+              "reached": 163,
+              "share_reached": 0.6791666666666667,
+              "has_move": 1.0,
+              "mean_playable": 3.950920245398773
+            },
+            "40": {
+              "reached": 162,
+              "share_reached": 0.675,
+              "has_move": 1.0,
+              "mean_playable": 4.41358024691358
+            }
+          },
+          "stops_by_board_size": {
+            "1": 59,
+            "2": 7,
+            "3": 2,
+            "5": 3,
+            "6": 1,
+            "7": 1,
+            "9": 1,
+            "10": 1,
+            "11": 1,
+            "13": 1,
+            "23": 1
+          }
+        }
+      ]
+    }
+  }
+}
