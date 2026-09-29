@@ -9,10 +9,10 @@ import { getRelationPresets, isSymmetricRelation, formatSemanticRelation } from 
 import { calculateSemanticMoveScore } from '../src/scoring/calculateSemanticMoveScore';
 import type { GameState, PlacedCard, SemanticEdge, SemanticRelation } from '../src/types';
 
-const neutralNames = ['Длительность', 'Письмо', 'Подготовка', 'Решение', 'Рисование', 'Тренировка', 'Учёба', 'Чтение'].sort();
-const playingNames = 'Аккуратность, Бодрость, Внимание, Воображение, Выбор, Грусть, Движение, Запрет, Знание, Игра, Исследование, Копирование, Лепка, Настойчивость, Небрежность, Неудача, Объяснение, Ответ, Отдых, Очередь, Память, Пение, Повторение, Поддержка, Помощь, Понимание, Правило, Радость, Рассказ, Самостоятельность, Сила, Создание, Сон, Спокойствие, Спорт, Танец, Успех, Усталость, Эксперимент, Эмоция'.split(', ').sort();
+const neutralNames = ["Здоровье", "Безопасность", "Дружба"].sort();
+const playingNames = ["Аккуратность", "Бодрость", "Внимание", "Воображение", "Выбор", "Грусть", "Движение", "Запрет", "Знание", "Игра", "Любопытство", "Доброта", "Терпение", "Настойчивость", "Небрежность", "Неудача", "Объяснение", "Ответ", "Отдых", "Очередь", "Память", "Доверие", "Привычка", "Поддержка", "Помощь", "Понимание", "Правило", "Радость", "Рассказ", "Самостоятельность", "Сила", "Смелость", "Сон", "Спокойствие", "Страх", "Удивление", "Успех", "Усталость", "Честность", "Эмоция"].sort();
 
-test('R2 catalog is separate; all existing standard decks keep their composition', () => {
+test('Revised catalog is separate; all existing standard decks keep their composition', () => {
   assert.equal(CARD_CATALOG.length, 100);
   assert.ok(!USER_SELECTABLE_DECKS.some(d => d.id === 'mixed-all'));
   assert.equal(initializeGame().deckSnapshot?.sourceDeckId, DEFAULT_DECK.id);
@@ -138,5 +138,5 @@ test('new families keep path and node direction semantics and the +3 cap', () =>
   assert.ok(isSymmetricRelation(contrast));
   const character = getRelationPresets(initializeGame(2, EVERYDAY_DECK).deckSnapshot).find(r => r.family === 'characteristic')!;
   assert.equal(formatSemanticRelation({relation: character, fromCardInstanceId: 'a', toCardInstanceId: 'b'},
-    new Map([['a','Рисование'],['b','Аккуратность']])), '«Аккуратность» — характеристика понятия «Рисование»');
+    new Map([['a','Рисование'],['b','Аккуратность']])), '«Аккуратность» — характеристика «Рисование»');
 });

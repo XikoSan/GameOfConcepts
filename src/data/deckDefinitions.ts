@@ -47,6 +47,7 @@ export const DEFAULT_MIX_RATIO: DeckMixRatio = {
   hard: 20,
 };
 
+// TODO: Remove this legacy deck when it is no longer needed for tests.
 export const EASY_DECK: DeckDefinition = {
   id: 'easy',
   name: 'Простая',
@@ -89,9 +90,9 @@ export const MIXED_ALL_DECK: DeckDefinition = {
 
 export const EVERYDAY_DECK: DeckDefinition = {
   id: 'everyday',
-  name: 'Повседневные понятия',
+  name: 'Простые понятия',
   kind: 'preset',
-  description: '40 игровых понятий, 8 нейтральных карт и шесть типов связей.',
+  description: '40 игровых понятий, 3 нейтральные карты и шесть типов связей.',
   source: { type: 'custom', cardIds: EVERYDAY_PLAY_CARD_IDS },
   catalog: EVERYDAY_CARD_CATALOG,
   neutralCards: EVERYDAY_NEUTRAL_CARDS,
@@ -101,7 +102,6 @@ export const EVERYDAY_DECK: DeckDefinition = {
 // Standard difficulty decks are derived from catalog metadata;
 // their size must never be duplicated as a constant.
 export const USER_SELECTABLE_DECKS: readonly DeckDefinition[] = [
-  EASY_DECK,
   EVERYDAY_DECK,
   MEDIUM_DECK,
   HARD_DECK,
@@ -113,7 +113,8 @@ export const DEFAULT_DECK = EVERYDAY_DECK;
 // can change without duplicating full card objects.
 export const DECK_DEFINITIONS: readonly DeckDefinition[] = [
   ...USER_SELECTABLE_DECKS,
-  // Preserve the definition for existing room snapshots.
+  // Keep hidden decks available for existing games and internal use.
+  EASY_DECK,
   MIXED_ALL_DECK,
   {
     id: 'mixed-50',
