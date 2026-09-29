@@ -185,7 +185,7 @@ export function formatSemanticRelation(
 ): string {
   const fromName = namesById.get(edge.fromCardInstanceId) ?? 'Карта';
   const toName = namesById.get(edge.toCardInstanceId) ?? 'Карта';
-  if (edge.relation.family === 'characteristic') return `«${toName}» — характеристика понятия «${fromName}»`;
+  if (edge.relation.family === 'characteristic') return `«${toName}» — характеристика «${fromName}»`;
   if (edge.relation.family === 'contrast') return `«${fromName}» противопоставлено «${toName}»`;
   if (edge.relation.family === 'variety') return `«${fromName}» — разновидность «${toName}»`;
   if (edge.relation.family === 'helps') return `«${fromName}» помогает: «${toName}»`;

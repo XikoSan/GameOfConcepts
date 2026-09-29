@@ -49,7 +49,7 @@ export function MatchLogEntry({ event, detail, names }: Props) {
     };
   }, [position]);
 
-  if (!card) return <li className="log-service-entry">{event.replace(/Игрок ([1-4])(?!\d)/g, (label, number) => names[Number(number) - 1] || label)}</li>;
+  if (!card) return null;
   return <li>
     <button ref={buttonRef} className="log-move-entry" type="button"
       aria-expanded={Boolean(position)} aria-controls={position ? id : undefined}
@@ -65,7 +65,7 @@ export function MatchLogEntry({ event, detail, names }: Props) {
       {detail ? detail.relations.map((relation, index) => {
         const score = detail.score.semanticScore?.edges[index];
         return <div className="log-edge-detail" key={index}>
-          <p>{relation}</p>
+          <p>{relation.replace(' — характеристика понятия «', ' — характеристика «')}</p>
           {score && <small>Связь 1{score.pathBonus ? ' · Путь +1' : ''}{score.nodeBonus ? ' · Узел +1' : ''}<b>+{score.total}</b></small>}
         </div>;
       }) : <p>Для этого хода сохранён только итог. Подробности доступны для новых ходов.</p>}

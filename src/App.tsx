@@ -8,6 +8,8 @@ import { MatchLogEntry } from './components/MatchLogEntry';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
+import { MusicControls, MusicSettings } from './components/MusicSettings';
+import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { Tutorial } from './components/Tutorial';
 import {
   incrementCounter,
@@ -186,6 +188,8 @@ const defaultInterfaceSettings = {
 };
 
 function App() {
+  const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const music = useBackgroundMusic(musicAudioRef);
   incrementCounter('render:App');
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
   // localStorage playerId.
@@ -239,17 +243,24 @@ function App() {
     onError: setOnlineError,
     onRoomUpdate: setOnlineRoom,
   });
-  const latestLogEntry = gameState.log.at(-1);
+  // Preserve original indexes: saved move details are keyed by log position.
+  const moveLog = gameState.log.map((event, index) => ({ event, index }))
+    .filter(({ event, index }) => gameState.logDetails?.[index]?.score || /^Игрок (\d+) сыграл «(.+)»\. .*\+(\d+)\.$/.test(event));
+  const latestLogEntry = moveLog.at(-1)?.event;
   useEffect(() => {
     const log = matchLogRef.current;
     if (log) log.scrollTop = log.scrollHeight;
-  }, [gameState.log.length, latestLogEntry]);
+  }, [moveLog.length, latestLogEntry]);
 
   const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
   const canControlPlayer = (playerIndex: number) =>
     mode === 'local' || localPlayerIndex === playerIndex;
   const isOnlineGameStarted = onlineRoom?.status === 'playing';
+  const startMusic = music.start;
+  useEffect(() => {
+    if (isOnlineGameStarted) startMusic();
+  }, [isOnlineGameStarted, onlineRoom?.id, startMusic]);
   const isOnlineTable = isOnlineGameStarted;
   const canUseGameActions = !onlineRoom || isOnlineGameStarted;
   const bottomTablePlayerIndex: number | null = isOnlineTable
@@ -312,7 +323,6 @@ function App() {
       activePlayerIndex === localPlayerIndex);
   const getSeatScore = (seatIndex: number) => gameState.scores?.[seatIndex] ?? 0;
   const pendingSemanticEdges = gameState.pendingMove?.semanticEdges ?? [];
-  const pendingSemanticScore = gameState.pendingMove?.scorePreview;
   const isSubmittingSemanticMove = false;
   const canEditSemanticMove =
     Boolean(gameState.pendingMove) &&
@@ -327,13 +337,6 @@ function App() {
     pendingSemanticEdges.length > 0 &&
     pendingSemanticEdges.every(isPendingEdgeComplete) &&
     !isSubmittingSemanticMove;
-  const semanticSubmitHint =
-    pendingSemanticEdges.length === 0
-      ? 'Выберите минимум одну смысловую связь.'
-      : pendingSemanticEdges.every(isPendingEdgeComplete)
-        ? 'Ход готов к голосованию.'
-        : 'Укажите тип и направление каждой выбранной связи.';
-
   const handlePlaceCard = (cardName: RegularCardName, coordinates: Coordinates) => {
     if (!selectedCard || hasPendingDecision) return;
 
@@ -414,6 +417,7 @@ function App() {
   const handleConfirmNewGame = () => {
     setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     resetGame(maxPlayers, localDeckId);
+    music.start();
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -429,6 +433,7 @@ function App() {
     setOnlineRoom(null);
     setOnlineError(null);
     startLocalGame(maxPlayers, localDeckId);
+    music.start();
     setSelectedCard(null);
     setDragPreview(null);
     setResetCameraSignal((signal) => signal + 1);
@@ -903,21 +908,6 @@ function App() {
     />
   );
 
-  const renderSemanticMovePanel = () => {
-    if (gameState.pendingMove?.semanticStatus !== 'defining-relations') return null;
-    return (
-      <section className="semantic-move-panel" aria-label="Смысловые связи хода">
-        <div className="semantic-move-header">
-          <h2>Связи хода</h2>
-          <strong>+{pendingSemanticScore?.total ?? 0}</strong>
-        </div>
-        <p className="semantic-move-note">
-          {canEditSemanticMove ? semanticSubmitHint : 'Автор хода выбирает связи на поле.'}
-        </p>
-      </section>
-    );
-  };
-
   const renderHandActions = () => (<div className="hand-actions">
           <button
             className="action-button action-button-quiet hand-redraw-button"
@@ -1032,6 +1022,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden onEnded={() => music.skip(1)} onPlaying={music.loaded} onError={music.failed} />
       <main className="game-table">
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
           <header className="table-status-bar">
@@ -1067,14 +1058,13 @@ function App() {
             </div>
             <aside className="turn-sidebar" aria-label="Управление партией и ходом">
               {renderControlPanel()}
-              {renderSemanticMovePanel()}
               <section className="sidebar-log" aria-label="Лог партии">
                 <h3>Лог партии</h3>
-                {gameState.log.length > 0 ? (
+                {moveLog.length > 0 ? (
                   <ol className="match-log" ref={matchLogRef}>
-                    {gameState.log.map((event, index) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
+                    {moveLog.map(({ event, index }) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
                   </ol>
-                ) : <p>События партии появятся здесь.</p>}
+                ) : <p>Принятые ходы появятся здесь.</p>}
               </section>
               <section className="table-reminder" aria-label="Памятка">
                 <h3>Памятка</h3>
@@ -1388,7 +1378,7 @@ function App() {
         </Modal>
       )}
       {activeModal === 'settings' && (
-        <Modal onClose={() => setActiveModal(null)} title="Настройки">
+        <Modal onClose={() => setActiveModal(null)} title="Настройки" headerActions={<MusicControls music={music} />}>
           <div className="settings-row">
             <label htmlFor="show-playable-highlights">
               Показывать подсветку допустимых клеток
@@ -1419,6 +1409,7 @@ function App() {
               type="checkbox"
             />
           </div>
+          <MusicSettings music={music} />
           <div className="modal-actions">
             <button type="button" onClick={handleResetSettings}>
               Сбросить настройки

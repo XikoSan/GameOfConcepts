@@ -4,6 +4,7 @@ import './Modal.css';
 
 interface ModalProps {
   title: string;
+  headerActions?: ReactNode;
   children: ReactNode;
   onClose: () => void;
   closeOnOverlayClick?: boolean;
@@ -11,6 +12,7 @@ interface ModalProps {
 
 export function Modal({
   title,
+  headerActions,
   children,
   onClose,
   closeOnOverlayClick = true,
@@ -42,6 +44,7 @@ export function Modal({
       >
         <header className="modal-header">
           <h2 id="modal-title">{title}</h2>
+          {headerActions}
           <button
             aria-label="Закрыть"
             className="modal-close-button"

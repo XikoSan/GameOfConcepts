@@ -1,0 +1,28 @@
+.music-settings { margin-top: 12px; padding-top: 12px; border-top: 1px solid #505654; display: grid; gap: 8px; text-align: left; }
+.music-settings h3 { margin: 0 0 4px; color: #ead5a1; font-size: 18px; }
+.music-settings label { font-size: 13px; }
+.music-settings select, .music-settings input[type=url] { width: 100%; min-width: 0; box-sizing: border-box; background: #242a2b; color: #eee9de; border: 1px solid #616966; border-radius: 6px; padding: 6px 8px; font: inherit; font-size: 13px; }
+.music-settings button { min-width: 0; padding: 9px 12px; border: 1px solid #616966; border-radius: 6px; background: linear-gradient(#444c4d, #303738); color: #eee9de; font: inherit; cursor: pointer; }
+.music-settings button:disabled { opacity: .5; cursor: default; }
+.music-controls { display: flex; gap: 4px; margin-left: auto; }
+.music-controls button { width: 30px; height: 30px; display: grid; place-items: center; padding: 5px; border: 1px solid #616966; border-radius: 5px; background: linear-gradient(#444c4d, #303738); color: #eee9de; cursor: pointer; }
+.music-controls button:hover { border-color: #baa06a; }
+.music-controls button:disabled { opacity: .5; cursor: default; }
+.music-controls svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.music-controls button:focus-visible { outline: 2px solid #d8c28e; outline-offset: 2px; }
+.modal-header:has(.music-controls) { gap: 6px; }
+.music-main-row { display: grid; grid-template-columns: auto minmax(0, 1fr) 145px; align-items: center; gap: 6px; }
+.music-attribution summary { cursor: pointer; color: #b9bfbc; font-size: 11px; }
+.music-volume { display: grid; grid-template-columns: auto minmax(0,1fr) 42px; align-items: center; gap: 6px; }
+.music-volume input { width: 100%; accent-color: #baa06a; }
+.music-volume output { font-size: 13px; text-align: right; }
+.music-custom { font-size: 12px; }
+.music-custom summary { cursor: pointer; color: #ead5a1; }
+.music-custom label { display: block; margin: 14px 0 7px; }
+.music-custom input[type=file] { width: 100%; font-size: 13px; }
+.music-url { display: flex; gap: 8px; }
+.music-settings p { margin: 4px 0; font-size: 12px; line-height: 1.5; color: #b9bfbc; }
+.music-settings .music-error { color: #ffd4ab; }
+.music-settings a { color: #d8c28e; }
+.music-settings :focus-visible { outline: 2px solid #d8c28e; outline-offset: 3px; }
+@media(max-width: 480px) { .music-main-row { grid-template-columns: auto minmax(0, 1fr); } .music-volume { grid-column: 2; } .music-url { flex-direction: column; } }

@@ -334,7 +334,6 @@ export function redrawPlayerHand(
       ...(gameState.handRedrawUsedByPlayerId ?? {}),
       [playerIndex]: true,
     },
-    log: [...gameState.log, `${getPlayerLabel(playerIndex)} пересдал руку.`],
   };
 }
 
