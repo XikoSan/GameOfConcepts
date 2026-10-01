@@ -1,0 +1,992 @@
+[
+  {
+    "card": "безнадёжность",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безнадёжность",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безнадёжность",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безнадёжность",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безразличие",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безразличие",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безразличие",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безутешность",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "безутешность",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "бодрость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "веселье",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "веселье",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "веселье",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "веселье",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "веселье",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "вздох",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "вздох",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "вздох",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "вздох",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "вздох",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "волнение",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "волнение",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "волнение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "волнение",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "волнение",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "воодушевление",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "воодушевление",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "воодушевление",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "воодушевление",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "воодушевление",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "вялость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "гнев",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "гнев",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "гнев",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "гнев",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "гнев",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "горе",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "горе",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "горе",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "горе",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "горе",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "грусть",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "грусть",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "грусть",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "грусть",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "грусть",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "дрожь",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "дрожь",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "дрожь",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "дрожь",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "дрожь",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "интерес",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "интерес",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "интерес",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "интерес",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "интерес",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "испуг",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "испуг",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "испуг",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "испуг",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "испуг",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "истома",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "крик",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "крик",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "крик",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "крик",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "крик",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "ласка",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "любовь",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "любовь",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "надежда",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "надежда",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "надежда",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "напряжение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "наслаждение",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "наслаждение",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "наслаждение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "наслаждение",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "наслаждение",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "нежность",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "нежность",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "нежность",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "нежность",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "нежность",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ненависть",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ненависть",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неприязнь",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неприязнь",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неудовольствие",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неудовольствие",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неудовольствие",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неудовольствие",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "неудовольствие",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "облегчение",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "облегчение",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "облегчение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "облегчение",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "облегчение",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "объятие",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "отчаяние",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "отчаяние",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "отчаяние",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "отчаяние",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ощущение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "плач",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "плач",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "плач",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "плач",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "плач",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "подавленность",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "подавленность",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "подавленность",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "подавленность",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "поцелуй",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "привязанность",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "привязанность",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "приподнятость",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "приподнятость",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "приподнятость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "приподнятость",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "приподнятость",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "радость",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "радость",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "радость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "радость",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "радость",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "разбитость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "раздражение",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "раздражение",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "раздражение",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "раздражение",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "раздражение",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "симпатия",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "симпатия",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "скука",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "скука",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "скука",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "скука",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "слёзы",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "слёзы",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "слёзы",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "слёзы",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "слёзы",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "смех",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "смех",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "смех",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "смех",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "смех",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "сострадание",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "сострадание",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "сострадание",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "спокойствие",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "спокойствие",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "спокойствие",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страдание",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страдание",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страдание",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страдание",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страдание",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страх",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страх",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страх",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страх",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "страх",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "тревога",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "тревога",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "тревога",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "тревога",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "тревога",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "увлечённость",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "увлечённость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "увлечённость",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "увлечённость",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "удовольствие",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "удовольствие",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "удовольствие",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "удовольствие",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "удовольствие",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ужас",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ужас",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ужас",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ужас",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "ужас",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "улыбка",
+    "center": "переживание",
+    "classification": "выражение"
+  },
+  {
+    "card": "улыбка",
+    "center": "реакция",
+    "classification": "выражение"
+  },
+  {
+    "card": "улыбка",
+    "center": "состояние",
+    "classification": "выражение"
+  },
+  {
+    "card": "улыбка",
+    "center": "чувство",
+    "classification": "выражение"
+  },
+  {
+    "card": "улыбка",
+    "center": "эмоция",
+    "classification": "выражение"
+  },
+  {
+    "card": "умиление",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "умиление",
+    "center": "реакция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "умиление",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "умиление",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "умиление",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "уныние",
+    "center": "переживание",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "уныние",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "уныние",
+    "center": "чувство",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "уныние",
+    "center": "эмоция",
+    "classification": "форма/содержание"
+  },
+  {
+    "card": "усталость",
+    "center": "состояние",
+    "classification": "форма/содержание"
+  }
+]

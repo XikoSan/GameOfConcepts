@@ -1,0 +1,7157 @@
+[
+  {
+    "a": "безнадёжность",
+    "b": "безразличие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "безутешность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "бодрость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "веселье",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "вздох",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "надежда",
+    "status": "direct"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "отчаяние",
+    "status": "direct"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "уныние",
+    "status": "context"
+  },
+  {
+    "a": "безнадёжность",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "безутешность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "бодрость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "веселье",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "вздох",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "интерес",
+    "status": "direct"
+  },
+  {
+    "a": "безразличие",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "сострадание",
+    "status": "direct"
+  },
+  {
+    "a": "безразличие",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "безразличие",
+    "b": "усталость",
+    "status": "context"
+  },
+  {
+    "a": "безутешность",
+    "b": "бодрость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "веселье",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "вздох",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "горе",
+    "status": "direct"
+  },
+  {
+    "a": "безутешность",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "безутешность",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "безутешность",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "веселье",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "вздох",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "вялость",
+    "status": "direct"
+  },
+  {
+    "a": "бодрость",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "радость",
+    "status": "context"
+  },
+  {
+    "a": "бодрость",
+    "b": "разбитость",
+    "status": "direct"
+  },
+  {
+    "a": "бодрость",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "бодрость",
+    "b": "усталость",
+    "status": "direct"
+  },
+  {
+    "a": "веселье",
+    "b": "вздох",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "смех",
+    "status": "direct"
+  },
+  {
+    "a": "веселье",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "улыбка",
+    "status": "direct"
+  },
+  {
+    "a": "веселье",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "веселье",
+    "b": "уныние",
+    "status": "direct"
+  },
+  {
+    "a": "веселье",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "волнение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "грусть",
+    "status": "direct"
+  },
+  {
+    "a": "вздох",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "облегчение",
+    "status": "direct"
+  },
+  {
+    "a": "вздох",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "вздох",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "всхлип",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "напряжение",
+    "status": "direct"
+  },
+  {
+    "a": "волнение",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "спокойствие",
+    "status": "direct"
+  },
+  {
+    "a": "волнение",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "страх",
+    "status": "context"
+  },
+  {
+    "a": "волнение",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "волнение",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "вялость",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "горе",
+    "status": "direct"
+  },
+  {
+    "a": "всхлип",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "плач",
+    "status": "direct"
+  },
+  {
+    "a": "всхлип",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "всхлип",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "гнев",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "скука",
+    "status": "context"
+  },
+  {
+    "a": "вялость",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "вялость",
+    "b": "усталость",
+    "status": "direct"
+  },
+  {
+    "a": "гнев",
+    "b": "горе",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "крик",
+    "status": "direct"
+  },
+  {
+    "a": "гнев",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "раздражение",
+    "status": "direct"
+  },
+  {
+    "a": "гнев",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "гнев",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "грусть",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "любовь",
+    "status": "context"
+  },
+  {
+    "a": "горе",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "плач",
+    "status": "direct"
+  },
+  {
+    "a": "горе",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "рыдание",
+    "status": "direct"
+  },
+  {
+    "a": "горе",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "слёзы",
+    "status": "direct"
+  },
+  {
+    "a": "горе",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "сострадание",
+    "status": "direct"
+  },
+  {
+    "a": "горе",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "горе",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "дрожь",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "радость",
+    "status": "direct"
+  },
+  {
+    "a": "грусть",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "грусть",
+    "b": "уныние",
+    "status": "direct"
+  },
+  {
+    "a": "грусть",
+    "b": "усталость",
+    "status": "context"
+  },
+  {
+    "a": "дрожь",
+    "b": "дружелюбие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "испуг",
+    "status": "direct"
+  },
+  {
+    "a": "дрожь",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "страх",
+    "status": "direct"
+  },
+  {
+    "a": "дрожь",
+    "b": "тревога",
+    "status": "direct"
+  },
+  {
+    "a": "дрожь",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "дрожь",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "интерес",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "симпатия",
+    "status": "direct"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "улыбка",
+    "status": "direct"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "дружелюбие",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "испуг",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "скука",
+    "status": "direct"
+  },
+  {
+    "a": "интерес",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "увлечённость",
+    "status": "direct"
+  },
+  {
+    "a": "интерес",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "интерес",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "истома",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "крик",
+    "status": "direct"
+  },
+  {
+    "a": "испуг",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "страх",
+    "status": "direct"
+  },
+  {
+    "a": "испуг",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "испуг",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "крик",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "наслаждение",
+    "status": "context"
+  },
+  {
+    "a": "истома",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "удовольствие",
+    "status": "direct"
+  },
+  {
+    "a": "истома",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "истома",
+    "b": "усталость",
+    "status": "direct"
+  },
+  {
+    "a": "крик",
+    "b": "ласка",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "ликование",
+    "status": "direct"
+  },
+  {
+    "a": "крик",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "крик",
+    "b": "страх",
+    "status": "direct"
+  },
+  {
+    "a": "крик",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "ужас",
+    "status": "direct"
+  },
+  {
+    "a": "крик",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "крик",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "ликование",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "любовь",
+    "status": "direct"
+  },
+  {
+    "a": "ласка",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "нежность",
+    "status": "direct"
+  },
+  {
+    "a": "ласка",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "привязанность",
+    "status": "direct"
+  },
+  {
+    "a": "ласка",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ласка",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "любовь",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "радость",
+    "status": "direct"
+  },
+  {
+    "a": "ликование",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ликование",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "надежда",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "нежность",
+    "status": "context"
+  },
+  {
+    "a": "любовь",
+    "b": "ненависть",
+    "status": "direct"
+  },
+  {
+    "a": "любовь",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "объятие",
+    "status": "direct"
+  },
+  {
+    "a": "любовь",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "поцелуй",
+    "status": "direct"
+  },
+  {
+    "a": "любовь",
+    "b": "привязанность",
+    "status": "context"
+  },
+  {
+    "a": "любовь",
+    "b": "радость",
+    "status": "context"
+  },
+  {
+    "a": "любовь",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "страх",
+    "status": "context"
+  },
+  {
+    "a": "любовь",
+    "b": "тревога",
+    "status": "context"
+  },
+  {
+    "a": "любовь",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "любовь",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "напряжение",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "отчаяние",
+    "status": "direct"
+  },
+  {
+    "a": "надежда",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "надежда",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "наслаждение",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "облегчение",
+    "status": "direct"
+  },
+  {
+    "a": "напряжение",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "спокойствие",
+    "status": "context"
+  },
+  {
+    "a": "напряжение",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "страх",
+    "status": "context"
+  },
+  {
+    "a": "напряжение",
+    "b": "тревога",
+    "status": "direct"
+  },
+  {
+    "a": "напряжение",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "напряжение",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "нежность",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "неудовольствие",
+    "status": "direct"
+  },
+  {
+    "a": "наслаждение",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "удовольствие",
+    "status": "direct"
+  },
+  {
+    "a": "наслаждение",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "наслаждение",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "ненависть",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "неприязнь",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "объятие",
+    "status": "direct"
+  },
+  {
+    "a": "нежность",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "поцелуй",
+    "status": "direct"
+  },
+  {
+    "a": "нежность",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "спокойствие",
+    "status": "context"
+  },
+  {
+    "a": "нежность",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "умиление",
+    "status": "direct"
+  },
+  {
+    "a": "нежность",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "нежность",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "неприязнь",
+    "status": "direct"
+  },
+  {
+    "a": "ненависть",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "симпатия",
+    "status": "direct"
+  },
+  {
+    "a": "ненависть",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ненависть",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "неудовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "симпатия",
+    "status": "direct"
+  },
+  {
+    "a": "неприязнь",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "неприязнь",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "облегчение",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "раздражение",
+    "status": "direct"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "скука",
+    "status": "direct"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "удовольствие",
+    "status": "direct"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "неудовольствие",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "объятие",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "облегчение",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "отчаяние",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "привязанность",
+    "status": "direct"
+  },
+  {
+    "a": "объятие",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "объятие",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "плач",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "отчаяние",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "отчаяние",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "поцелуй",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "рыдание",
+    "status": "direct"
+  },
+  {
+    "a": "плач",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "слёзы",
+    "status": "direct"
+  },
+  {
+    "a": "плач",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "плач",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "плач",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "привязанность",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "поцелуй",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "радость",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "привязанность",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "разбитость",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "смех",
+    "status": "direct"
+  },
+  {
+    "a": "радость",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "улыбка",
+    "status": "direct"
+  },
+  {
+    "a": "радость",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "радость",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "раздражение",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "страдание",
+    "status": "context"
+  },
+  {
+    "a": "разбитость",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "разбитость",
+    "b": "усталость",
+    "status": "direct"
+  },
+  {
+    "a": "раздражение",
+    "b": "рыдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "спокойствие",
+    "status": "context"
+  },
+  {
+    "a": "раздражение",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "раздражение",
+    "b": "усталость",
+    "status": "context"
+  },
+  {
+    "a": "рыдание",
+    "b": "симпатия",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "рыдание",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "скука",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "симпатия",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "слёзы",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "увлечённость",
+    "status": "direct"
+  },
+  {
+    "a": "скука",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "скука",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "смех",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "слёзы",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "умиление",
+    "status": "direct"
+  },
+  {
+    "a": "слёзы",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "слёзы",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "сострадание",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "смех",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "спокойствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "страдание",
+    "status": "direct"
+  },
+  {
+    "a": "сострадание",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "сострадание",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "страдание",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "тревога",
+    "status": "direct"
+  },
+  {
+    "a": "спокойствие",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "спокойствие",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "страх",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "тревога",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "страдание",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "тревога",
+    "status": "context"
+  },
+  {
+    "a": "страх",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "ужас",
+    "status": "direct"
+  },
+  {
+    "a": "страх",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "страх",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "увлечённость",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "тревога",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "удовольствие",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "увлечённость",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "удовольствие",
+    "b": "ужас",
+    "status": "unannotated"
+  },
+  {
+    "a": "удовольствие",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "удовольствие",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "удовольствие",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "удовольствие",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "ужас",
+    "b": "улыбка",
+    "status": "unannotated"
+  },
+  {
+    "a": "ужас",
+    "b": "умиление",
+    "status": "unannotated"
+  },
+  {
+    "a": "ужас",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "ужас",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "улыбка",
+    "b": "умиление",
+    "status": "direct"
+  },
+  {
+    "a": "улыбка",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "улыбка",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "умиление",
+    "b": "уныние",
+    "status": "unannotated"
+  },
+  {
+    "a": "умиление",
+    "b": "усталость",
+    "status": "unannotated"
+  },
+  {
+    "a": "уныние",
+    "b": "усталость",
+    "status": "unannotated"
+  }
+]

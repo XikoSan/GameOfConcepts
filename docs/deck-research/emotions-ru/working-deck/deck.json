@@ -1,0 +1,939 @@
+{
+  "status": "Принят рабочий исследовательский состав: пять нейтральных карт; ощущение, настроение и отношение перенесены в игральные. Не интеграция в игру.",
+  "scope": "Исследовательский состав; пары являются экспертными гипотезами",
+  "neutral_cards": [
+    "переживание",
+    "состояние",
+    "реакция",
+    "чувство",
+    "эмоция"
+  ],
+  "playable_cards": [
+    {
+      "word": "безнадёжность",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "надежда",
+        "отчаяние"
+      ]
+    },
+    {
+      "word": "безразличие",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "интерес",
+        "отношение",
+        "сострадание"
+      ]
+    },
+    {
+      "word": "безутешность",
+      "neutral_partners": [
+        "переживание",
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "горе",
+        "страдание"
+      ]
+    },
+    {
+      "word": "бодрость",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "вялость",
+        "ощущение",
+        "разбитость",
+        "усталость"
+      ]
+    },
+    {
+      "word": "веселье",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "настроение",
+        "смех",
+        "улыбка",
+        "уныние"
+      ]
+    },
+    {
+      "word": "вздох",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "грусть",
+        "облегчение"
+      ]
+    },
+    {
+      "word": "волнение",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "напряжение",
+        "спокойствие"
+      ]
+    },
+    {
+      "word": "воодушевление",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "настроение",
+        "приподнятость",
+        "уныние"
+      ]
+    },
+    {
+      "word": "вялость",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "бодрость",
+        "ощущение",
+        "усталость"
+      ]
+    },
+    {
+      "word": "гнев",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "крик",
+        "раздражение"
+      ]
+    },
+    {
+      "word": "горе",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безутешность",
+        "плач",
+        "слёзы",
+        "сострадание"
+      ]
+    },
+    {
+      "word": "грусть",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "вздох",
+        "настроение",
+        "радость",
+        "уныние"
+      ]
+    },
+    {
+      "word": "дрожь",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "испуг",
+        "страх",
+        "тревога"
+      ]
+    },
+    {
+      "word": "дружелюбие",
+      "neutral_partners": [],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "отношение",
+        "симпатия",
+        "улыбка"
+      ]
+    },
+    {
+      "word": "интерес",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безразличие",
+        "отношение",
+        "скука",
+        "увлечённость"
+      ]
+    },
+    {
+      "word": "испуг",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "дрожь",
+        "крик",
+        "страх"
+      ]
+    },
+    {
+      "word": "истома",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "ощущение",
+        "удовольствие",
+        "усталость"
+      ]
+    },
+    {
+      "word": "крик",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "гнев",
+        "испуг",
+        "страдание",
+        "страх",
+        "ужас"
+      ]
+    },
+    {
+      "word": "ласка",
+      "neutral_partners": [
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "любовь",
+        "нежность",
+        "отношение",
+        "привязанность"
+      ]
+    },
+    {
+      "word": "любовь",
+      "neutral_partners": [
+        "переживание",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "ласка",
+        "ненависть",
+        "объятие",
+        "отношение",
+        "поцелуй"
+      ]
+    },
+    {
+      "word": "надежда",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безнадёжность",
+        "отчаяние"
+      ]
+    },
+    {
+      "word": "напряжение",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "волнение",
+        "облегчение",
+        "ощущение",
+        "тревога"
+      ]
+    },
+    {
+      "word": "наслаждение",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "неудовольствие",
+        "удовольствие"
+      ]
+    },
+    {
+      "word": "настроение",
+      "neutral_partners": [],
+      "unreviewed_neutral_pairs": [
+        "переживание",
+        "состояние",
+        "реакция",
+        "чувство",
+        "эмоция"
+      ],
+      "playable_partners": [
+        "веселье",
+        "воодушевление",
+        "грусть",
+        "подавленность",
+        "приподнятость",
+        "раздражение",
+        "скука",
+        "спокойствие",
+        "тревога",
+        "увлечённость",
+        "уныние"
+      ]
+    },
+    {
+      "word": "нежность",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "ласка",
+        "объятие",
+        "отношение",
+        "поцелуй",
+        "умиление"
+      ]
+    },
+    {
+      "word": "ненависть",
+      "neutral_partners": [
+        "переживание",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "любовь",
+        "неприязнь",
+        "отношение",
+        "симпатия"
+      ]
+    },
+    {
+      "word": "неприязнь",
+      "neutral_partners": [
+        "переживание",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "ненависть",
+        "отношение",
+        "симпатия"
+      ]
+    },
+    {
+      "word": "неудовольствие",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "наслаждение",
+        "раздражение",
+        "скука",
+        "удовольствие"
+      ]
+    },
+    {
+      "word": "облегчение",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "вздох",
+        "напряжение"
+      ]
+    },
+    {
+      "word": "объятие",
+      "neutral_partners": [
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "любовь",
+        "нежность",
+        "отношение",
+        "привязанность"
+      ]
+    },
+    {
+      "word": "отношение",
+      "neutral_partners": [],
+      "unreviewed_neutral_pairs": [
+        "переживание",
+        "состояние",
+        "реакция",
+        "чувство",
+        "эмоция"
+      ],
+      "playable_partners": [
+        "безразличие",
+        "дружелюбие",
+        "интерес",
+        "ласка",
+        "любовь",
+        "нежность",
+        "ненависть",
+        "неприязнь",
+        "объятие",
+        "поцелуй",
+        "привязанность",
+        "симпатия",
+        "сострадание"
+      ]
+    },
+    {
+      "word": "отчаяние",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безнадёжность",
+        "надежда",
+        "страдание"
+      ]
+    },
+    {
+      "word": "ощущение",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "бодрость",
+        "вялость",
+        "истома",
+        "напряжение",
+        "разбитость",
+        "усталость"
+      ]
+    },
+    {
+      "word": "плач",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "горе",
+        "слёзы",
+        "страдание"
+      ]
+    },
+    {
+      "word": "подавленность",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "настроение",
+        "приподнятость",
+        "уныние"
+      ]
+    },
+    {
+      "word": "поцелуй",
+      "neutral_partners": [
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "любовь",
+        "нежность",
+        "отношение"
+      ]
+    },
+    {
+      "word": "привязанность",
+      "neutral_partners": [
+        "переживание",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "ласка",
+        "объятие",
+        "отношение"
+      ]
+    },
+    {
+      "word": "приподнятость",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "воодушевление",
+        "настроение",
+        "подавленность"
+      ]
+    },
+    {
+      "word": "радость",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "грусть",
+        "смех",
+        "улыбка"
+      ]
+    },
+    {
+      "word": "разбитость",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "бодрость",
+        "ощущение",
+        "усталость"
+      ]
+    },
+    {
+      "word": "раздражение",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "гнев",
+        "настроение",
+        "неудовольствие"
+      ]
+    },
+    {
+      "word": "симпатия",
+      "neutral_partners": [
+        "переживание",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "дружелюбие",
+        "ненависть",
+        "неприязнь",
+        "отношение"
+      ]
+    },
+    {
+      "word": "скука",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "интерес",
+        "настроение",
+        "неудовольствие",
+        "увлечённость"
+      ]
+    },
+    {
+      "word": "слёзы",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "горе",
+        "плач",
+        "страдание",
+        "умиление"
+      ]
+    },
+    {
+      "word": "смех",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "веселье",
+        "радость"
+      ]
+    },
+    {
+      "word": "сострадание",
+      "neutral_partners": [
+        "переживание",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безразличие",
+        "горе",
+        "отношение",
+        "страдание"
+      ]
+    },
+    {
+      "word": "спокойствие",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "волнение",
+        "настроение",
+        "тревога"
+      ]
+    },
+    {
+      "word": "страдание",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "безутешность",
+        "крик",
+        "отчаяние",
+        "плач",
+        "слёзы",
+        "сострадание"
+      ]
+    },
+    {
+      "word": "страх",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "дрожь",
+        "испуг",
+        "крик",
+        "ужас"
+      ]
+    },
+    {
+      "word": "тревога",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "дрожь",
+        "напряжение",
+        "настроение",
+        "спокойствие"
+      ]
+    },
+    {
+      "word": "увлечённость",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "интерес",
+        "настроение",
+        "скука"
+      ]
+    },
+    {
+      "word": "удовольствие",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "истома",
+        "наслаждение",
+        "неудовольствие"
+      ]
+    },
+    {
+      "word": "ужас",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "крик",
+        "страх"
+      ]
+    },
+    {
+      "word": "улыбка",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "веселье",
+        "дружелюбие",
+        "радость",
+        "умиление"
+      ]
+    },
+    {
+      "word": "умиление",
+      "neutral_partners": [
+        "переживание",
+        "реакция",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "нежность",
+        "слёзы",
+        "улыбка"
+      ]
+    },
+    {
+      "word": "уныние",
+      "neutral_partners": [
+        "переживание",
+        "состояние",
+        "чувство",
+        "эмоция"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "веселье",
+        "воодушевление",
+        "грусть",
+        "настроение",
+        "подавленность"
+      ]
+    },
+    {
+      "word": "усталость",
+      "neutral_partners": [
+        "состояние"
+      ],
+      "unreviewed_neutral_pairs": [],
+      "playable_partners": [
+        "бодрость",
+        "вялость",
+        "истома",
+        "ощущение",
+        "разбитость"
+      ]
+    }
+  ],
+  "unreviewed_playable_pairs": [
+    [
+      "настроение",
+      "отношение"
+    ]
+  ],
+  "metrics": {
+    "playable_count": 57,
+    "neutral_count": 5,
+    "direct_playable_pairs": 106,
+    "min_playable_partners": 2,
+    "components": [
+      57
+    ],
+    "center_coverage": {
+      "переживание": {
+        "direct_partners": 44,
+        "unreviewed_new_pairs": 2,
+        "no_match_known_graph": 0.0003073722040951435,
+        "risk_if_both_new_cards_match": 0.00011033873993158998
+      },
+      "состояние": {
+        "direct_partners": 45,
+        "unreviewed_new_pairs": 2,
+        "no_match_known_graph": 0.0001891521255970114,
+        "risk_if_both_new_cards_match": 6.018476723541272e-05
+      },
+      "реакция": {
+        "direct_partners": 28,
+        "unreviewed_new_pairs": 2,
+        "no_match_known_graph": 0.028362071559688243,
+        "risk_if_both_new_cards_match": 0.019280620075059002
+      },
+      "чувство": {
+        "direct_partners": 46,
+        "unreviewed_new_pairs": 2,
+        "no_match_known_graph": 0.00011033873993158998,
+        "risk_if_both_new_cards_match": 3.009238361770636e-05
+      },
+      "эмоция": {
+        "direct_partners": 35,
+        "unreviewed_new_pairs": 2,
+        "no_match_known_graph": 0.006289308176100629,
+        "risk_if_both_new_cards_match": 0.0037027961556263442
+      }
+    }
+  },
+  "provenance": [
+    "previous-7-neutral-55-playable.json",
+    "decision.json"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "source_words": 310,
+  "source_sha256": "16f53453dc5d12c9382e5177a0692660df5303e2c261efadb4bd471cbe07ffb5",
+  "unordered_pairs": 47895,
+  "pair_status_counts": {
+    "no_annotation": 47091,
+    "direct_hypothesis": 411,
+    "context_hypothesis": 351,
+    "near_meaning_not_counted": 24,
+    "duplicate_cluster": 18
+  },
+  "semantic_annotations": 811,
+  "representative_concepts": 293,
+  "alias_clusters": 16,
+  "countable_concept_pairs": 761,
+  "unannotated_is_not_negative": true,
+  "coverage_note": "Every pair is inventoried, but only explicit positive/synonym annotations were semantically reviewed. No claim of 47,895 independent expert judgments."
+}

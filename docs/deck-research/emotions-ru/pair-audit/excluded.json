@@ -1,0 +1,56 @@
+[
+  {
+    "a": "внимание",
+    "b": "интерес",
+    "reason": "outside_original_310",
+    "source": "explicit_enumerated_group"
+  },
+  {
+    "pair": "восторг|разочарование",
+    "reason": "not_a_lexical_opposite_in_fixed_sense"
+  },
+  {
+    "a": "благодарность",
+    "b": "неблагодарность",
+    "reason": "outside_original_310",
+    "source": "explicit_pair"
+  },
+  {
+    "pair": "взаимность|отвержение",
+    "reason": "not_a_lexical_opposite_in_fixed_sense"
+  },
+  {
+    "pair": "искренность|скрытность",
+    "reason": "not_a_lexical_opposite_in_fixed_sense"
+  },
+  {
+    "a": "невозмутимость",
+    "b": "возбудимость",
+    "reason": "outside_original_310",
+    "source": "explicit_pair"
+  },
+  {
+    "a": "самоуважение",
+    "b": "самоуничижение",
+    "reason": "outside_original_310",
+    "source": "explicit_pair"
+  },
+  {
+    "a": "чуткость",
+    "b": "понимание",
+    "reason": "outside_original_310",
+    "source": "explicit_enumerated_group"
+  },
+  {
+    "a": "беспомощность",
+    "b": "помощь",
+    "reason": "outside_original_310",
+    "source": "explicit_pair"
+  },
+  {
+    "a": "амбиция",
+    "b": "гордость",
+    "reason": "outside_original_310",
+    "source": "explicit_pair"
+  }
+]
