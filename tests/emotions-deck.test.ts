@@ -1,31 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CARD_CATALOG, validateCardCatalog } from '../src/data/cardCatalog';
-import { EVERYDAY_CARD_CATALOG, EVERYDAY_NEUTRAL_CARDS } from '../src/data/everydayCatalog';
-import { DEFAULT_DECK, EVERYDAY_DECK, USER_SELECTABLE_DECKS, DECK_DEFINITIONS, MIXED_ALL_DECK } from '../src/data/deckDefinitions';
+import { CARD_CATALOG } from '../src/data/cardCatalog';
+import { EMOTIONS_PLAY_CARDS, EMOTIONS_NEUTRAL_CARDS } from '../src/data/emotionsCatalog';
+import { DEFAULT_DECK, EMOTIONS_DECK, USER_SELECTABLE_DECKS, DECK_DEFINITIONS, MIXED_ALL_DECK } from '../src/data/deckDefinitions';
 import { buildDeck, validateDeckDefinitions } from '../src/decks/deckBuilder';
 import { initializeGame, createPlayerDeckFromSnapshot, placeCard, upsertPendingSemanticEdge, submitPendingSemanticMove, confirmPendingCard } from '../src/game';
-import { getRelationPresets, isSymmetricRelation, formatSemanticRelation } from '../src/scoring/semanticRelations';
+import { getRelationPresets, isSymmetricRelation, hasSupportedGameRelations } from '../src/scoring/semanticRelations';
 import { calculateSemanticMoveScore } from '../src/scoring/calculateSemanticMoveScore';
 import type { GameState, PlacedCard, SemanticEdge, SemanticRelation } from '../src/types';
 
-const neutralNames = ["Здоровье", "Безопасность", "Дружба"].sort();
-const playingNames = ["Аккуратность", "Бодрость", "Внимание", "Воображение", "Выбор", "Грусть", "Движение", "Запрет", "Знание", "Игра", "Любопытство", "Доброта", "Терпение", "Настойчивость", "Небрежность", "Неудача", "Объяснение", "Ответ", "Отдых", "Очередь", "Память", "Доверие", "Привычка", "Поддержка", "Помощь", "Понимание", "Правило", "Радость", "Рассказ", "Самостоятельность", "Сила", "Смелость", "Сон", "Спокойствие", "Страх", "Удивление", "Успех", "Усталость", "Честность", "Эмоция"].sort();
+const neutralNames = ["Переживание", "Состояние", "Реакция", "Чувство", "Эмоция"].sort();
+const playingNames = ["Безнадёжность", "Безразличие", "Безутешность", "Бодрость", "Веселье", "Вздох", "Волнение", "Воодушевление", "Вялость", "Гнев", "Горе", "Грусть", "Дрожь", "Дружелюбие", "Интерес", "Испуг", "Истома", "Крик", "Ласка", "Любовь", "Надежда", "Напряжение", "Наслаждение", "Настроение", "Нежность", "Ненависть", "Неприязнь", "Неудовольствие", "Облегчение", "Объятие", "Отношение", "Отчаяние", "Ощущение", "Плач", "Подавленность", "Поцелуй", "Привязанность", "Приподнятость", "Радость", "Разбитость", "Раздражение", "Симпатия", "Скука", "Слёзы", "Смех", "Сострадание", "Спокойствие", "Страдание", "Страх", "Тревога", "Увлечённость", "Удовольствие", "Ужас", "Улыбка", "Умиление", "Уныние", "Усталость"].sort();
 
 test('Revised catalog is separate; all existing standard decks keep their composition', () => {
-  assert.equal(CARD_CATALOG.length, 100);
+  assert.equal(CARD_CATALOG.length, 60);
   assert.ok(!USER_SELECTABLE_DECKS.some(d => d.id === 'mixed-all'));
   assert.equal(initializeGame().deckSnapshot?.sourceDeckId, DEFAULT_DECK.id);
-  assert.deepEqual(validateCardCatalog(EVERYDAY_CARD_CATALOG), []);
+  assert.equal(EMOTIONS_PLAY_CARDS.length, 57);
+  assert.deepEqual(USER_SELECTABLE_DECKS.map(d => d.id), ["emotions", "medium", "hard"]);
   assert.deepEqual(validateDeckDefinitions(DECK_DEFINITIONS, CARD_CATALOG), []);
-  assert.deepEqual(buildDeck(CARD_CATALOG, EVERYDAY_DECK).cards.map(c => c.name).sort(), playingNames);
-  assert.deepEqual(EVERYDAY_NEUTRAL_CARDS.map(c => c.name).sort(), neutralNames);
+  assert.deepEqual(buildDeck(CARD_CATALOG, EMOTIONS_DECK).cards.map(c => c.name).sort(), playingNames);
+  assert.deepEqual(EMOTIONS_NEUTRAL_CARDS.map(c => c.name).sort(), neutralNames);
   assert.ok(playingNames.every(name => !neutralNames.includes(name)));
-  for (const [id, expected] of [['easy', 40], ['medium', 40], ['hard', 20], ['mixed-all', 100]] as const) {
+  for (const [id, expected] of [['medium', 40], ['hard', 20], ['mixed-all', 60]] as const) {
     const def = DECK_DEFINITIONS.find(d => d.id === id)!;
     const deck = buildDeck(CARD_CATALOG, def);
     assert.equal(deck.totalCards, expected);
-    assert.ok(deck.cardDefinitionIds.every(id => !id.startsWith('everyday-')));
+    assert.ok(deck.cardDefinitionIds.every(id => !id.startsWith('emotion-')));
   }
 });
 
@@ -33,7 +34,7 @@ test('two to four players each receive a complete personal deck and a dedicated 
   const seen = new Set<string>();
   for (let i = 0; i < 80; i++) {
     const count = 2 + i % 3;
-    const state = initializeGame(count, EVERYDAY_DECK);
+    const state = initializeGame(count, EMOTIONS_DECK);
     seen.add(state.startCard.cardName);
     assert.ok(neutralNames.includes(state.startCard.cardName));
     assert.equal(state.startCard.playerId, null);
@@ -41,7 +42,7 @@ test('two to four players each receive a complete personal deck and a dedicated 
     assert.equal(state.players.length, count);
     for (let p = 0; p < count; p++) {
       assert.equal(state.players[p].cards.length, 5);
-      assert.equal(state.deck[p].length, 35);
+      assert.equal(state.deck[p].length, 52);
       assert.deepEqual([...state.players[p].cards, ...state.deck[p]].sort(), playingNames);
     }
   }
@@ -49,7 +50,7 @@ test('two to four players each receive a complete personal deck and a dedicated 
 });
 
 test('snapshots survive JSON serialization, new joins, and starting an online lobby', () => {
-  const original = initializeGame(2, EVERYDAY_DECK);
+  const original = initializeGame(2, EMOTIONS_DECK);
   const snapshot = JSON.parse(JSON.stringify(original.deckSnapshot));
   // Simulate a changed catalog: saved names, not current catalog metadata, remain authoritative.
   snapshot.cards[0].name = 'Сохранённое понятие';
@@ -58,43 +59,47 @@ test('snapshots survive JSON serialization, new joins, and starting an online lo
   assert.ok([...joined.player.cards, ...joined.deck].includes('Сохранённое понятие'));
   const started = initializeGame(4, MIXED_ALL_DECK, 2, snapshot);
   assert.equal(started.currentPlayerIndex, 2);
-  assert.equal(started.deckSnapshot?.sourceDeckId, 'everyday');
-  assert.deepEqual(started.deckSnapshot?.relationFamilies, EVERYDAY_DECK.relationFamilies);
+  assert.equal(started.deckSnapshot?.sourceDeckId, 'emotions');
+  assert.deepEqual(started.deckSnapshot?.relationFamilies, EMOTIONS_DECK.relationFamilies);
   assert.ok(neutralNames.includes(started.startCard.cardName));
   assert.equal(started.deckSnapshot?.cards?.[0].name, 'Сохранённое понятие');
   assert.notEqual(started.deckSnapshot?.cards?.[0], snapshot.cards[0]);
   const classic = initializeGame(2, MIXED_ALL_DECK);
   const legacy = { sourceDeckId: 'mixed-all', cardDefinitionIds: classic.deckSnapshot!.cardDefinitionIds };
   assert.equal(getRelationPresets(legacy).length, 5);
-  assert.equal(createPlayerDeckFromSnapshot(legacy, 2)!.deck.length, 95);
+  assert.equal(createPlayerDeckFromSnapshot(legacy, 2)!.deck.length, 55);
 });
 
 function pending(state: GameState): GameState {
   return placeCard(state, state.players[0].cards[0], { x: 8, y: 7 });
 }
 
-test('relation restrictions apply in the engine, including tampered saved moves', () => {
-  const state = pending(initializeGame(2, EVERYDAY_DECK, 0));
-  const classic = getRelationPresets()[0];
-  assert.equal(upsertPendingSemanticEdge(state, state.startCard.id, classic, 'new-to-neighbor'), state);
+test('retired relations and malformed roles are rejected', () => {
+  const state = pending(initializeGame(2, EMOTIONS_DECK, 0));
+  assert.ok(hasSupportedGameRelations(state));
   const presets = getRelationPresets(state.deckSnapshot);
-  assert.equal(presets.length, 6);
-  const character = presets.find(r => r.family === 'characteristic')!;
-  const malformed = { ...character, fromRole: 'property', toRole: 'property-bearer' } as SemanticRelation;
+  assert.equal(presets.length, 5);
+  const cause = presets.find(r => r.family === 'cause')!;
+  const malformed = { ...cause, fromRole: 'property', toRole: 'property-bearer' } as SemanticRelation;
   assert.equal(upsertPendingSemanticEdge(state, state.startCard.id, malformed, 'new-to-neighbor'), state);
-  const good = upsertPendingSemanticEdge(state, state.startCard.id, character, 'new-to-neighbor');
+  const good = upsertPendingSemanticEdge(state, state.startCard.id, cause, 'new-to-neighbor');
   const bad = structuredClone(good);
-  bad.pendingMove!.semanticEdges![0].relation = classic;
+  bad.pendingMove!.semanticEdges![0].relation = malformed;
   assert.equal(submitPendingSemanticMove(bad), bad);
+  assert.equal(hasSupportedGameRelations(bad), false);
   bad.pendingMove!.semanticStatus = 'voting';
   assert.equal(confirmPendingCard(bad), bad);
-  const old = pending(initializeGame(2, MIXED_ALL_DECK, 0));
-  assert.equal(upsertPendingSemanticEdge(old, old.startCard.id, presets[3], 'new-to-neighbor'), old);
+  const retired = structuredClone(state);
+  retired.deckSnapshot!.sourceDeckId = 'everyday';
+  assert.equal(hasSupportedGameRelations(retired), false);
+  retired.deckSnapshot!.sourceDeckId = 'emotions';
+  retired.deckSnapshot!.relationFamilies = ['helps'] as unknown as NonNullable<GameState['deckSnapshot']>['relationFamilies'];
+  assert.equal(hasSupportedGameRelations(retired), false);
 });
 
-test('all six types can be configured on a pending move, accepted, scored and logged', () => {
-  for (const relation of getRelationPresets(initializeGame(2, EVERYDAY_DECK).deckSnapshot)) {
-    let state = pending(initializeGame(2, EVERYDAY_DECK, 0));
+test('all five types can be configured on a pending move, accepted, scored and logged', () => {
+  for (const relation of getRelationPresets(initializeGame(2, EMOTIONS_DECK).deckSnapshot)) {
+    let state = pending(initializeGame(2, EMOTIONS_DECK, 0));
     state = upsertPendingSemanticEdge(state, state.startCard.id, relation, 'new-to-neighbor');
     assert.equal(state.pendingMove!.scorePreview!.total, 1);
     state = confirmPendingCard(submitPendingSemanticMove(state));
@@ -102,7 +107,7 @@ test('all six types can be configured on a pending move, accepted, scored and lo
     assert.equal(state.scores[0], 1);
     assert.equal(state.players[0].cards.length, 5);
     assert.equal(state.semanticEdges![0].relation.family, relation.family);
-    assert.ok(Object.values(state.board).filter(c => c.playerId !== null).every(c => c.definitionId?.startsWith('everyday-')));
+    assert.ok(Object.values(state.board).filter(c => c.playerId !== null).every(c => c.definitionId?.startsWith('emotion-')));
     assert.ok(state.log.length > 0);
   }
 });
@@ -124,8 +129,8 @@ function score(relation: SemanticRelation, neutralCenter = false) {
         direction: 'neighbor-to-new', createdOrder: 0 }] } });
 }
 
-test('new families keep path and node direction semantics and the +3 cap', () => {
-  for (const relation of getRelationPresets(initializeGame(2, EVERYDAY_DECK).deckSnapshot)) {
+test('classic families keep path and node direction semantics and the +3 cap', () => {
+  for (const relation of getRelationPresets(initializeGame(2, EMOTIONS_DECK).deckSnapshot)) {
     const result = score(relation);
     assert.equal(result.total, 3, relation.family);
     assert.equal(result.edges[0].pathBonus, 1);
@@ -134,9 +139,6 @@ test('new families keep path and node direction semantics and the +3 cap', () =>
     assert.equal(withNeutral.edges[0].pathBonus, 0);
     assert.equal(withNeutral.edges[0].nodeBonus, 1);
   }
-  const contrast = getRelationPresets(initializeGame(2, EVERYDAY_DECK).deckSnapshot).find(r => r.family === 'contrast')!;
-  assert.ok(isSymmetricRelation(contrast));
-  const character = getRelationPresets(initializeGame(2, EVERYDAY_DECK).deckSnapshot).find(r => r.family === 'characteristic')!;
-  assert.equal(formatSemanticRelation({relation: character, fromCardInstanceId: 'a', toCardInstanceId: 'b'},
-    new Map([['a','Рисование'],['b','Аккуратность']])), '«Аккуратность» — характеристика «Рисование»');
+  const opposite = getRelationPresets().find(r => r.family === 'opposite')!;
+  assert.ok(isSymmetricRelation(opposite));
 });

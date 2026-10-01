@@ -1,0 +1,14 @@
+.training-session { position: fixed; inset: 0; z-index: 800; background: #202425; color: #eeeede; text-align: left; }
+.training-guide { position: fixed; z-index: 1600; visibility: hidden; width: min(280px, calc(100vw - 20px)); box-sizing: border-box; padding: 14px 30px 14px 16px; border: 1px solid #82958b; border-radius: 8px; background: #292e2f; color: #eeeede; box-shadow: 0 5px 18px #0003; text-align: left; }
+.training-guide p { margin: 0; font-size: 14px; line-height: 1.5; }
+.training-guide button { font: inherit; cursor: pointer; }
+.training-guide .training-close { position: absolute; top: 3px; right: 3px; width: 26px; height: 26px; padding: 0; border: 0; background: transparent; color: #bac6c0; font-size: 21px; }
+.training-guide .training-close:hover { color: white; }
+.training-guide .training-primary { margin-top: 12px; padding: 6px 12px; border: 1px solid #819d8b; border-radius: 5px; background: #3c5c4b; color: #fff; font-size: 13px; }
+.training-guide .training-feedback { margin-top: 8px; color: #efd297; font-size: 12px; }
+.training-guide-arrow { position: absolute; width: 10px; height: 10px; background: #292e2f; transform: rotate(45deg); pointer-events: none; }
+.training-guide[data-side="top"] .training-guide-arrow { bottom: -6px; border-right: 1px solid #82958b; border-bottom: 1px solid #82958b; }
+.training-guide[data-side="bottom"] .training-guide-arrow { top: -6px; border-left: 1px solid #82958b; border-top: 1px solid #82958b; }
+.training-guide[data-side="right"] .training-guide-arrow { left: -6px; border-left: 1px solid #82958b; border-bottom: 1px solid #82958b; }
+.training-guide[data-side="left"] .training-guide-arrow { right: -6px; border-right: 1px solid #82958b; border-top: 1px solid #82958b; }
+.training-target-ring { position: fixed; z-index: 1500; visibility: hidden; pointer-events: none; border: 1px solid #b9d3b9; border-radius: 7px; box-shadow: 0 0 0 2px #b9d3b928; box-sizing: border-box; }

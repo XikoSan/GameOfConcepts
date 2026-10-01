@@ -128,7 +128,7 @@ export function SemanticRelationPopover({
 
   const handleFamilySelect = (family: RelationFamily) => {
     setSelectedFamily(family);
-    setSourceCardId((family === 'opposite' || family === 'contrast') ? pendingCard.id : null);
+    setSourceCardId((family === 'opposite') ? pendingCard.id : null);
   };
 
   const handleSave = () => {

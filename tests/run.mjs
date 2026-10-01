@@ -7,7 +7,7 @@ import process from 'node:process';
 const directory = await mkdtemp(join(tmpdir(), 'concepts-tests-'));
 try {
   const file = join(directory, 'tests.mjs');
-  await build({ input: 'tests/everyday-deck.test.ts', platform: 'node',
+  await build({ input: 'tests/all.test.ts', platform: 'node',
     transform: { define: { 'import.meta.env.DEV': 'false' } },
     output: { file, format: 'esm' } });
   const result = spawnSync(process.execPath, ['--test', file], { stdio: 'inherit' });

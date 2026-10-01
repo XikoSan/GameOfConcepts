@@ -138,7 +138,7 @@ export function RulesContent({ deckSnapshot }: { deckSnapshot?: GameDeckSnapshot
   const activeSectionTitles = activeTab.sectionTitles;
   const activeSections = useMemo(
     () =>
-      getRulesSectionsForDeck(Boolean(deckSnapshot?.relationFamilies?.includes('helps')), deckSnapshot?.neutralCards?.map((card) => card.name)).filter((section) =>
+      getRulesSectionsForDeck(deckSnapshot?.neutralCards?.map((card) => card.name)).filter((section) =>
         activeSectionTitles.includes(section.title)
       ),
     [activeSectionTitles, deckSnapshot]

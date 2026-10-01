@@ -10,6 +10,7 @@ import {
   DEFAULT_DECK,
 } from '../data/deckDefinitions';
 import type { GameState } from '../game';
+import { hasSupportedGameRelations } from '../scoring/semanticRelations';
 import type { MaxPlayers, PlayerColor, Room, RoomPlayer } from '../types/room';
 
 const ROOM_CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -66,7 +67,8 @@ const isCompatibleMultiplayerRoom = (room: Room) =>
   Array.isArray(room.turn_order) &&
   typeof room.current_turn_index === 'number' &&
   room.game_state?.scoringVersion === 3 &&
-  Array.isArray(room.game_state?.semanticEdges);
+  Array.isArray(room.game_state?.semanticEdges) &&
+  hasSupportedGameRelations(room.game_state);
 
 const getRoomPlayers = (room: Room): RoomPlayer[] => {
   if (Array.isArray(room.players) && room.players.length > 0) {
@@ -293,6 +295,7 @@ export async function getRoomByCode(code: string): Promise<Room | null> {
     throw error;
   }
 
+  if (data && !hasSupportedGameRelations(data.game_state)) throw new Error('В этой партии используются удалённые типы связей. Создайте новую комнату.');
   return data;
 }
 
@@ -310,6 +313,7 @@ export async function getRoomById(roomId: string): Promise<Room | null> {
     throw error;
   }
 
+  if (data && !hasSupportedGameRelations(data.game_state)) throw new Error('В этой партии используются удалённые типы связей. Создайте новую комнату.');
   return data;
 }
 
@@ -801,7 +805,12 @@ export function subscribeToRoom(
       (payload) => {
         console.log('[room realtime update raw]', payload);
         console.log('[room realtime update room]', payload.new);
-        onRoomUpdate(payload.new as Room);
+        const nextRoom = payload.new as Room;
+        if (!hasSupportedGameRelations(nextRoom.game_state)) {
+          onStatusProblem?.();
+          return;
+        }
+        onRoomUpdate(nextRoom);
       }
     )
     .on(

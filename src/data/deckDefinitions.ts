@@ -1,6 +1,6 @@
 import type { CardDefinition, CardDifficulty } from './cardCatalog';
 import type { RelationFamily } from '../types';
-import { EVERYDAY_CARD_CATALOG, EVERYDAY_PLAY_CARD_IDS, EVERYDAY_NEUTRAL_CARDS } from './everydayCatalog';
+import { EMOTIONS_PLAY_CARDS, EMOTIONS_NEUTRAL_CARDS } from './emotionsCatalog';
 
 export type DeckKind = 'preset' | 'custom';
 
@@ -47,17 +47,6 @@ export const DEFAULT_MIX_RATIO: DeckMixRatio = {
   hard: 20,
 };
 
-// TODO: Remove this legacy deck when it is no longer needed for tests.
-export const EASY_DECK: DeckDefinition = {
-  id: 'easy',
-  name: 'Простая',
-  kind: 'preset',
-  source: {
-    type: 'difficulty',
-    difficulty: 'easy',
-  },
-};
-
 export const MEDIUM_DECK: DeckDefinition = {
   id: 'medium',
   name: 'Средняя',
@@ -88,33 +77,32 @@ export const MIXED_ALL_DECK: DeckDefinition = {
   },
 };
 
-export const EVERYDAY_DECK: DeckDefinition = {
-  id: 'everyday',
-  name: 'Простые понятия',
+export const EMOTIONS_DECK: DeckDefinition = {
+  id: 'emotions',
+  name: 'Эмоции и чувства',
   kind: 'preset',
-  description: '40 игровых понятий, 3 нейтральные карты и шесть типов связей.',
-  source: { type: 'custom', cardIds: EVERYDAY_PLAY_CARD_IDS },
-  catalog: EVERYDAY_CARD_CATALOG,
-  neutralCards: EVERYDAY_NEUTRAL_CARDS,
-  relationFamilies: ['characteristic', 'contrast', 'variety', 'helps', 'causes', 'regulates'],
+  description: `${EMOTIONS_PLAY_CARDS.length} игральных и ${EMOTIONS_NEUTRAL_CARDS.length} нейтральных карт.`,
+  source: { type: 'custom', cardIds: EMOTIONS_PLAY_CARDS.map((card) => card.id) },
+  catalog: EMOTIONS_PLAY_CARDS,
+  neutralCards: EMOTIONS_NEUTRAL_CARDS,
+  relationFamilies: ['kind', 'part', 'cause', 'property', 'opposite'],
 };
 
 // Standard difficulty decks are derived from catalog metadata;
 // their size must never be duplicated as a constant.
 export const USER_SELECTABLE_DECKS: readonly DeckDefinition[] = [
-  EVERYDAY_DECK,
+  EMOTIONS_DECK,
   MEDIUM_DECK,
   HARD_DECK,
 ];
 
-export const DEFAULT_DECK = EVERYDAY_DECK;
+export const DEFAULT_DECK = EMOTIONS_DECK;
 
 // Custom decks reference stable definition ids so catalog metadata
 // can change without duplicating full card objects.
 export const DECK_DEFINITIONS: readonly DeckDefinition[] = [
   ...USER_SELECTABLE_DECKS,
   // Keep hidden decks available for existing games and internal use.
-  EASY_DECK,
   MIXED_ALL_DECK,
   {
     id: 'mixed-50',

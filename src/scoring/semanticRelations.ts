@@ -1,6 +1,7 @@
 import type {
   Coordinates,
   GameDeckSnapshot,
+  GameState,
   PendingMove,
   PendingSemanticEdge,
   PlacedCard,
@@ -15,12 +16,6 @@ export const RELATION_FAMILY_LABELS: Record<RelationFamily, string> = {
   cause: 'Причина',
   property: 'Свойство',
   opposite: 'Противоположность',
-  characteristic: 'Характеристика',
-  contrast: 'Противопоставление',
-  variety: 'Разновидность',
-  helps: 'Помогает',
-  causes: 'Вызывает',
-  regulates: 'Регулирует',
 };
 
 export const RELATION_PRESETS: SemanticRelation[] = [
@@ -31,20 +26,12 @@ export const RELATION_PRESETS: SemanticRelation[] = [
   { family: 'opposite', symmetric: true },
 ];
 
-export const ALL_RELATION_PRESETS: readonly SemanticRelation[] = [
-  ...RELATION_PRESETS,
-  { family: 'characteristic', fromRole: 'bearer', toRole: 'characteristic' },
-  { family: 'contrast', symmetric: true },
-  { family: 'variety', fromRole: 'kind', toRole: 'general' },
-  { family: 'helps', fromRole: 'helper', toRole: 'helped' },
-  { family: 'causes', fromRole: 'cause', toRole: 'effect' },
-  { family: 'regulates', fromRole: 'regulator', toRole: 'regulated' },
-];
+export const ALL_RELATION_PRESETS: readonly SemanticRelation[] = RELATION_PRESETS;
 
 export function isSymmetricRelation(
   relation: SemanticRelation
 ): relation is Extract<SemanticRelation, { symmetric: true }> {
-  return relation.family === 'opposite' || relation.family === 'contrast';
+  return relation.family === 'opposite';
 }
 
 export function getRelationPresets(snapshot?: GameDeckSnapshot): readonly SemanticRelation[] {
@@ -63,6 +50,16 @@ export function isRelationAllowed(relation: SemanticRelation, snapshot?: GameDec
     relation.fromRole === preset.fromRole && relation.toRole === preset.toRole;
 }
 
+// Unsupported saved relations must not be silently reinterpreted under new rules.
+export function hasSupportedGameRelations(state: GameState): boolean {
+  const families = state.deckSnapshot?.relationFamilies;
+  if (state.deckSnapshot?.sourceDeckId === 'everyday') return false;
+  if (families && (!families.length || families.some((family) =>
+    !RELATION_PRESETS.some((preset) => preset.family === family)))) return false;
+  return [...(state.semanticEdges ?? []), ...(state.pendingMove?.semanticEdges ?? [])]
+    .every((edge) => isRelationAllowed(edge.relation, state.deckSnapshot));
+}
+
 const ROLE_LABELS: Record<string, string> = {
   kind: 'вид',
   general: 'общее',
@@ -72,12 +69,6 @@ const ROLE_LABELS: Record<string, string> = {
   effect: 'следствие',
   property: 'свойство',
   'property-bearer': 'карта',
-  bearer: 'понятие',
-  characteristic: 'характеристика',
-  helper: 'помогает',
-  helped: 'получает помощь',
-  regulator: 'задаёт порядок',
-  regulated: 'регулируется',
 };
 
 export function getRelationFamilyLabel(family: RelationFamily): string {
@@ -89,11 +80,6 @@ export function getRelationRoleLabel(role: string): string {
 }
 
 export function getRelationDirectionQuestion(family: RelationFamily): string {
-  if (family === 'characteristic') return 'Какое понятие описываем?';
-  if (family === 'variety') return 'Что является разновидностью?';
-  if (family === 'helps') return 'Что помогает?';
-  if (family === 'causes') return 'Что вызывает другое?';
-  if (family === 'regulates') return 'Что задаёт порядок или ограничения?';
   if (family === 'kind') return 'Что является видом?';
   if (family === 'part') return 'Что является частью?';
   if (family === 'cause') return 'Что является причиной?';
@@ -185,12 +171,6 @@ export function formatSemanticRelation(
 ): string {
   const fromName = namesById.get(edge.fromCardInstanceId) ?? 'Карта';
   const toName = namesById.get(edge.toCardInstanceId) ?? 'Карта';
-  if (edge.relation.family === 'characteristic') return `«${toName}» — характеристика «${fromName}»`;
-  if (edge.relation.family === 'contrast') return `«${fromName}» противопоставлено «${toName}»`;
-  if (edge.relation.family === 'variety') return `«${fromName}» — разновидность «${toName}»`;
-  if (edge.relation.family === 'helps') return `«${fromName}» помогает: «${toName}»`;
-  if (edge.relation.family === 'causes') return `«${fromName}» вызывает «${toName}»`;
-  if (edge.relation.family === 'regulates') return `«${fromName}» регулирует: «${toName}»`;
   if (edge.relation.family === 'kind') return `${fromName} — вид ${toName}`;
   if (edge.relation.family === 'part') return `${fromName} — часть ${toName}`;
   if (edge.relation.family === 'cause') {

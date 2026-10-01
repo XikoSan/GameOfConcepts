@@ -48,13 +48,7 @@ export type RelationFamily =
   | 'part'
   | 'cause'
   | 'property'
-  | 'opposite'
-  | 'characteristic'
-  | 'contrast'
-  | 'variety'
-  | 'helps'
-  | 'causes'
-  | 'regulates';
+  | 'opposite';
 
 export type DirectedRelationRole =
   | 'kind'
@@ -64,13 +58,7 @@ export type DirectedRelationRole =
   | 'cause'
   | 'effect'
   | 'property'
-  | 'property-bearer'
-  | 'bearer'
-  | 'characteristic'
-  | 'helper'
-  | 'helped'
-  | 'regulator'
-  | 'regulated';
+  | 'property-bearer';
 
 export type SemanticRelation =
   | {
@@ -96,13 +84,7 @@ export type SemanticRelation =
   | {
       family: 'opposite';
       symmetric: true;
-    }
-  | { family: 'contrast'; symmetric: true }
-  | { family: 'characteristic'; fromRole: 'bearer'; toRole: 'characteristic' }
-  | { family: 'variety'; fromRole: 'kind'; toRole: 'general' }
-  | { family: 'helps'; fromRole: 'helper'; toRole: 'helped' }
-  | { family: 'causes'; fromRole: 'cause'; toRole: 'effect' }
-  | { family: 'regulates'; fromRole: 'regulator'; toRole: 'regulated' };
+    };
 
 export interface PendingSemanticEdge {
   id: string;

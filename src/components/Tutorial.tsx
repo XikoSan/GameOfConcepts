@@ -60,7 +60,7 @@ function ShotVisual({ shot }: { shot: Shot }) {
   return <svg className="tutorial-annotated-shot" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={shot.alt}>
     <image href={shot.src} width={width} height={height} />
     {(path ? [{ x: 106, y: 114, rotate: 0 }, { x: 106, y: 226, rotate: 0 }]
-      : [{ x: 160, y: 58, rotate: 90 }, { x: 216, y: 114, rotate: 0 }]).map(arrow => (
+      : [{ x: 164, y: 62, rotate: -90 }, { x: 220, y: 118, rotate: 180 }]).map(arrow => (
       <g key={`${arrow.x}-${arrow.y}`} transform={`translate(${arrow.x} ${arrow.y}) rotate(${arrow.rotate})`} aria-hidden="true">
         <circle r="12" fill="#253e4c" stroke="#b5c5c9" strokeWidth="0.8" />
         <path d="M 0 6 V -6 M -4 -2 L 0 -6 L 4 -2" fill="none" stroke="#f4e8cb" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
@@ -70,12 +70,12 @@ function ShotVisual({ shot }: { shot: Shot }) {
 }
 const extraShots: Record<number, Shot[]> = {
   2: [{ src: overviewImage, alt: 'Игровой экран: игроки сверху, поле в центре, рука снизу, управление и лог справа.' }],
-  3: [{ src: logImage, alt: 'Принятый ход: «Знание» помогает «Решению», начислено одно очко.' }],
-  4: [{ src: pickerImage, alt: 'Выбор типа «Помогает» и направления связи на игровом поле.' }],
+  3: [{ src: logImage, alt: 'Принятый ход: «Радость» — причина «Улыбки», начислено одно очко.' }],
+  4: [{ src: pickerImage, alt: 'Выбор типа «Причина» и направления связи на игровом поле.' }],
   5: [{ src: moveImage, alt: 'Связь подготовлена к голосованию.' }, { src: votingImage, alt: 'Принять или отклонить предложенные связи.' }],
   6: [],
   7: [{ src: pathImage, arrows: 'path', alt: 'Спорт вызывает усталость, усталость вызывает сон. Причинная последовательность из трёх карт.' }],
-  8: [{ src: nodeImage, arrows: 'node', alt: 'Знание и память помогают решению. Новая связь с центром узла даёт два очка.' }],
+  8: [{ src: nodeImage, arrows: 'node', alt: 'Радость вызывает улыбку и смех. Новая связь с центром узла даёт два очка.' }],
   9: [],
 };
 function ExtraCopy({ step }: { step: number }) {
@@ -89,12 +89,12 @@ function ExtraCopy({ step }: { step: number }) {
     case 3: return <>
       <p className="tutorial-intro">Находите смысловые связи между понятиями и объясняйте их другим игрокам.</p>
       <div className="tutorial-explanation"><p>Каждая обоснованная и принятая связь приносит очки. Просто поставить карту рядом недостаточно.</p></div>
-      <div className="tutorial-explanation"><h4>Пример</h4><p>«Знание <u>помогает</u> решению». Если остальные принимают объяснение, игрок получает 1 очко.</p></div>
+      <div className="tutorial-explanation"><h4>Пример</h4><p>«Радость — <u>причина</u> улыбки». Если остальные принимают объяснение, игрок получает 1 очко.</p></div>
       <div className="tutorial-explanation"><p>Цель — набрать больше очков к <TutorialTerm explanation="Условие окончания выбирают перед началом партии: когда закончится колода или когда один из игроков наберёт 30, 50 либо 70 очков.">концу партии</TutorialTerm>.</p></div>
     </>;
     case 4: return <>
       <p>Перетащите карту из руки на свободную клетку, которая соприкасается стороной с картой на поле.</p>
-      <div className="tutorial-explanation"><p>Нажмите на связь между картами. Выберите её тип и, если требуется, <TutorialTerm explanation={<>Направление определяет роли понятий. «Знание <u>помогает</u> решению» и «Решение <u>помогает</u> знанию» — разные связи: меняется то, что помогает, и то, чему помогают.</>}>направление</TutorialTerm>. Отправьте на голосование.</p></div>
+      <div className="tutorial-explanation"><p>Нажмите на связь между картами. Выберите её тип и, если требуется, <TutorialTerm explanation={<>Направление определяет роли понятий. «Радость — <u>причина</u> улыбки» и «Улыбка — <u>причина</u> радости» — разные связи: меняются причина и следствие.</>}>направление</TutorialTerm>. Отправьте на голосование.</p></div>
       <div className="tutorial-explanation"><p>Новую карту можно связать с несколькими соседями. Для каждого соседа связь выбирается отдельно.</p></div>
       <p className="tutorial-hint">Для хода нужна хотя бы одна связь. Выбирайте место, где у новой карты нет соседей с тем же понятием.</p>
     </>;
@@ -116,7 +116,7 @@ function ExtraCopy({ step }: { step: number }) {
     </>;
     case 8: return <>
       <p>В смысловом узле несколько понятий связаны с одним центром одинаковым типом связи и направлением: все к центру или все от него.</p>
-      <div className="tutorial-explanation"><h4>Знание и память <u>помогают</u> решению</h4><p>«Решение» — центр узла. Новая связь приносит <strong>1 за связь + 1 за поддержание смыслового узла</strong>.</p></div>
+      <div className="tutorial-explanation"><h4>Радость — <u>причина</u> улыбки и смеха</h4><p>«Радость» — центр узла. Новая связь приносит <strong>1 за связь + 1 за поддержание смыслового узла</strong>.</p></div>
       <div className="tutorial-explanation"><p>Нужны как минимум <TutorialTerm explanation="Окружающие карты узла принадлежат одному игроку. Центр может быть вашим, чужим или нейтральным. Узел состоит из трёх и более карт.">две ваши карты вокруг центра</TutorialTerm>.</p></div>
       <p className="tutorial-hint">Если та же новая связь одновременно подходит для пути, оба бонуса складываются.</p>
     </>;
@@ -161,7 +161,7 @@ export function Tutorial({ onClose }: { onClose: () => void }) {
 
   return (
     <div ref={rootRef} className="tutorial-host" onKeyDown={trapFocus}>
-      <Modal title="Обучение" onClose={zoom ? closeZoom : onClose}>
+      <Modal title="Быстрое обучение" onClose={zoom ? closeZoom : onClose}>
         <div className="tutorial">
           {zoom ? <div className="tutorial-zoom"><ShotVisual shot={zoom} /><button autoFocus type="button" onClick={closeZoom}>Вернуться к шагу</button></div> : <div className={`tutorial-body tutorial-body--${step}`} ref={bodyRef}>
             <div className={`tutorial-screenshots tutorial-screenshots--${step}`}>
@@ -199,8 +199,8 @@ export function Tutorial({ onClose }: { onClose: () => void }) {
                   <TutorialTerm explanation="Общее место для вашей онлайн-партии. Остальные игроки находят её в списке доступных комнат и присоединяются. Затем создатель запускает партию.">комнату</TutorialTerm>, остальные присоединяются к ней.</p>
               </div>
               </> : <>
-                <p className="tutorial-intro"><span className="tutorial-text-pin" aria-hidden="true">1</span>Перед началом выберите колоду. От неё зависят понятия на картах и доступные{' '}
-                  <TutorialTerm explanation={<>Тип связи обозначает, как соотносятся два понятия. Например, одно <u>является частью</u> другого или <u>помогает</u> ему. У каждой колоды свой набор доступных типов.</>}>типы связей</TutorialTerm>.</p>
+                <p className="tutorial-intro"><span className="tutorial-text-pin" aria-hidden="true">1</span>Перед началом выберите колоду. От неё зависят понятия на картах. Во всех колодах одинаковые{' '}
+                  <TutorialTerm explanation={<>Тип связи обозначает, как соотносятся два понятия. Например, одно <u>является частью</u> другого или <u>является причиной</u> другого. Доступны пять типов: Вид, Часть, Причина, Свойство, Противоположность.</>}>типы связей</TutorialTerm>.</p>
                 <div className="tutorial-explanation">
                   <p><span className="tutorial-text-pin" aria-hidden="true">2</span>Каждый игрок получает собственную копию выбранной колоды и пять карт на руку.</p>
                 </div>

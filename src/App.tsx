@@ -10,7 +10,10 @@ import { PlayerHand } from './components/PlayerHand';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
-import { Tutorial } from './components/Tutorial';
+import { TableReminder } from './components/TableReminder';
+import packageInfo from '../package.json';
+import './MainMenu.css';
+import { TrainingGame } from './components/TrainingGame';
 import {
   incrementCounter,
   printPerformanceReport,
@@ -28,7 +31,7 @@ import {
   subscribeToRoom,
 } from './services/roomService';
 import { getHandRedrawAvailability, initializeGame } from './game';
-import { getRelationPresets, getRelationFamilyLabel, isSymmetricRelation } from './scoring/semanticRelations';
+import { isSymmetricRelation } from './scoring/semanticRelations';
 import {
   getDeckDefinitionById,
   DEFAULT_DECK,
@@ -196,6 +199,8 @@ function App() {
   const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
+  const [showMainMenu, setShowMainMenu] = useState(true);
+  const [hasLocalGame, setHasLocalGame] = useState(false);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [resetCameraSignal, setResetCameraSignal] = useState(0);
   const [onlineRoom, setOnlineRoom] = useState<Room | null>(null);
@@ -250,7 +255,7 @@ function App() {
   useEffect(() => {
     const log = matchLogRef.current;
     if (log) log.scrollTop = log.scrollHeight;
-  }, [moveLog.length, latestLogEntry]);
+  }, [moveLog.length, latestLogEntry, showMainMenu]);
 
   const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
@@ -415,6 +420,8 @@ function App() {
   };
 
   const handleConfirmNewGame = () => {
+    setHasLocalGame(true);
+    setShowMainMenu(false);
     setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     resetGame(maxPlayers, localDeckId);
     music.start();
@@ -425,6 +432,8 @@ function App() {
   };
 
   const handleStartLocalGame = () => {
+    setHasLocalGame(true);
+    setShowMainMenu(false);
     setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     // TEMP(MVP): Выход из онлайн-комнаты пока только локальный, без удаления
     // комнаты из Supabase.
@@ -560,6 +569,7 @@ function App() {
     setOnlineRoom(room);
     setOnlineError(null);
     if (room.status === 'playing') {
+      setShowMainMenu(false);
       setActiveModal(null);
     } else {
       setActiveModal('new-game');
@@ -800,6 +810,7 @@ function App() {
     if (onlineRoom?.status !== 'playing' || activeModal !== 'new-game') return;
 
     const closeTimer = window.setTimeout(() => {
+      setShowMainMenu(false);
       setActiveModal(null);
     }, 0);
 
@@ -944,19 +955,9 @@ function App() {
           )}
   </div>);
 
-  const renderControlPanel = () => (
+  const renderControlPanel = () => onlineRoom ? (
     <aside className="side-panel control-panel" aria-label="Панель управления">
       <nav className="panel-actions" aria-label="Действия">
-        <section className="action-group action-group-primary" aria-label="Партия">
-          <h2>Партия</h2>
-          <button className="action-button action-button-primary" type="button" onClick={handleOpenNewGameModal}>
-            Онлайн игра
-          </button>
-          <button className="action-button action-button-secondary" type="button" onClick={() => setActiveModal('local-game')}>
-            Локальная игра
-          </button>
-        </section>
-
         {onlineRoom && <section className="action-group" aria-label="Инструменты">
           <h2>Инструменты</h2>
           {onlineRoom && (
@@ -981,7 +982,7 @@ function App() {
 
 
     </aside>
-  );
+  ) : null;
 
   const renderPlayerHand = (
     playerIndex: number,
@@ -1020,17 +1021,29 @@ function App() {
     );
   };
 
+  const openMainMenu = () => {
+    setSelectedCard(null);
+    setDragPreview(null);
+    setActiveModal(null);
+    // Rooms keep their game state on the server; local state stays in its controller.
+    roomSubscriptionRef.current?.unsubscribe();
+    roomSubscriptionRef.current = null;
+    onlineRoomRef.current = null;
+    setOnlineRoom(null);
+    setShowMainMenu(true);
+  };
+
   return (
     <div className="app-container">
       <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden onEnded={() => music.skip(1)} onPlaying={music.loaded} onError={music.failed} />
-      <main className="game-table">
+      {!showMainMenu && <main className="game-table" inert={activeModal === 'tutorial'} aria-hidden={activeModal === 'tutorial' ? true : undefined}>
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
           <header className="table-status-bar">
             {renderPlayers()}
             <nav className="table-menu" aria-label="Меню игры">
-              <button type="button" onClick={() => setActiveModal('tutorial')}>Обучение</button>
-              <button type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
-              <button type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
+              <button className="table-menu-tutorial" type="button" onClick={openMainMenu}>Меню</button>
+              <button className="table-menu-rules" type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
+              <button className="table-menu-settings" type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
             </nav>
           </header>
           <div className="table-workspace">
@@ -1066,31 +1079,26 @@ function App() {
                   </ol>
                 ) : <p>Принятые ходы появятся здесь.</p>}
               </section>
-              <section className="table-reminder" aria-label="Памятка">
-                <h3>Памятка</h3>
-                <h4>Типы связей</h4>
-                <ul className="reminder-relations">
-                  {getRelationPresets(gameState.deckSnapshot).map((relation) => (
-                    <li key={relation.family}>{getRelationFamilyLabel(relation.family)}</li>
-                  ))}
-                </ul>
-                <div className="reminder-score">
-                  <h4><span>Принятая связь</span><strong>1 очко</strong></h4>
-                </div>
-                <div className="reminder-score">
-                  <h4><span>Смысловой путь</span><strong>+1 очко</strong></h4>
-                  <p>Последовательность связей одного типа с согласованным направлением.</p>
-                </div>
-                <div className="reminder-score">
-                  <h4><span>Смысловой узел</span><strong>+1 очко</strong></h4>
-                  <p>Связи одного типа вокруг одного понятия, направленные все к центру или все от него.</p>
-                </div>
-                <p className="reminder-score-total">Бонусы складываются. До 3 очков за новую связь.</p>
-              </section>
+              <TableReminder snapshot={gameState.deckSnapshot} />
             </aside>
           </div>
         </section>
-      </main>
+      </main>}
+      {showMainMenu && activeModal !== 'tutorial' && <main className="main-menu" aria-label="Главное меню" inert={activeModal !== null}>
+        <h1>Игра понятий</h1>
+        <nav className="main-menu-actions" aria-label="Главное меню">
+          {hasLocalGame && <button type="button" onClick={() => { openMainMenu(); setShowMainMenu(false); }}>Продолжить игру</button>}
+          <button type="button" onClick={() => setActiveModal('local-game')}>Локальная игра</button>
+          <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
+          <button type="button" onClick={() => setActiveModal('tutorial')}>Обучение</button>
+          <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
+          <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
+        </nav>
+        <footer className="main-menu-footer">
+          <a href="https://github.com/XikoSan/GameOfConcepts/issues/new" target="_blank" rel="noreferrer">Обратная связь</a>
+          <span>Версия {packageInfo.version}</span>
+        </footer>
+      </main>}
       {dragPreview && (
         <DragPreviewLayer
           cardName={dragPreview.cardName}
@@ -1371,7 +1379,8 @@ function App() {
           </div>
         </Modal>
       )}
-      {activeModal === 'tutorial' && <Tutorial onClose={() => setActiveModal(null)} />}
+      {activeModal === 'tutorial' && <TrainingGame onClose={openMainMenu} controls={null}
+        onOpenRules={() => setActiveModal('rules')} onOpenSettings={() => setActiveModal('settings')} />}
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">
           <RulesContent deckSnapshot={gameState.deckSnapshot} />

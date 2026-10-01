@@ -273,34 +273,13 @@ export const rulesTabs: RulesTab[] = [
   },
 ];
 
-export function getRulesSectionsForDeck(everyday: boolean, neutralNames: readonly string[] = []): RulesSection[] {
-  if (!everyday) return rulesSections;
-  const replaceBlock = (block: RulesBlock): RulesBlock => {
-    if (block.type === 'details') return { ...block, blocks: block.blocks.map(replaceBlock) };
-    if (block.type === 'example') {
-      const examples: Partial<Record<RulesExampleId, string>> = {
-        'accepted-connection': 'Пример: «Внимание» помогает «Пониманию». После принятия связи — 1 очко.',
-        chain: 'Пример пути: «Объяснение» помогает «Пониманию», а «Понимание» помогает «Выбору». Для бонуса внутренняя карта «Понимание» должна принадлежать вам.',
-        cross: 'Пример узла: «Знание» помогает «Выбору», «Объяснению» и «Пониманию». Направление связей совпадает — от центра. Для бонуса окружающие карты вашего узла должны принадлежать вам; центр может быть нейтральным, вашим или чужим.',
-        field: 'В центре поля находится одна нейтральная карта выбранной колоды. Новые карты размещаются рядом по стороне.',
-      };
-      return { type: 'paragraph', text: examples[block.id] ?? 'Выберите связь на поле и проверьте направление по предварительному описанию.' };
-    }
-    if ('text' in block) return {
-      ...block,
-      text: block.text
-        .replace('Например, одно понятие выступает причиной второго, а второе — причиной третьего.', 'Например, одно понятие помогает второму, а второе — третьему.')
-        .replace('«Противоположности»', '«Противопоставления»'),
-    };
-    return block;
-  };
-  return rulesSections.map((section) => {
-    if (section.title === 'Связи' || section.title === 'Подсчёт очков') return section;
-    const blocks = section.blocks.map(replaceBlock);
-    if (section.title === 'Подготовка') blocks.push({
+export function getRulesSectionsForDeck(neutralNames: readonly string[] = []): RulesSection[] {
+  if (!neutralNames.length) return rulesSections;
+  return rulesSections.map((section) => section.title !== 'Подготовка' ? section : {
+    ...section,
+    blocks: [...section.blocks, {
       type: 'card',
-      text: `У этой колоды отдельные нейтральные карты: ${neutralNames.join(', ')}. Они не входят в личные колоды игроков. В начале партии случайно выбирается только одна из них.`,
-    });
-    return { ...section, blocks };
+      text: `Нейтральные карты выбранной колоды: ${neutralNames.join(', ')}. Они не входят в личные колоды игроков. В начале партии случайно выбирается одна из них.`,
+    }],
   });
 }
