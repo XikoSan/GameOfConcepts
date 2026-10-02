@@ -8,11 +8,63 @@ import { DragPreviewLayer } from './DragPreviewLayer';
 import { MatchLogEntry } from './MatchLogEntry';
 import './TrainingGame.css';
 import { TrainingHint } from './TrainingHint';
+import localSetupImage from '../assets/tutorial/start-local.png';
+import onlineSetupImage from '../assets/tutorial/start-online.png';
 
 const noop = () => {};
-export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings }: {
+interface TrainingGameProps {
   onClose: () => void; controls: ReactNode; onOpenRules: () => void; onOpenSettings: () => void;
-}) {
+}
+
+export function TrainingGame(props: TrainingGameProps) {
+  const [showSetup, setShowSetup] = useState(true);
+  const [setupMode, setSetupMode] = useState<'local' | 'online'>('local');
+  const nextButton = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!showSetup) return;
+    const previous = document.activeElement as HTMLElement | null;
+    nextButton.current?.focus();
+    return () => previous?.focus();
+  }, [showSetup]);
+  return <>
+    <TrainingTable {...props} paused={showSetup} />
+    {showSetup && <div className="training-start-screen" role="dialog" aria-modal="true" aria-labelledby="training-start-title"
+    onKeyDown={event => {
+      if (event.key === 'Escape') props.onClose();
+      if (event.key === 'Tab') {
+        const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('button'));
+        const first = buttons[0], last = buttons.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+      }
+    }}>
+    <section className="training-start-panel">
+      <header><h2 id="training-start-title">Добро пожаловать в обучение</h2>
+        <button type="button" className="training-start-close" onClick={props.onClose} aria-label="Выйти из обучения">×</button>
+      </header>
+      <p className="training-start-summary">Для начала игры нужно выбрать тему колоды, количество игроков и имена участников.</p>
+      <div id="training-setup-panel" className="training-start-examples" aria-label={setupMode === 'local' ? 'Запуск локальной игры' : 'Подключение онлайн'}>
+        {setupMode === 'local' ? <figure className="training-example-local">
+          <div className="training-start-image"><img src={localSetupImage} alt="Окно локальной игры: количество игроков, выбор колоды и имена участников" /></div>
+        </figure> : <figure className="training-example-online">
+          <div className="training-start-image training-start-image-online"><img src={onlineSetupImage} alt="Окно онлайн-игры: никнейм, количество игроков, колода и список доступных комнат" /></div>
+          <figcaption className="training-room-note">Узнайте у друга название комнаты, найдите её в списке и нажмите «Подключиться».</figcaption>
+        </figure>}
+      </div>
+      <footer className="training-start-footer">
+        <div className="training-mode-switch" role="group" aria-label="Режим игры">
+          <button type="button" aria-pressed={setupMode === 'local'} aria-controls="training-setup-panel" onClick={() => setSetupMode('local')}>Локально</button>
+          <button type="button" aria-pressed={setupMode === 'online'} aria-controls="training-setup-panel" onClick={() => setSetupMode('online')}>Онлайн</button>
+        </div>
+        <button ref={nextButton} type="button" className="training-primary" onClick={() => setShowSetup(false)}>К игре</button>
+      </footer>
+    </section>
+  </div>}
+  </>;
+
+}
+
+function TrainingTable({ onClose, controls, onOpenRules, onOpenSettings, paused }: TrainingGameProps & { paused: boolean }) {
   const [state, dispatch] = useReducer(trainingReducer, undefined, createTrainingState);
   const [camera, setCamera] = useState(0);
   const [drag, setDrag] = useState<{ cardName: string; initialX: number; initialY: number; playerColor: 'blue' | 'orange' | 'green' | 'purple' } | null>(null);
@@ -21,6 +73,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings }:
   const ready = Boolean(game.pendingMove?.semanticEdges?.length);
 
   useEffect(() => {
+    if (paused) return;
     const previous = document.activeElement as HTMLElement | null;
     document.querySelector<HTMLButtonElement>('.training-primary')?.focus();
     // Include board popovers: these are rendered in a portal outside the dialog.
@@ -39,7 +92,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings }:
     };
     document.addEventListener('keydown', trap);
     return () => { document.removeEventListener('keydown', trap); previous?.focus(); };
-  }, []);
+  }, [paused]);
 
   useEffect(() => {
     if (phase !== 'voting') return;
@@ -47,7 +100,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings }:
     return () => window.clearTimeout(timer);
   }, [phase]);
 
-  return <div ref={root} className="training-session" role="dialog" aria-modal="true" aria-label="Учебная партия">
+  return <div ref={root} inert={paused} aria-hidden={paused ? true : undefined} className="training-session" role="dialog" aria-modal="true" aria-label="Учебная партия">
     <main className="game-table"><section className="play-area" aria-label="Игровой стол">
       <header className="table-status-bar">
         <div className="table-players" aria-label="Игроки и счёт">
@@ -108,7 +161,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings }:
       </aside>
       </div>
     </section></main>
-    <TrainingHint phase={phase} ready={ready} feedback={feedback} dragging={Boolean(drag)} onBegin={() => dispatch({ type: 'begin' })} onClose={onClose} />
+    {!paused && <TrainingHint phase={phase} ready={ready} feedback={feedback} dragging={Boolean(drag)} onBegin={() => dispatch({ type: 'begin' })} onClose={onClose} />}
     {drag && <DragPreviewLayer {...drag} />}
   </div>;
 }
