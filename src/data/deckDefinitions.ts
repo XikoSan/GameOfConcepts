@@ -92,8 +92,6 @@ export const EMOTIONS_DECK: DeckDefinition = {
 // their size must never be duplicated as a constant.
 export const USER_SELECTABLE_DECKS: readonly DeckDefinition[] = [
   EMOTIONS_DECK,
-  MEDIUM_DECK,
-  HARD_DECK,
 ];
 
 export const DEFAULT_DECK = EMOTIONS_DECK;
@@ -103,6 +101,8 @@ export const DEFAULT_DECK = EMOTIONS_DECK;
 export const DECK_DEFINITIONS: readonly DeckDefinition[] = [
   ...USER_SELECTABLE_DECKS,
   // Keep hidden decks available for existing games and internal use.
+  MEDIUM_DECK,
+  HARD_DECK,
   MIXED_ALL_DECK,
   {
     id: 'mixed-50',

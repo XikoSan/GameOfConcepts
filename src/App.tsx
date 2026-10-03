@@ -192,6 +192,7 @@ const defaultInterfaceSettings = {
 
 function App() {
   const musicAudioRef = useRef<HTMLAudioElement>(null);
+  const menuMusicStarted = useRef(false);
   const music = useBackgroundMusic(musicAudioRef);
   incrementCounter('render:App');
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
@@ -202,6 +203,8 @@ function App() {
   const [showMainMenu, setShowMainMenu] = useState(true);
   const [hasLocalGame, setHasLocalGame] = useState(false);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
+  const [trainingSetup, setTrainingSetup] = useState(false);
+  const [trainingRunning, setTrainingRunning] = useState(false);
   const [resetCameraSignal, setResetCameraSignal] = useState(0);
   const [onlineRoom, setOnlineRoom] = useState<Room | null>(null);
   const [onlineError, setOnlineError] = useState<string | null>(null);
@@ -846,16 +849,6 @@ function App() {
     playerId,
   ]);
 
-  const lastGains = new Map<number, number>();
-  for (let index = gameState.log.length - 1; index >= 0; index -= 1) {
-    const score = gameState.logDetails?.[index]?.score;
-    const legacy = score ? null : /^Игрок (\d+) сыграл «(.+)»\. .*\+(\d+)\.$/.exec(gameState.log[index]);
-    const seat = score?.playerId ?? (legacy ? Number(legacy[1]) - 1 : null);
-    if (seat !== null && !lastGains.has(seat)) {
-      lastGains.set(seat, score?.totalGained ?? Number(legacy?.[3]));
-    }
-  }
-
   const renderPlayers = () => (
     <div className="table-players" aria-label="Игроки и счёт">
         {(onlineRoom ? onlinePlayers : localPlayers).map((player) => {
@@ -872,11 +865,6 @@ function App() {
               <div className="player-score-content">
                 <div className="player-score-points">
                   <strong className="player-score-total" title="Общий счёт">{getSeatScore(player.seatIndex)}</strong>
-                  {(lastGains.get(player.seatIndex) ?? 0) > 0 && (
-                    <span className="player-score-gain" title="Очки за последний принятый ход">
-                      +{lastGains.get(player.seatIndex)}
-                    </span>
-                  )}
                 </div>
                 <div className="player-score-identity">
                   <span className="player-score-name" title={player.nickname}>{player.nickname}</span>
@@ -1021,7 +1009,15 @@ function App() {
     );
   };
 
+  const startMenuMusic = () => {
+    if (menuMusicStarted.current) return;
+    menuMusicStarted.current = true;
+    music.start();
+  };
+
   const openMainMenu = () => {
+    setTrainingRunning(false);
+    music.select('music-for-manatees');
     setSelectedCard(null);
     setDragPreview(null);
     setActiveModal(null);
@@ -1035,8 +1031,8 @@ function App() {
 
   return (
     <div className="app-container">
-      <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden onEnded={() => music.skip(1)} onPlaying={music.loaded} onError={music.failed} />
-      {!showMainMenu && <main className="game-table" inert={activeModal === 'tutorial'} aria-hidden={activeModal === 'tutorial' ? true : undefined}>
+      <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden loop={showMainMenu && activeModal !== 'tutorial'} onEnded={() => { if (!showMainMenu || activeModal === 'tutorial') music.skip(1); }} onPlaying={music.loaded} onError={music.failed} />
+      {!showMainMenu && <main className="game-table" inert={trainingRunning} aria-hidden={trainingRunning ? true : undefined}>
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
           <header className="table-status-bar">
             {renderPlayers()}
@@ -1084,13 +1080,15 @@ function App() {
           </div>
         </section>
       </main>}
-      {showMainMenu && activeModal !== 'tutorial' && <main className="main-menu" aria-label="Главное меню" inert={activeModal !== null}>
+      {showMainMenu && activeModal !== 'tutorial' && <main className="main-menu" aria-label="Главное меню" inert={activeModal !== null}
+        onPointerDownCapture={event => { if (event.button === 0) startMenuMusic(); }}
+        onKeyDownCapture={event => { if (event.key === 'Enter' || event.key === ' ') startMenuMusic(); }}>
         <h1>Игра понятий</h1>
         <nav className="main-menu-actions" aria-label="Главное меню">
           {hasLocalGame && <button type="button" onClick={() => { openMainMenu(); setShowMainMenu(false); }}>Продолжить игру</button>}
-          <button type="button" onClick={() => setActiveModal('local-game')}>Локальная игра</button>
+          <button type="button" onClick={() => { setLocalNameDrafts(['', '', '', '']); setActiveModal('local-game'); }}>Локальная игра</button>
           <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
-          <button type="button" onClick={() => setActiveModal('tutorial')}>Обучение</button>
+          <button type="button" onClick={() => { setTrainingSetup(true); setMaxPlayers(2); setLocalDeckId(DEFAULT_DECK.id); setLocalNameDrafts(['', 'Учебный соперник', '', '']); setActiveModal('local-game'); }}>Обучение</button>
           <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
           <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
         </nav>
@@ -1108,7 +1106,9 @@ function App() {
         />
       )}
       {activeModal === 'local-game' && (
-        <Modal onClose={() => setActiveModal(null)} title="Локальная игра">
+        <>
+          {trainingSetup && <aside className="training-local-annotation-window" aria-label="Пояснение к обучению"><h2>Добро пожаловать в обучение</h2><p>Для того чтобы начать локальную игру, нужно выбрать количество игроков, тему игральной колоды и ввести никнеймы.</p><div className="training-local-callout">В обучении параметры заданы заранее. Введите свой никнейм и начните партию.</div></aside>}
+          <Modal onClose={() => { setTrainingSetup(false); setLocalNameDrafts(['', '', '', '']); setActiveModal(null); }} title="Локальная игра">
           <div className="control-panel local-game-setup">
             <div className="local-game-options">
               <div className="max-players-picker" aria-label="Количество локальных игроков">
@@ -1118,7 +1118,7 @@ function App() {
                     className={maxPlayers === playersCount ? 'active' : ''}
                     aria-pressed={maxPlayers === playersCount}
                     key={playersCount}
-                    onClick={() => setMaxPlayers(playersCount)}
+                    onClick={() => setMaxPlayers(playersCount)} disabled={trainingSetup}
                     type="button"
                   >
                     {playersCount}
@@ -1128,6 +1128,7 @@ function App() {
               <label className="deck-select-field">
                 <span>Колода</span>
                 <select
+                  disabled={trainingSetup}
                   onChange={(event) => setLocalDeckId(event.target.value)}
                   value={localDeckId}
                 >
@@ -1146,20 +1147,22 @@ function App() {
                   <span>Игрок {index + 1}</span>
                   <input
                     type="text"
-                    value={localNameDrafts[index]}
+                    value={trainingSetup && index === 1 ? 'Учебный соперник' : localNameDrafts[index]}
                     placeholder={`Игрок ${index + 1}`}
                     maxLength={24}
                     autoComplete="off"
+                    disabled={trainingSetup && index === 1}
                     onChange={(event) => setLocalNameDrafts((names) => names.map((name, seat) => seat === index ? event.target.value : name))}
                   />
                 </label>
               ))}
             </fieldset>
-            <button className="action-button action-button-primary" type="button" onClick={onlineRoom ? handleStartLocalGame : handleConfirmNewGame}>
+            <button className="action-button action-button-primary" type="button" onClick={() => { if (trainingSetup) { setTrainingSetup(false); setTrainingRunning(true); setShowMainMenu(false); setActiveModal('tutorial'); } else if (onlineRoom) { handleStartLocalGame(); } else { handleConfirmNewGame(); } }}>
               Начать партию
             </button>
           </div>
-        </Modal>
+          </Modal>
+        </>
       )}
       {activeModal === 'new-game' && (
         <Modal onClose={closeOnlineModal} title="Онлайн игра">
@@ -1379,7 +1382,7 @@ function App() {
           </div>
         </Modal>
       )}
-      {activeModal === 'tutorial' && <TrainingGame onClose={openMainMenu} controls={null}
+      {trainingRunning && <TrainingGame playerName={localNameDrafts[0].trim() || 'Вы'} paused={activeModal !== 'tutorial' && activeModal !== null} onClose={openMainMenu} controls={null}
         onOpenRules={() => setActiveModal('rules')} onOpenSettings={() => setActiveModal('settings')} />}
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">

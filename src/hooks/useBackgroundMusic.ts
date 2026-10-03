@@ -5,9 +5,9 @@ import type { CustomMusic } from '../services/musicStorage';
 
 interface Track { id: string; title: string; src: string; custom?: boolean }
 const builtInTracks: Track[] = [
+  { id: 'music-for-manatees', title: 'Music for Manatees', src: '/music/music-for-manatees.mp3' },
   { id: 'clean-soul', title: 'Clean Soul', src: '/music/clean-soul.mp3' },
   { id: 'dreams-become-real', title: 'Dreams Become Real', src: '/music/dreams-become-real.mp3' },
-  { id: 'music-for-manatees', title: 'Music for Manatees', src: '/music/music-for-manatees.mp3' },
 ];
 function preference(key: string, fallback: string) {
   try { return localStorage.getItem(`music:${key}`) ?? fallback; } catch { return fallback; }
@@ -16,7 +16,7 @@ function preference(key: string, fallback: string) {
 export function useBackgroundMusic(audioRef: RefObject<HTMLAudioElement | null>) {
   const objectUrls = useRef(new Set<string>());
   const [tracks, setTracks] = useState(builtInTracks);
-  const [selected, setSelected] = useState(() => preference('track', builtInTracks[0].id));
+  const [selected, setSelected] = useState(builtInTracks[0].id);
   const [volume, setVolume] = useState(() => {
     const value = Number(preference('volume', '0.25'));
     return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.25;

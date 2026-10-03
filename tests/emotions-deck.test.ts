@@ -17,7 +17,7 @@ test('Revised catalog is separate; all existing standard decks keep their compos
   assert.ok(!USER_SELECTABLE_DECKS.some(d => d.id === 'mixed-all'));
   assert.equal(initializeGame().deckSnapshot?.sourceDeckId, DEFAULT_DECK.id);
   assert.equal(EMOTIONS_PLAY_CARDS.length, 57);
-  assert.deepEqual(USER_SELECTABLE_DECKS.map(d => d.id), ["emotions", "medium", "hard"]);
+  assert.deepEqual(USER_SELECTABLE_DECKS.map(d => d.id), ["emotions"]);
   assert.deepEqual(validateDeckDefinitions(DECK_DEFINITIONS, CARD_CATALOG), []);
   assert.deepEqual(buildDeck(CARD_CATALOG, EMOTIONS_DECK).cards.map(c => c.name).sort(), playingNames);
   assert.deepEqual(EMOTIONS_NEUTRAL_CARDS.map(c => c.name).sort(), neutralNames);
