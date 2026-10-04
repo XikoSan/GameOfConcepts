@@ -8,6 +8,8 @@ import { DragPreviewLayer } from './DragPreviewLayer';
 import { MatchLogEntry } from './MatchLogEntry';
 import './TrainingGame.css';
 import { TrainingHint } from './TrainingHint';
+import { TableSidebar } from './TableSidebar';
+import { useCompactTable } from '../hooks/useCompactTable';
 
 const noop = () => {};
 interface TrainingGameProps {
@@ -17,6 +19,8 @@ interface TrainingGameProps {
 export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, paused = false, playerName = 'Вы' }: TrainingGameProps) {
   const [state, dispatch] = useReducer(trainingReducer, undefined, createTrainingState);
   const [camera, setCamera] = useState(0);
+  const compact = useCompactTable();
+  const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
   const [drag, setDrag] = useState<{ cardName: string; initialX: number; initialY: number; playerColor: 'blue' | 'orange' | 'green' | 'purple' } | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const { game, phase, selected } = state;
@@ -72,6 +76,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
       <div className="table-workspace"><div className="table-center">
         <div className="board-section">
           <GameBoard gameState={game} resetCameraSignal={camera}
+            actionDock={compact && phase !== 'explain' && phase !== 'opponent' ? actionDock : null}
             selectedCard={phase === 'place' ? (selected ?? drag?.cardName ?? null) : null}
             onPlaceCard={(name, position) => { setDrag(null); dispatch({ type: 'place', name, position }); }}
             onFinishDrag={() => setDrag(null)} showPlayableHighlights={phase === 'place'} showTooltips={true}
@@ -87,7 +92,8 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
           </button></div>
 
         </div>
-        <div className="table-hand-tray" aria-label="Ваша учебная рука">
+        <div className={`table-hand-tray ${compact && game.pendingMove ? 'has-mobile-actions' : ''}`} aria-label="Ваша учебная рука">
+          <div className="mobile-action-dock" ref={setActionDock} />
           <PlayerHand playerNumber={0} cards={game.players[0].cards} deckCount={game.deck[0].length}
             selectedCard={phase === 'place' ? (selected ?? null) : null} isActive={phase === 'place'} displayName={playerName}
             onStartCardDrag={(cardName, playerColor, event) => {
@@ -101,16 +107,12 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
           </button><p className="hand-redraw-caption">Пересдача руки</p></div>
         </div>
       </div>
-      <aside className="turn-sidebar" aria-label="Управление партией и ходом">
-        {controls}
-        <section className="sidebar-log" aria-label="Лог партии"><h3>Лог партии</h3>
+      <TableSidebar controls={controls} reveal={phase === 'log' || phase === 'reminder' ? phase : null} log={<section className="sidebar-log" aria-label="Лог партии"><h3>Лог партии</h3>
           {game.log.length ? <ol className="match-log">{game.log.map((event, index) => <MatchLogEntry key={index} event={event} detail={game.logDetails?.[index]} names={[playerName, 'Учебный соперник']} />)}</ol> : <p>Принятые ходы появятся здесь.</p>}
-        </section>
-        <TableReminder snapshot={game.deckSnapshot} />
-      </aside>
+        </section>} reminder={<TableReminder snapshot={game.deckSnapshot} />} />
       </div>
     </section></main>
-    {!paused && <TrainingHint state={state} dragging={Boolean(drag)} dispatch={dispatch} onClose={onClose} />}
+    {!paused && <TrainingHint actionDock={compact ? actionDock : null} state={state} dragging={Boolean(drag)} dispatch={dispatch} onClose={onClose} />}
     {drag && <DragPreviewLayer {...drag} />}
   </div>;
 }

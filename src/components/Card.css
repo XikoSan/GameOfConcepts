@@ -32,11 +32,11 @@
   line-height: 1.1;
 }
 
-.card[draggable='true'] {
+.card[data-draggable='true'] {
   cursor: grab;
 }
 
-.card[draggable='true']:active {
+.card[data-draggable='true']:active {
   cursor: grabbing;
 }
 

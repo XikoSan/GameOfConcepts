@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { DragEvent as ReactDragEvent } from 'react';
+import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { DictionaryModal } from './components/DictionaryModal';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
@@ -7,6 +7,8 @@ import { GameBoard } from './components/GameBoard';
 import { MatchLogEntry } from './components/MatchLogEntry';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
+import { TableSidebar } from './components/TableSidebar';
+import { useCompactTable } from './hooks/useCompactTable';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
@@ -47,6 +49,7 @@ import type {
 import type { MaxPlayers, Room, RoomPlayer } from './types/room';
 import './App.css';
 import './TableTheme.css';
+import './MobileTable.css';
 
 const getPlayerLabel = (playerId: number) => `Игрок ${playerId + 1}`;
 
@@ -199,6 +202,8 @@ function App() {
   // localStorage playerId.
   const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
+  const compactTable = useCompactTable();
+  const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [showMainMenu, setShowMainMenu] = useState(true);
   const [hasLocalGame, setHasLocalGame] = useState(false);
@@ -387,7 +392,7 @@ function App() {
   const handleStartCardDrag = (
     cardName: RegularCardName,
     playerColor: DragPreview['playerColor'],
-    event: ReactDragEvent<HTMLDivElement>
+    event: ReactDragEvent<HTMLDivElement> | ReactPointerEvent<HTMLDivElement>
   ) => {
     if (hasPendingDecision) return;
 
@@ -879,6 +884,7 @@ function App() {
 
   const renderBoard = () => (
     <GameBoard
+      actionDock={compactTable ? actionDock : null}
       key={gameState.startCard.id}
       resetCameraSignal={resetCameraSignal}
       gameState={gameState}
@@ -1056,7 +1062,8 @@ function App() {
                   </button>
                 </div>
               </div>
-              <div className="table-hand-tray">
+              <div className={`table-hand-tray ${compactTable && gameState.pendingMove ? 'has-mobile-actions' : ''}`}>
+                <div className="mobile-action-dock" ref={setActionDock} />
                 {/* Online keeps the local hand; hot-seat follows the active player. */}
                 {isOnlineTable
                   ? bottomTablePlayerIndex !== null && renderPlayerHand(bottomTablePlayerIndex, undefined, onlinePlayers.length < 2)
@@ -1065,18 +1072,14 @@ function App() {
               </div>
               {isOnlineTable && onlinePlayers.length < 2 && <p className="online-waiting-note">Ожидание второго игрока</p>}
             </div>
-            <aside className="turn-sidebar" aria-label="Управление партией и ходом">
-              {renderControlPanel()}
-              <section className="sidebar-log" aria-label="Лог партии">
+            <TableSidebar controls={renderControlPanel()} log={<section className="sidebar-log" aria-label="Лог партии">
                 <h3>Лог партии</h3>
                 {moveLog.length > 0 ? (
                   <ol className="match-log" ref={matchLogRef}>
                     {moveLog.map(({ event, index }) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
                   </ol>
                 ) : <p>Принятые ходы появятся здесь.</p>}
-              </section>
-              <TableReminder snapshot={gameState.deckSnapshot} />
-            </aside>
+              </section>} reminder={<TableReminder snapshot={gameState.deckSnapshot} />} />
           </div>
         </section>
       </main>}

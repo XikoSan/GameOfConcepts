@@ -46,13 +46,13 @@ export function DragPreviewLayer({
   }, [applyPreviewTransform]);
 
   useEffect(() => {
-    const handleWindowDragOver = (event: globalThis.DragEvent) => {
+    const handleWindowDragOver = (event: globalThis.DragEvent | globalThis.PointerEvent) => {
       if (event.clientX === 0 && event.clientY === 0) return;
 
       incrementCounter('drag:window-dragover');
       latestPositionRef.current = {
         x: event.clientX,
-        y: event.clientY,
+        y: event.clientY - ('pointerType' in event && event.pointerType !== 'mouse' ? 44 : 0),
       };
 
       const eventFrame = Math.floor(performance.now() / 16);
@@ -65,9 +65,11 @@ export function DragPreviewLayer({
     };
 
     window.addEventListener('dragover', handleWindowDragOver);
+    window.addEventListener('pointermove', handleWindowDragOver);
 
     return () => {
       window.removeEventListener('dragover', handleWindowDragOver);
+      window.removeEventListener('pointermove', handleWindowDragOver);
       if (animationFrameRef.current !== null) {
         window.cancelAnimationFrame(animationFrameRef.current);
       }

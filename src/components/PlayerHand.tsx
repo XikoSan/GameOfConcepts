@@ -17,7 +17,7 @@ interface PlayerHandProps {
   onStartCardDrag: (
     cardName: RegularCardName,
     playerColor: 'blue' | 'orange' | 'green' | 'purple',
-    event: React.DragEvent<HTMLDivElement>
+    event: React.DragEvent<HTMLDivElement> | React.PointerEvent<HTMLDivElement>
   ) => void;
   onCancelCardDrag: () => void;
   onOpenDictionary: (term: string) => void;

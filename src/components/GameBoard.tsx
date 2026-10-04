@@ -23,7 +23,7 @@ import type {
   SemanticEdge,
   SemanticRelation,
 } from '../game';
-import { formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
+import { formatSemanticRelation, formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
 import { Cell } from './Cell';
 import { SemanticRelationPopover } from './SemanticRelationPopover';
 import {
@@ -35,6 +35,7 @@ import {
 import './GameBoard.css';
 
 interface GameBoardProps {
+  actionDock?: HTMLElement | null;
   gameState: GameState;
   resetCameraSignal: number;
   selectedCard: RegularCardName | null;
@@ -222,6 +223,7 @@ const getOccupiedOverlayRects = (
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
+  actionDock = null,
   resetCameraSignal,
   selectedCard,
   onPlaceCard,
@@ -290,7 +292,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   );
 
   const getDropCoordinates = useCallback(
-    (event: React.DragEvent<HTMLDivElement>): Coordinates | null => {
+    (event: { clientX: number; clientY: number }): Coordinates | null => {
       const container = containerRef.current;
       if (!container) return null;
 
@@ -339,6 +341,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     },
     [gameState, getDropCoordinates, onFinishDrag, onPlaceCard, selectedCard]
   );
+
+  useEffect(() => {
+    const drop = (event: Event) => {
+      if (!selectedCard || containerRef.current?.closest('[inert]')) return;
+      const detail = (event as CustomEvent<{ cardName: string; clientX: number; clientY: number }>).detail;
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect || detail.cardName !== selectedCard || detail.clientX < rect.left || detail.clientX > rect.right || detail.clientY < rect.top || detail.clientY > rect.bottom) return;
+      const coordinates = getDropCoordinates(detail);
+      if (coordinates && canPlaceCard(gameState, coordinates, selectedCard)) onPlaceCard(selectedCard, coordinates);
+      onFinishDrag();
+    };
+    window.addEventListener('card-pointer-drop', drop);
+    return () => window.removeEventListener('card-pointer-drop', drop);
+  }, [selectedCard, gameState, getDropCoordinates, onPlaceCard, onFinishDrag]);
 
   const handleBoardClick = useCallback(() => {
     setHighlightedRelationCardId(null);
@@ -413,10 +429,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     };
   }, []);
 
+  const touchPoints = useRef(new Map<number, { x: number; y: number }>());
+  const pinch = useRef<{ distance: number; x: number; y: number } | null>(null);
+  const measurePinch = () => {
+    const [a, b] = [...touchPoints.current.values()];
+    return a && b ? { distance: Math.hypot(a.x - b.x, a.y - b.y), x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } : null;
+  };
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
     if (selectedCard || event.button !== 0) return;
 
+      if (event.pointerType !== 'mouse') {
+        touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        pinch.current = measurePinch();
+      }
       incrementCounter('pan:pointerdown');
       dragRef.current = {
         isDragging: true,
@@ -431,6 +457,25 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handlePointerMove = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current;
     if (!drag.isDragging) return;
+    if (touchPoints.current.has(event.pointerId)) {
+      touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      const next = measurePinch(), previous = pinch.current;
+      pinch.current = next;
+      if (next && previous && previous.distance > 0) {
+        const container = containerRef.current;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        setCamera(camera => {
+          const zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, camera.zoom * next.distance / previous.distance));
+          const x = previous.x - rect.left - rect.width / 2;
+          const y = previous.y - rect.top - rect.height / 2;
+          return { zoom, offsetX: next.x - rect.left - rect.width / 2 - (x - camera.offsetX) * zoom / camera.zoom,
+            offsetY: next.y - rect.top - rect.height / 2 - (y - camera.offsetY) * zoom / camera.zoom };
+        });
+        drag.lastX = event.clientX; drag.lastY = event.clientY;
+        return;
+      }
+    }
 
     incrementCounter('pan:pointermove');
     const deltaX = event.clientX - drag.lastX;
@@ -448,7 +493,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, []);
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
-    dragRef.current.isDragging = false;
+    touchPoints.current.delete(event.pointerId);
+    pinch.current = measurePinch();
+    const remaining = [...touchPoints.current.values()][0];
+    dragRef.current = { isDragging: Boolean(remaining), lastX: remaining?.x ?? 0, lastY: remaining?.y ?? 0 };
     incrementCounter('pan:pointerup');
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
@@ -808,6 +856,45 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     previousPendingActionsRectRef.current = pendingActionsRect;
   }, [pendingActionsRect]);
 
+  const mobileActions = actionDock && pendingCard && pendingMove ? (
+    activeRelationNeighbor && activeRelationEditorForCurrentMove && canEditSemanticMove ?
+      <SemanticRelationPopover
+        key={activeRelationNeighbor.id}
+        relationPresets={getRelationPresets(gameState.deckSnapshot)}
+        pendingCard={pendingCard} neighborCard={activeRelationNeighbor}
+        selectedEdge={activeRelationEdge} selectedScore={activeRelationScore}
+        position={{ left: 0, top: 0 }}
+        onClose={() => setActiveRelationEditor(null)}
+        onDelete={() => handleRemoveRelation(activeRelationNeighbor.id)}
+        onSave={(relation, direction) => handleSaveRelation(activeRelationNeighbor.id, relation, direction)} />
+    : <section className="mobile-move-actions" onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()} aria-label={canEditSemanticMove ? 'Связи хода' : 'Голосование'}>
+        <header><strong>{pendingCard.cardName}</strong><span>{pendingSemanticEdges.length} {pluralizeRelation(pendingSemanticEdges.length)} · +{pendingSemanticScore?.total ?? 0}</span></header>
+        {canEditSemanticMove ? <>
+          <p>Выберите соседнюю карту, чтобы задать связь.</p>
+          <div className="mobile-neighbor-list">{semanticNeighbors.map(neighbor => {
+            const edge = pendingSemanticEdges.find(item => item.neighborCardInstanceId === neighbor.id);
+            return <button key={neighbor.id} type="button" aria-label={'Связь между ' + pendingCard.cardName + ' и ' + neighbor.cardName} onClick={() => openRelationEditor(neighbor)}>
+              {edge ? '✓' : '+'} {neighbor.cardName}
+            </button>;
+          })}</div>
+          <footer className="semantic-submit-popover">
+            <button type="button" disabled={!canSubmitSemanticMove} onClick={handleSubmitSemanticMove}>На голосование</button>
+            <button type="button" onClick={handleCancelSemanticMove}>Отменить</button>
+          </footer>
+        </> : <>
+          <ul className="mobile-vote-relations">{pendingSemanticEdges.map(edge => <li key={edge.id}>{formatSemanticRelation({
+            relation: edge.relation,
+            fromCardInstanceId: edge.direction === 'new-to-neighbor' ? pendingCard.id : edge.neighborCardInstanceId,
+            toCardInstanceId: edge.direction === 'new-to-neighbor' ? edge.neighborCardInstanceId : pendingCard.id,
+          }, new Map(boardCards.map(card => [card.id, card.cardName])))}</li>)}</ul>
+          {canReviewPendingMove ? <footer>
+            <button type="button" onClick={onReturnPendingMove}>Отклонить</button>
+            <button type="button" className="mobile-primary" onClick={onConfirmPendingMove}>Принять</button>
+          </footer> : <p role="status">{pendingMove.semanticStatus === 'defining-relations' ? 'Игрок выбирает связи' : pendingMoveStatusLabel || 'Ожидаем голоса игроков'}</p>}
+        </>}
+      </section>
+  ) : null;
+
   return (
     <div
       className={`game-board-container ${selectedCard ? '' : 'can-pan'}`}
@@ -821,6 +908,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       onDrop={handleDrop}
       onClick={handleBoardClick}
     >
+      {actionDock && mobileActions && createPortal(mobileActions, actionDock)}
       <div
         className="game-board"
         style={boardStyle}
@@ -859,10 +947,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               isLastPlaced={placedCard?.id === gameState.lastPlacedCardId}
               showTooltip={showTooltips}
               showPendingActions={
-                placedCard?.status === 'pending' && canReviewPendingMove
+                !actionDock && placedCard?.status === 'pending' && canReviewPendingMove
               }
               showPendingWaitBadge={
-                placedCard?.status === 'pending' && showPendingWaitBadge
+                !actionDock && placedCard?.status === 'pending' && showPendingWaitBadge
               }
               pendingMoveStatusLabel={pendingMoveStatusLabel}
               onConfirmPendingMove={onConfirmPendingMove}
@@ -947,7 +1035,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             );
           })}
       </div>
-      {pendingCard &&
+      {!actionDock && pendingCard &&
         canEditSemanticMove &&
         pendingMove?.semanticStatus === 'defining-relations' &&
         pendingActionsRect &&
@@ -979,7 +1067,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           </div>,
           document.body
         )}
-      {pendingCard &&
+      {!actionDock && pendingCard &&
         activeRelationEditorForCurrentMove &&
         activeRelationNeighbor &&
         relationEditorRect &&

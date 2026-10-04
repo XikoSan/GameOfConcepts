@@ -4,11 +4,13 @@ import { suggestedTrainingMove, type TrainingState, type TrainingAction } from '
 import type { Dispatch } from 'react';
 
 interface Props {
+  actionDock?: HTMLElement | null;
   state: TrainingState; dragging: boolean; dispatch: Dispatch<TrainingAction>; onClose: () => void;
 }
 
-export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
+export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }: Props) {
   const { phase, feedback, game } = state;
+  const docked = Boolean(actionDock && (phase === 'explain' || phase === 'opponent'));
   const ready = Boolean(game.pendingMove?.semanticEdges?.length);
   const suggestion = useMemo(() => phase === 'place' ? suggestedTrainingMove(state) : undefined, [state, phase]);
   const box = useRef<HTMLElement>(null);
@@ -36,8 +38,8 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
         target = find('.training-session .hand-redraw-button');
         text = 'Пересдача руки доступна один раз за обычную партию, до размещения карты: вся рука уходит вниз колоды, вы получаете новые карты и сохраняете ход. В обучении эта кнопка отключена.';
       } else if (phase === 'reminder') {
-        target = find('.training-session .table-reminder');
-        text = 'Справа — памятка с типами связей и подсчётом очков. Здесь можно проверить, сколько очков приносит связь и когда она получает бонус за участие в узле или пути.';
+        target = find(actionDock ? '.training-session .mobile-reminder-trigger' : '.training-session .table-reminder');
+        text = 'В боковой панели — памятка с типами связей и подсчётом очков. Здесь можно проверить, сколько очков приносит связь и когда она получает бонус за участие в узле или пути.';
       } else if (phase === 'place') {
         target = find('.training-session .card', state.selected || suggestion?.name);
         const goal = !state.moves ? 'Начните с любой карты и разместите её рядом с нейтральной картой.' : !state.sawNode ? 'Попробуйте собрать узел вокруг «Эмоции». У вас уже есть связь с этой картой. Свяжите с ней ещё одну свою карту типом «Вид»: две ваши карты будут направлены к общему центру. Новая связь принесёт 1 очко за связь и ещё 1 за участие в узле.' : !state.sawPath ? 'Теперь попробуйте продолжить связь в путь: разместите разновидность рядом со своей эмоцией и свяжите их типом «Вид». Получится последовательность: разновидность → ваша эмоция → «Эмоция». Связи одного типа идут одна за другой через вашу карту. Новая связь принесёт 1 очко за связь и ещё 1 за участие в пути.' : 'Продолжите свой ход.';
@@ -68,8 +70,8 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
         target = find('.training-session .player-score-total');
         text = 'Здесь ваш общий счёт.';
       } else if (phase === 'log') {
-        target = find('.training-session .sidebar-log');
-        text = 'В логе сохраняются принятые ходы. Наведите курсор на запись, чтобы увидеть выбранные связи и расчёт очков.';
+        target = find(actionDock ? '.training-session .mobile-log-trigger' : '.training-session .sidebar-log');
+        text = 'В логе сохраняются принятые ходы. Откройте запись, чтобы увидеть выбранные связи и расчёт очков.';
       } else if (phase === 'opponent') {
         target = find('.training-session .card-in-cell', game.pendingMove?.cardName);
         text = `Соперник предлагает ход. ${state.lastExplanation} Теперь вы голосуете за весь ход: принять или отклонить.`;
@@ -83,7 +85,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
       target ??= find('.training-session .board-section');
       if (text !== lastMessage) { lastMessage = text; setMessage(text); }
       const hint = box.current, pointer = arrow.current, outline = ring.current;
-      if (hint && pointer && outline) {
+      if (hint && pointer && outline && !docked) {
         const rect = target?.getBoundingClientRect();
         const visible = rect && rect.width > 0 && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth && !dragging;
         hint.style.visibility = visible ? 'visible' : 'hidden';
@@ -100,7 +102,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
             { side: 'left', x: bounds.left - w - gap, y: cy - h / 2 },
           ];
           const overflow = (p: typeof candidates[number]) => Math.max(0, margin - p.x) + Math.max(0, p.x + w + margin - innerWidth) + Math.max(0, margin - p.y) + Math.max(0, p.y + h + margin - innerHeight);
-          const chosen = phase === 'opponent-result' ? candidates.find(candidate => candidate.side === 'bottom')! : ['log', 'reminder'].includes(phase) ? candidates.find(candidate => candidate.side === 'left')! : candidates.sort((a, b) => overflow(a) - overflow(b))[0];
+          const chosen = actionDock && ['place', 'hand', 'deck', 'redraw'].includes(phase) ? candidates.find(candidate => candidate.side === 'top')! : phase === 'opponent-result' ? candidates.find(candidate => candidate.side === 'bottom')! : !actionDock && ['log', 'reminder'].includes(phase) ? candidates.find(candidate => candidate.side === 'left')! : candidates.sort((a, b) => overflow(a) - overflow(b))[0];
           const x = Math.max(margin, Math.min(chosen.x, innerWidth - w - margin));
           const y = Math.max(margin, Math.min(chosen.y, innerHeight - h - margin));
           hint.style.left = x + 'px'; hint.style.top = y + 'px'; hint.dataset.side = chosen.side;
@@ -114,13 +116,13 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
     };
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [phase, ready, dragging, state, game, feedback, suggestion]);
+  }, [phase, ready, dragging, state, game, feedback, suggestion, docked, actionDock]);
 
   if (phase === 'voting' || (phase === 'relation' && state.moves > 0)) return null;
 
   return createPortal(<>
-    <div ref={ring} className="training-target-ring" aria-hidden="true" />
-    <section ref={box} className="training-guide" aria-label="Подсказка обучения">
+    <div ref={ring} className="training-target-ring" aria-hidden="true" hidden={docked} />
+    <section ref={box} className={`training-guide ${docked ? 'training-guide-docked' : ''}`} aria-label="Подсказка обучения">
       <span ref={arrow} className="training-guide-arrow" aria-hidden="true" />
       <button className="training-close" type="button" onClick={onClose} aria-label="Выйти из обучения">×</button>
       <div aria-live="polite" aria-atomic="true"><p>{message}</p>
@@ -131,5 +133,5 @@ export function TrainingHint({ state, dragging, dispatch, onClose }: Props) {
       {phase === 'opponent' && <div className="training-vote-actions"><button className="training-primary" onClick={() => dispatch({ type: 'reject-opponent' })}>Отклонить</button><button className="training-primary" onClick={() => dispatch({ type: 'approve-opponent' })}>Принять</button></div>}
       {phase === 'complete' && <button className="training-primary" onClick={onClose}>В меню</button>}
     </section>
-  </>, document.body);
+  </>, docked && actionDock ? actionDock : document.body);
 }
