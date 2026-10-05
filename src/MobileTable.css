@@ -111,7 +111,7 @@
 }
 
 @media (max-width: 1200px) and (max-height: 600px) and (orientation: landscape), (max-width: 900px) and (orientation: landscape), (pointer: coarse) and (max-height: 600px) and (orientation: landscape) {
-  .app-container { --mobile-dock-height: 124px; }
+  .app-container { --mobile-dock-height: 100px; }
   .app-container .table-status-bar { grid-template-columns: minmax(0, 1fr) 230px; }
   .app-container .table-hand-tray .cards-container { grid-template-columns: repeat(5, minmax(0, 1fr)); }
   .app-container .table-hand-tray .card { height: 60px; min-height: 60px; }
@@ -143,7 +143,7 @@
   .app-container .table-hand-tray .deck-stack { left: 8px; top: 50%; bottom: auto; transform: translateY(-50%); flex-direction: column; gap: 4px; }
   .app-container .hand-actions { right: 6px; top: 50%; bottom: auto; transform: translateY(-50%); }
   .app-container .hand-redraw-caption { display: none; }
-  .app-container .table-hand-tray .card { height: 76px; min-height: 76px; }
+  .app-container .table-hand-tray .card { height: 68px; min-height: 68px; }
   .mobile-action-dock .semantic-relation-popover { gap: 3px 8px; }
   .mobile-action-dock .semantic-relation-popover section { gap: 3px; }
   .mobile-action-dock .semantic-popover-preview { padding: 3px 6px; }
@@ -153,4 +153,19 @@
 @media (max-width: 900px) and (orientation: portrait) {
   .keyboard-editing .app-container .training-local-annotation-window { display: none; }
   .keyboard-editing .app-container:has(.training-local-annotation-window) .modal-overlay { padding: 8px; }
+}
+
+@media (max-width: 1200px) and (max-height: 600px) and (orientation: landscape), (max-width: 900px) and (orientation: landscape), (pointer: coarse) and (max-height: 600px) and (orientation: landscape) {
+  .mobile-action-dock .semantic-relation-popover { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto; min-height: 0; height: 100%; align-content: center; gap: 3px 10px; }
+  .mobile-action-dock .semantic-relation-popover > section:first-of-type { align-self: center; }
+  .mobile-action-dock .semantic-popover-chips { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; }
+  .mobile-action-dock .semantic-popover-chips button { grid-column: span 2; padding: 3px 2px; }
+  .mobile-action-dock .semantic-popover-chips button:nth-last-child(-n+2) { grid-column: span 3; }
+  .mobile-action-dock .semantic-popover-source { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+  .mobile-action-dock .semantic-relation-popover > header { align-self: center; }
+  .mobile-action-dock .semantic-relation-popover > footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; align-self: center; }
+  .mobile-action-dock .semantic-relation-popover > footer button { height: 40px; min-width: 0; padding: 3px; line-height: 1.15; }
+  .mobile-action-dock .semantic-relation-popover button { font-size: 11px; }
+  .mobile-action-dock .semantic-relation-popover section > span { line-height: 1.15; font-size: 11px; }
+  .mobile-action-dock .semantic-popover-preview { align-self: center; }
 }
