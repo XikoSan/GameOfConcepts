@@ -14,6 +14,7 @@ export function TableSidebar({ controls, log, reminder, reveal }: Props) {
   const [opened, setOpened] = useState<'log' | 'reminder' | null>(null);
   const [dismissedReveal, setDismissedReveal] = useState<Props['reveal']>(null);
   const panel = (reveal !== dismissedReveal ? reveal : null) ?? opened;
+  const swipe = useRef<{ x: number; y: number } | null>(null);
   const id = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
@@ -39,6 +40,8 @@ export function TableSidebar({ controls, log, reminder, reveal }: Props) {
     </nav>
     {panel && <button className="mobile-sidebar-dismiss" type="button" aria-label="Закрыть боковую панель" onClick={close} />}
     <aside id={id} className={`turn-sidebar mobile-sidebar ${panel ? 'is-open' : ''}`} inert={!panel}
+      onTouchStart={event => { const p = event.touches[0]; swipe.current = { x: p.clientX, y: p.clientY }; }}
+      onTouchEnd={event => { const p = event.changedTouches[0], start = swipe.current; swipe.current = null; if (start && p.clientX - start.x > 60 && Math.abs(p.clientY - start.y) < 40) close(); }}
       aria-hidden={!panel} aria-label={panel === 'log' ? 'Лог партии' : 'Памятка'}>
       <header className="mobile-sidebar-heading"><strong>{panel === 'log' ? 'Лог партии' : 'Памятка'}</strong>
         <button ref={closeRef} type="button" aria-label="Закрыть панель" onClick={close}>×</button>

@@ -87,6 +87,8 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
       const hint = box.current, pointer = arrow.current, outline = ring.current;
       if (hint && pointer && outline && !docked) {
         const rect = target?.getBoundingClientRect();
+        const panelOpen = actionDock && ['log', 'reminder'].includes(phase) && find('.training-session .mobile-sidebar.is-open');
+        if (panelOpen) { hint.style.visibility = 'hidden'; outline.style.visibility = 'hidden'; frame = requestAnimationFrame(update); return; }
         const visible = rect && rect.width > 0 && rect.bottom > 0 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth && !dragging;
         hint.style.visibility = visible ? 'visible' : 'hidden';
         outline.style.visibility = visible ? 'visible' : 'hidden';

@@ -50,7 +50,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
 
   useEffect(() => {
     if (phase !== 'voting' || paused) return;
-    const timer = window.setTimeout(() => dispatch({ type: 'accept' }), 7000);
+    const timer = window.setTimeout(() => dispatch({ type: 'accept' }), 7000 / 3);
     return () => window.clearTimeout(timer);
   }, [phase, paused]);
 
@@ -107,7 +107,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
           </button><p className="hand-redraw-caption">Пересдача руки</p></div>
         </div>
       </div>
-      <TableSidebar controls={controls} reveal={phase === 'log' || phase === 'reminder' ? phase : null} log={<section className="sidebar-log" aria-label="Лог партии"><h3>Лог партии</h3>
+      <TableSidebar controls={controls} log={<section className="sidebar-log" aria-label="Лог партии"><h3>Лог партии</h3>
           {game.log.length ? <ol className="match-log">{game.log.map((event, index) => <MatchLogEntry key={index} event={event} detail={game.logDetails?.[index]} names={[playerName, 'Учебный соперник']} />)}</ol> : <p>Принятые ходы появятся здесь.</p>}
         </section>} reminder={<TableReminder snapshot={game.deckSnapshot} />} />
       </div>

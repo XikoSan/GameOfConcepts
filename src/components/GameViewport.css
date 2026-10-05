@@ -18,3 +18,12 @@
     transform: rotate(90deg);
   }
 }
+
+.game-viewport.is-editing {
+  inset: auto;
+  left: 0;
+  top: var(--visible-top, 0px);
+  width: var(--visible-width, 100vw);
+  height: var(--visible-height, 100dvh);
+  transform: none;
+}
