@@ -94,7 +94,7 @@
   .app-container input, .app-container select { font-size: 16px; }
   .app-container .main-menu { min-height: 0; height: 100dvh; gap: 14px; padding: 16px; overflow-y: auto; }
   .app-container .main-menu h1 { font-size: 26px; }
-  .app-container .main-menu-actions { grid-template-columns: 1fr 1fr; width: min(560px, 100%); gap: 8px; }
+  .app-container .main-menu-actions { grid-template-columns: 1fr; width: min(560px, 100%); gap: 8px; }
   .app-container .main-menu-actions button { min-height: 44px; padding: 8px 12px; }
   .app-container .main-menu-footer { width: min(560px, 100%); }
   .app-container .training-local-annotation-window { top: 50%; left: 10px; transform: translateY(-50%); width: calc(40% - 20px); padding: 14px; max-height: calc(100dvh - 20px); overflow-y: auto; }
@@ -169,3 +169,18 @@
   .mobile-action-dock .semantic-relation-popover section > span { line-height: 1.15; font-size: 11px; }
   .mobile-action-dock .semantic-popover-preview { align-self: center; }
 }
+
+@media (max-width: 1200px) and (max-height: 600px) and (orientation: landscape), (max-width: 900px) and (orientation: landscape), (pointer: coarse) and (max-height: 600px) and (orientation: landscape) {
+  .mobile-move-actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto 1fr; height: 100%; min-height: 0; align-items: center; column-gap: 16px; }
+  .mobile-move-actions > header { grid-column: 1; }
+  .mobile-move-actions > .mobile-neighbor-list { grid-column: 1; overflow-y: auto; max-height: 100%; }
+  .mobile-move-actions > footer { grid-column: 2; grid-row: 1 / -1; align-self: center; margin: 0; flex-wrap: nowrap; }
+  .mobile-move-actions > .mobile-vote-relations { grid-column: 1; max-height: 48px; overflow-y: auto; }
+  .mobile-action-dock .training-guide-docked { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; height: 100%; min-height: 0; }
+  .mobile-action-dock .training-guide-docked > [aria-live] { max-height: 100%; overflow-y: auto; }
+  .mobile-action-dock .training-guide-docked .training-primary { margin: 0; }
+  .mobile-action-dock .training-vote-actions { flex-wrap: nowrap; gap: 8px; }
+}
+
+/* Android already lays out the WebView edge-to-edge; do not reserve a full cutout column. */
+.native-app .app-container .game-table { padding-left: 6px; padding-right: 6px; }

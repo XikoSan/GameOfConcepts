@@ -80,7 +80,8 @@ const GRID_MAX = 40;
 const GRID_SIZE = GRID_MAX - GRID_MIN + 1;
 const CELL_SIZE = 56;
 const MIN_ZOOM = 0.6;
-const MAX_ZOOM = 1;
+const MAX_ZOOM = 2;
+const INITIAL_ZOOM = 1.5;
 const ZOOM_STEP = 0.1;
 
 const getCellCenter = (coordinates: Coordinates) => ({
@@ -92,9 +93,9 @@ const getCenteredCamera = (coordinates: Coordinates): CameraState => {
   const center = getCellCenter(coordinates);
 
   return {
-    offsetX: -center.x,
-    offsetY: -center.y,
-    zoom: MAX_ZOOM,
+    offsetX: -center.x * INITIAL_ZOOM,
+    offsetY: -center.y * INITIAL_ZOOM,
+    zoom: INITIAL_ZOOM,
   };
 };
 

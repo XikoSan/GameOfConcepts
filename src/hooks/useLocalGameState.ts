@@ -93,7 +93,7 @@ const withLocalPendingVote = (gameState: GameState): GameState => {
   };
 };
 
-export function useLocalGameState(): GameController {
+export function useLocalGameState(): GameController & { restoreLocalGame: (state: GameState) => void } {
   const [localPlayerCount, setLocalPlayerCount] = useState(2);
   const [localDeckId, setLocalDeckId] = useState(DEFAULT_DECK.id);
   const [gameState, setGameState] = useState<GameState>(() => initializeGame(2));
@@ -212,6 +212,10 @@ export function useLocalGameState(): GameController {
   }, []);
 
   return {
+    restoreLocalGame: (saved) => {
+      setGameState(saved);
+      setLocalPlayerCount(saved.players.length);
+    },
     gameState,
     mode: 'local',
     connectionStatus: 'local',

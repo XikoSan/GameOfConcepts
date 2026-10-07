@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   rulesExamples,
   getRulesSectionsForDeck,
@@ -134,6 +134,15 @@ function RulesBlockView({ block }: { block: RulesBlock }) {
 
 export function RulesContent({ deckSnapshot }: { deckSnapshot?: GameDeckSnapshot }) {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  const root = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const container = root.current;
+    if (!container) return;
+    container.querySelectorAll<HTMLElement>('.rules-main, .rules-body, .rules-section-inner').forEach(element => { element.scrollTop = 0; });
+    container.scrollTop = 0;
+    const modal = container.closest('.modal-content');
+    if (modal) modal.scrollTop = 0;
+  }, [activeTabIndex]);
   const activeTab = rulesTabs[activeTabIndex];
   const activeSectionTitles = activeTab.sectionTitles;
   const activeSections = useMemo(
@@ -144,7 +153,7 @@ export function RulesContent({ deckSnapshot }: { deckSnapshot?: GameDeckSnapshot
     [activeSectionTitles, deckSnapshot]
   );
   return (
-    <div className="rules-content">
+    <div ref={root} className="rules-content">
       <aside className="rules-sidebar" aria-label="Навигация по правилам">
         <p className="rules-sidebar-label">Разделы</p>
         <div className="rules-tabs" role="tablist" aria-label="Разделы правил">

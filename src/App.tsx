@@ -1,3 +1,6 @@
+import { readSavedSession, writeSavedSession, type SavedSession } from './services/savedSession';
+import type { TrainingState } from './tutorial/trainingGame';
+import { Capacitor } from '@capacitor/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
@@ -186,7 +189,7 @@ interface DragPreview {
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
 }
 
-type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | null;
+type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | 'leave-game' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -195,7 +198,7 @@ const defaultInterfaceSettings = {
 
 function App() {
   const musicAudioRef = useRef<HTMLAudioElement>(null);
-  const menuMusicStarted = useRef(false);
+  const menuMusicStarted = useRef(Capacitor.isNativePlatform());
   const music = useBackgroundMusic(musicAudioRef);
   incrementCounter('render:App');
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
@@ -206,7 +209,11 @@ function App() {
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [showMainMenu, setShowMainMenu] = useState(true);
-  const [hasLocalGame, setHasLocalGame] = useState(false);
+  const [savedSession, setSavedSession] = useState(readSavedSession);
+  const [saveError, setSaveError] = useState('');
+  const [trainingInitialState, setTrainingInitialState] = useState<TrainingState>();
+  const trainingSnapshot = useRef<TrainingState | null>(null);
+  const rememberTrainingState = useCallback((state: TrainingState) => { trainingSnapshot.current = state; }, []);
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [trainingSetup, setTrainingSetup] = useState(false);
   const [trainingRunning, setTrainingRunning] = useState(false);
@@ -250,6 +257,7 @@ function App() {
     rejectCross,
     resetGame,
     startLocalGame,
+    restoreLocalGame,
   } = useGameState({
     room: onlineRoom,
     localPlayerId: playerId,
@@ -428,7 +436,6 @@ function App() {
   };
 
   const handleConfirmNewGame = () => {
-    setHasLocalGame(true);
     setShowMainMenu(false);
     setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     resetGame(maxPlayers, localDeckId);
@@ -440,7 +447,6 @@ function App() {
   };
 
   const handleStartLocalGame = () => {
-    setHasLocalGame(true);
     setShowMainMenu(false);
     setLocalPlayerNames(localNameDrafts.slice(0, maxPlayers).map((name) => name.trim()));
     // TEMP(MVP): Выход из онлайн-комнаты пока только локальный, без удаления
@@ -934,19 +940,7 @@ function App() {
             </svg>
           </button>
           <p className="hand-redraw-caption">Пересдача руки</p>
-          {isRedrawConfirmOpen && canUseHandRedraw && (
-            <div className="control-redraw-confirm">
-              <p>Заменить всю руку? Пересдачу можно использовать один раз за партию.</p>
-              <div className="control-redraw-actions">
-                <button type="button" onClick={handleRedrawHand}>
-                  Пересдать
-                </button>
-                <button type="button" onClick={() => setIsRedrawConfirmOpen(false)}>
-                  Отмена
-                </button>
-              </div>
-            </div>
-          )}
+
   </div>);
 
   const renderControlPanel = () => onlineRoom ? (
@@ -1035,6 +1029,34 @@ function App() {
     setShowMainMenu(true);
   };
 
+  const requestMainMenu = () => { setSaveError(''); setActiveModal('leave-game'); };
+  const leaveGame = (save: boolean) => {
+    if (onlineRoom) { openMainMenu(); return; }
+    try {
+      const session: SavedSession | null = save ? (trainingRunning && trainingSnapshot.current
+        ? { version: 1, kind: 'training', training: trainingSnapshot.current, names: [localNameDrafts[0].trim() || 'Вы'] }
+        : { version: 1, kind: 'local', game: gameState, names: localPlayerNames }) : null;
+      writeSavedSession(session);
+      setSavedSession(session);
+      openMainMenu();
+    } catch { setSaveError('Не удалось сохранить партию. Освободите место на устройстве или останьтесь в игре.'); }
+  };
+  const resumeSavedGame = () => {
+    if (!savedSession) return;
+    if (savedSession.kind === 'training') {
+      setTrainingInitialState(savedSession.training);
+      setLocalNameDrafts([savedSession.names[0] || 'Вы', 'Учебный соперник', '', '']);
+      setTrainingRunning(true);
+      setActiveModal('tutorial');
+    } else {
+      restoreLocalGame(savedSession.game);
+      setLocalPlayerNames(savedSession.names);
+      setActiveModal(null);
+      setResetCameraSignal(value => value + 1);
+    }
+    setShowMainMenu(false);
+  };
+
   return (
     <div className="app-container">
       <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden loop={showMainMenu && activeModal !== 'tutorial'} onEnded={() => { if (!showMainMenu || activeModal === 'tutorial') music.skip(1); }} onPlaying={music.loaded} onError={music.failed} />
@@ -1043,7 +1065,7 @@ function App() {
           <header className="table-status-bar">
             {renderPlayers()}
             <nav className="table-menu" aria-label="Меню игры">
-              <button className="table-menu-tutorial" type="button" onClick={openMainMenu}>Меню</button>
+              <button className="table-menu-tutorial" type="button" onClick={requestMainMenu}>Меню</button>
               <button className="table-menu-rules" type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
               <button className="table-menu-settings" type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
             </nav>
@@ -1088,12 +1110,18 @@ function App() {
         onKeyDownCapture={event => { if (event.key === 'Enter' || event.key === ' ') startMenuMusic(); }}>
         <h1>Игра понятий</h1>
         <nav className="main-menu-actions" aria-label="Главное меню">
-          {hasLocalGame && <button type="button" onClick={() => { openMainMenu(); setShowMainMenu(false); }}>Продолжить игру</button>}
-          <button type="button" onClick={() => { setLocalNameDrafts(['', '', '', '']); setActiveModal('local-game'); }}>Локальная игра</button>
-          <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
-          <button type="button" onClick={() => { setTrainingSetup(true); setMaxPlayers(2); setLocalDeckId(DEFAULT_DECK.id); setLocalNameDrafts(['', 'Учебный соперник', '', '']); setActiveModal('local-game'); }}>Обучение</button>
-          <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
-          <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
+          <div className="main-menu-row">
+            <button type="button" onClick={() => { setLocalNameDrafts(['', '', '', '']); setActiveModal('local-game'); }}>Локальная игра</button>
+            <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
+          </div>
+          <div className="main-menu-row main-menu-learning">
+            <button className="main-menu-training" type="button" onClick={() => { setTrainingSetup(true); setMaxPlayers(2); setLocalDeckId(DEFAULT_DECK.id); setLocalNameDrafts(['', 'Учебный соперник', '', '']); setActiveModal('local-game'); }}>Обучение</button>
+            {savedSession && <button type="button" onClick={resumeSavedGame}>{savedSession.kind === 'training' ? 'Продолжить обучение' : 'Продолжить игру'}</button>}
+          </div>
+          <div className="main-menu-row">
+            <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
+            <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
+          </div>
         </nav>
         <footer className="main-menu-footer">
           <a href="https://github.com/XikoSan/GameOfConcepts/issues/new" target="_blank" rel="noreferrer">Обратная связь</a>
@@ -1160,7 +1188,7 @@ function App() {
                 </label>
               ))}
             </fieldset>
-            <button className="action-button action-button-primary" type="button" onClick={() => { if (trainingSetup) { setTrainingSetup(false); setTrainingRunning(true); setShowMainMenu(false); setActiveModal('tutorial'); } else if (onlineRoom) { handleStartLocalGame(); } else { handleConfirmNewGame(); } }}>
+            <button className="action-button action-button-primary" type="button" onClick={() => { if (trainingSetup) { setTrainingInitialState(undefined); trainingSnapshot.current = null; setTrainingSetup(false); setTrainingRunning(true); setShowMainMenu(false); setActiveModal('tutorial'); } else if (onlineRoom) { handleStartLocalGame(); } else { handleConfirmNewGame(); } }}>
               Начать партию
             </button>
           </div>
@@ -1385,8 +1413,28 @@ function App() {
           </div>
         </Modal>
       )}
-      {trainingRunning && <TrainingGame playerName={localNameDrafts[0].trim() || 'Вы'} paused={activeModal !== 'tutorial' && activeModal !== null} onClose={openMainMenu} controls={null}
+      {trainingRunning && <TrainingGame initialState={trainingInitialState} onStateChange={rememberTrainingState} playerName={localNameDrafts[0].trim() || 'Вы'} paused={activeModal !== 'tutorial' && activeModal !== null} onClose={requestMainMenu} controls={null}
         onOpenRules={() => setActiveModal('rules')} onOpenSettings={() => setActiveModal('settings')} />}
+      {isRedrawConfirmOpen && canUseHandRedraw && !showMainMenu && activeModal === null && (
+        <Modal title="Пересдать руку?" onClose={() => setIsRedrawConfirmOpen(false)}>
+          <div className="redraw-confirm-dialog">
+            <p>Заменить всю руку? Пересдачу можно использовать один раз за партию.</p>
+            <div className="control-redraw-actions">
+              <button type="button" onClick={handleRedrawHand}>Пересдать</button>
+              <button type="button" onClick={() => setIsRedrawConfirmOpen(false)}>Отмена</button>
+            </div>
+          </div>
+        </Modal>
+      )}
+      {activeModal === 'leave-game' && <Modal title="Вернуться в меню?" onClose={() => setActiveModal(trainingRunning ? 'tutorial' : null)}>
+        <p>{onlineRoom ? 'Партия сохранена в комнате. Вы сможете вернуться к ней через список онлайн-комнат.' : 'Сохраните текущую партию, чтобы продолжить позже, или завершите её без сохранения.'}</p>
+        {saveError && <p role="alert">{saveError}</p>}
+        <div className="modal-actions leave-game-actions">
+          <button type="button" onClick={() => setActiveModal(trainingRunning ? 'tutorial' : null)}>Остаться в игре</button>
+          {!onlineRoom && <button type="button" onClick={() => leaveGame(false)}>Завершить партию</button>}
+          <button className="save-game-button" type="button" onClick={() => leaveGame(true)}>{onlineRoom ? 'В меню' : 'Сохранить и выйти'}</button>
+        </div>
+      </Modal>}
       {activeModal === 'rules' && (
         <Modal onClose={() => setActiveModal(null)} title="Правила">
           <RulesContent deckSnapshot={gameState.deckSnapshot} />

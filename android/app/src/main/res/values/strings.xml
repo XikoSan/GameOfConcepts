@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Игра понятий</string>
+    <string name="title_activity_main">Игра понятий</string>
+    <string name="package_name">com.xikosan.gameofconcepts</string>
+    <string name="custom_url_scheme">com.xikosan.gameofconcepts</string>
+</resources>

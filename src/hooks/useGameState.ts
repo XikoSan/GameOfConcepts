@@ -52,5 +52,6 @@ export function useGameState({
   return {
     ...multiplayerController,
     startLocalGame: localController.resetGame,
+    restoreLocalGame: localController.restoreLocalGame,
   };
 }

@@ -39,11 +39,11 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
         text = 'Пересдача руки доступна один раз за обычную партию, до размещения карты: вся рука уходит вниз колоды, вы получаете новые карты и сохраняете ход. В обучении эта кнопка отключена.';
       } else if (phase === 'reminder') {
         target = find(actionDock ? '.training-session .mobile-reminder-trigger' : '.training-session .table-reminder');
-        text = 'В боковой панели — памятка с типами связей и подсчётом очков. Здесь можно проверить, сколько очков приносит связь и когда она получает бонус за участие в узле или пути.';
+        text = actionDock ? 'Кнопка «Памятка» открывает типы связей и правила подсчёта очков. К ней можно обращаться в любой момент игры.' : 'Здесь собраны типы связей и правила подсчёта очков. К памятке можно обращаться в любой момент игры.';
       } else if (phase === 'place') {
         target = find('.training-session .card', state.selected || suggestion?.name);
-        const goal = !state.moves ? 'Начните с любой карты и разместите её рядом с нейтральной картой.' : !state.sawNode ? 'Попробуйте собрать узел вокруг «Эмоции». У вас уже есть связь с этой картой. Свяжите с ней ещё одну свою карту типом «Вид»: две ваши карты будут направлены к общему центру. Новая связь принесёт 1 очко за связь и ещё 1 за участие в узле.' : !state.sawPath ? 'Теперь попробуйте продолжить связь в путь: разместите разновидность рядом со своей эмоцией и свяжите их типом «Вид». Получится последовательность: разновидность → ваша эмоция → «Эмоция». Связи одного типа идут одна за другой через вашу карту. Новая связь принесёт 1 очко за связь и ещё 1 за участие в пути.' : 'Продолжите свой ход.';
-        text = `${goal} ${suggestion ? `Например карта, «${suggestion.name}» как вид «${suggestion.neighbor}».` : ''} Перетащите карту из руки на свободную клетку рядом с уже выложенной картой.`;
+        const goal = !state.moves ? 'Начните с любой карты и разместите её рядом с нейтральной картой.' : !state.sawNode ? 'Узел объединяет ваши карты связями одного типа и направления с общим центром. Перетащите ещё одну эмоцию к «Эмоции» и выберите «Вид». Новая связь даст 1 очко за связь и ещё 1 за участие в узле.' : !state.sawPath ? 'Путь — последовательность связей одного типа, направленных одна за другой через ваши карты. Продолжите её: разновидность → ваша эмоция → «Эмоция». Новая связь даст 1 очко за связь и ещё 1 за участие в пути.' : 'Продолжите свой ход.';
+        text = `${goal} ${suggestion ? `Например, соедините «${suggestion.name}» → «${suggestion.neighbor}» типом «Вид».` : ''} Перетащите карту из руки на свободную клетку рядом с уже выложенной картой.`;
       } else if (phase === 'relation' && editor) {
         const chosen = find('.semantic-popover-chips button[aria-pressed="true"]');
         const source = find('.semantic-popover-source button[aria-pressed="true"]');
@@ -59,7 +59,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
         }
       } else if (phase === 'relation') {
         target = ready ? find('.semantic-submit-popover button', 'На голосование') : find('.training-session button[aria-label^="Связь между"]');
-        text = ready ? 'Связь выбрана. Нажмите «На голосование», чтобы перейти к обоснованию.' : 'Чтобы связать соседние понятия, нажмите «+» между ними. Само соседство карт не создаёт связи и не приносит очков.';
+        text = ready ? 'Связь выбрана. Нажмите «На голосование». Перед отправкой хода вы сможете обосновать связь вслух.' : 'Чтобы связать соседние понятия, нажмите «+» между ними. Само соседство карт не создаёт связи и не приносит очков.';
       } else if (phase === 'explain') {
         target = find('.training-session .card-in-cell', game.pendingMove?.cardName);
         text = 'Объясните вслух, почему эти понятия связаны выбранным типом. Остальные игроки выслушают ваше обоснование и примут или отклонят ход.';
@@ -71,7 +71,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
         text = 'Здесь ваш общий счёт.';
       } else if (phase === 'log') {
         target = find(actionDock ? '.training-session .mobile-log-trigger' : '.training-session .sidebar-log');
-        text = 'В логе сохраняются принятые ходы. Откройте запись, чтобы увидеть выбранные связи и расчёт очков.';
+        text = actionDock ? 'Нажмите «Лог», чтобы открыть историю принятых ходов. В каждой записи можно посмотреть связи и расчёт очков.' : 'В логе сохраняются принятые ходы. Откройте запись, чтобы увидеть связи и расчёт очков.';
       } else if (phase === 'opponent') {
         target = find('.training-session .card-in-cell', game.pendingMove?.cardName);
         text = `Соперник предлагает ход. ${state.lastExplanation} Теперь вы голосуете за весь ход: принять или отклонить.`;
@@ -94,7 +94,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
         outline.style.visibility = visible ? 'visible' : 'hidden';
         if (visible && rect) {
           // Keep the hint outside the editor, leaving all relation controls accessible.
-          const bounds = phase === 'relation' && editor ? editor.getBoundingClientRect() : rect;
+          const bounds = phase === 'relation' && actionDock ? actionDock.getBoundingClientRect() : phase === 'relation' && editor ? editor.getBoundingClientRect() : rect;
           const w = hint.offsetWidth, h = hint.offsetHeight, gap = phase === 'relation' && ready ? 34 : 14, margin = 10;
           const cx = (rect.left + rect.right) / 2, cy = (rect.top + rect.bottom) / 2;
           const candidates = [

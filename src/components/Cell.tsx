@@ -185,6 +185,28 @@ export const Cell: React.FC<CellProps> = ({
   const [pendingOverlayPosition, setPendingOverlayPosition] =
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLSpanElement>(null);
+  const cardName = placedCard?.cardName;
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const title = titleRef.current;
+    if (!card || !title) return;
+    const fitTitle = () => {
+      title.style.fontSize = '';
+      const style = getComputedStyle(card);
+      const available = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2;
+      const baseSize = parseFloat(getComputedStyle(title).fontSize);
+      if (available > 0 && title.scrollWidth > available) {
+        title.style.fontSize = `${baseSize * available / title.scrollWidth * 0.98}px`;
+      }
+    };
+    const observer = new ResizeObserver(fitTitle);
+    observer.observe(card);
+    fitTitle();
+    let active = true;
+    void document.fonts.ready.then(() => { if (active) fitTitle(); });
+    return () => { active = false; observer.disconnect(); };
+  }, [cardName]);
   const popoverOpenTimeoutRef = useRef<number | null>(null);
   const popoverCloseTimeoutRef = useRef<number | null>(null);
   const popoverRequestIdRef = useRef(0);
@@ -711,7 +733,7 @@ export const Cell: React.FC<CellProps> = ({
           onClick={openPinnedPopover}
           style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
         >
-          <span className="card-title" lang="ru">
+          <span ref={titleRef} className="card-title" lang="ru">
             {placedCard.cardName}
           </span>
           {shouldShowTooltip &&

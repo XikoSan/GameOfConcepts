@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { TableReminder } from './TableReminder';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { createTrainingState, trainingReducer } from '../tutorial/trainingGame';
+import { createTrainingState, trainingReducer, type TrainingState } from '../tutorial/trainingGame';
 import { GameBoard } from './GameBoard';
 import { PlayerHand } from './PlayerHand';
 import { DragPreviewLayer } from './DragPreviewLayer';
@@ -13,11 +13,13 @@ import { useCompactTable } from '../hooks/useCompactTable';
 
 const noop = () => {};
 interface TrainingGameProps {
+  initialState?: TrainingState; onStateChange?: (state: TrainingState) => void;
   onClose: () => void; controls: ReactNode; onOpenRules: () => void; onOpenSettings: () => void; paused?: boolean; playerName?: string;
 }
 
-export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, paused = false, playerName = 'Вы' }: TrainingGameProps) {
-  const [state, dispatch] = useReducer(trainingReducer, undefined, createTrainingState);
+export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, paused = false, playerName = 'Вы', initialState, onStateChange }: TrainingGameProps) {
+  const [state, dispatch] = useReducer(trainingReducer, initialState, saved => saved ?? createTrainingState());
+  useEffect(() => { onStateChange?.(state); }, [state, onStateChange]);
   const [camera, setCamera] = useState(0);
   const compact = useCompactTable();
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);

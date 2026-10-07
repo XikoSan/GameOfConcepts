@@ -976,3 +976,7 @@
     padding-top: 4px;
   }
 }
+
+.modal-window:has(.redraw-confirm-dialog) { width: min(420px, 100%); }
+.redraw-confirm-dialog p { margin: 0 0 16px; font-size: 15px; line-height: 1.45; }
+.redraw-confirm-dialog .control-redraw-actions button { min-height: 44px; font-size: 14px; }

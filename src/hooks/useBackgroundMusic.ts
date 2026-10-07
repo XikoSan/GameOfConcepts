@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { App as NativeApp } from '@capacitor/app';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
 import { readMusic, writeMusic } from '../services/musicStorage';
@@ -21,8 +23,23 @@ export function useBackgroundMusic(audioRef: RefObject<HTMLAudioElement | null>)
     const value = Number(preference('volume', '0.25'));
     return Number.isFinite(value) ? Math.max(0, Math.min(1, value)) : 0.25;
   });
-  // Playback starts only on an explicit gesture; do not autoplay after a reload.
-  const [playing, setPlaying] = useState(false);
+  const [playing, setPlaying] = useState(() => Capacitor.isNativePlatform());
+  const [foreground, setForeground] = useState(() => !document.hidden);
+  useEffect(() => {
+    let disposed = false;
+    let nativeActive = true;
+    const update = () => setForeground(nativeActive && !document.hidden);
+    document.addEventListener('visibilitychange', update);
+    const listener = Capacitor.isNativePlatform() ? NativeApp.addListener('appStateChange', ({ isActive }) => {
+      nativeActive = isActive;
+      if (!disposed) update();
+    }) : null;
+    return () => {
+      disposed = true;
+      document.removeEventListener('visibilitychange', update);
+      void listener?.then(handle => handle.remove());
+    };
+  }, []);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -59,7 +76,7 @@ export function useBackgroundMusic(audioRef: RefObject<HTMLAudioElement | null>)
     const audio = audioRef.current;
     if (!audio) return;
     let obsolete = false;
-    if (playing) {
+    if (playing && foreground) {
       void audio.play().catch((reason: DOMException) => {
         if (obsolete) return;
         setPlaying(false);
@@ -70,7 +87,7 @@ export function useBackgroundMusic(audioRef: RefObject<HTMLAudioElement | null>)
       });
     } else audio.pause();
     return () => { obsolete = true; audio.pause(); };
-  }, [playing, activeTrack.src, audioRef]);
+  }, [playing, foreground, activeTrack.src, audioRef]);
 
   function select(id: string) { setError(''); setLoading(playing); setSelected(id); }
   function skip(offset: number) {
