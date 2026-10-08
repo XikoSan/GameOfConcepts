@@ -26,3 +26,11 @@ dist-ssr
 # Python research tools
 __pycache__/
 *.py[cod]
+
+# Release signing and server credentials
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+key.properties

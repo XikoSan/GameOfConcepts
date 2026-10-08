@@ -1,3 +1,4 @@
+// Training UI over the scripted training controller. Reuse core move/scoring rules while keeping the teaching sequence separate from ordinary games.
 import type { ReactNode } from 'react';
 import { TableReminder } from './TableReminder';
 import { useEffect, useReducer, useRef, useState } from 'react';

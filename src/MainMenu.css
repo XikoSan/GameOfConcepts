@@ -37,3 +37,5 @@
 .main-menu-actions .main-menu-training:hover { background: #496d59; }
 .app-container .main-menu-footer { width: min(560px, 100%); }
 .leave-game-actions { flex-wrap: wrap; gap: 8px; }
+
+.main-menu-footer .feedback-link { border: 0; padding: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-decoration: underline; }

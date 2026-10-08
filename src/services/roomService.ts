@@ -1,3 +1,4 @@
+// Supabase persistence boundary. Current playerId comes from localStorage and is not authenticated; host checks here are client-side safeguards only.
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabaseClient';
 import {
@@ -148,7 +149,7 @@ function ensureGameStateCapacity(
 
   // Room rows may be created or resumed with fewer seats than max_players.
   // Grow seat-indexed arrays, but never shrink them because existing card ownership may point there.
-  console.debug('[room debug capacity before]', {
+  if (import.meta.env.DEV) console.debug('[room debug capacity before]', {
     requiredCount: normalizedCount,
     gameStatePlayersLength: currentPlayers.length,
     handsLength: currentPlayers.length,
@@ -161,7 +162,7 @@ function ensureGameStateCapacity(
     currentDeck.length >= normalizedCount &&
     currentScores.length >= normalizedCount
   ) {
-    console.debug('[room debug capacity after]', {
+    if (import.meta.env.DEV) console.debug('[room debug capacity after]', {
       requiredCount: normalizedCount,
       gameStatePlayersLength: currentPlayers.length,
       handsLength: currentPlayers.length,
@@ -211,7 +212,7 @@ function ensureGameStateCapacity(
     scoringVersion: 3 as const,
   };
 
-  console.debug('[room debug capacity after]', {
+  if (import.meta.env.DEV) console.debug('[room debug capacity after]', {
     requiredCount: normalizedCount,
     gameStatePlayersLength: nextGameState.players.length,
     handsLength: nextGameState.players.length,
@@ -394,13 +395,13 @@ export async function createRoom({
   const normalizedMaxPlayers = normalizePlayerCount(
     Number(maxPlayers) || 2
   ) as MaxPlayers;
-  console.log('[roomService createRoom input]', {
+  if (import.meta.env.DEV) console.log('[roomService createRoom input]', {
     playerId,
     nickname,
     maxPlayers: normalizedMaxPlayers,
     hasInitialGameState: Boolean(initialGameState),
   });
-  console.debug('[createRoom maxPlayers]', {
+  if (import.meta.env.DEV) console.debug('[createRoom maxPlayers]', {
     inputMaxPlayers: maxPlayers,
     normalizedMaxPlayers,
   });
@@ -419,7 +420,7 @@ export async function createRoom({
 
   // New rooms must be born with players, turn_order, and game_state together.
   // Creating a legacy row would leave clients unable to resolve seats or current turn.
-  console.log('[roomService createRoom before insert]', {
+  if (import.meta.env.DEV) console.log('[roomService createRoom before insert]', {
     code: roomCode,
     status: 'waiting',
     maxPlayers: normalizedMaxPlayers,
@@ -428,7 +429,7 @@ export async function createRoom({
     scoresLength: initialGameState.scores.length,
     turnOrder: [playerId],
   });
-  console.debug('[room debug create]', {
+  if (import.meta.env.DEV) console.debug('[room debug create]', {
     maxPlayers: normalizedMaxPlayers,
     roomPlayersLength: 1,
     roomPlayers: [
@@ -445,7 +446,7 @@ export async function createRoom({
     turnOrder: [playerId],
     currentTurnIndex: 0,
   });
-  console.debug('[capacity debug before create]', {
+  if (import.meta.env.DEV) console.debug('[capacity debug before create]', {
     maxPlayers: normalizedMaxPlayers,
     playersLength: initialGameState.players.length,
     deckLength: initialGameState.deck.length,
@@ -458,7 +459,7 @@ export async function createRoom({
     pendingCross: null,
     pendingTurnScore: null,
   };
-  console.debug('[capacity debug after create]', {
+  if (import.meta.env.DEV) console.debug('[capacity debug after create]', {
     maxPlayers: normalizedMaxPlayers,
     playersLength: nextGameState.players.length,
     deckLength: nextGameState.deck.length,
@@ -483,11 +484,11 @@ export async function createRoom({
     version: 0,
     game_state: nextGameState,
   });
-  console.debug('[createRoom debug payload]', fullPayload);
+  if (import.meta.env.DEV) console.debug('[createRoom debug payload]', fullPayload);
 
   const insertRoom = async (payload: RoomInsertPayload) => {
     const cleanPayload = stripUndefined(payload);
-    console.debug('[createRoom debug insert payload]', cleanPayload);
+    if (import.meta.env.DEV) console.debug('[createRoom debug insert payload]', cleanPayload);
     // .select().single() returns the inserted server row with defaults, ids, and timestamps.
     // The client should not continue from a locally guessed room shape.
     const { data, error, status, statusText } = await supabase
@@ -496,13 +497,13 @@ export async function createRoom({
       .select()
       .single<Room>();
 
-    console.log('[roomService createRoom result]', {
+    if (import.meta.env.DEV) console.log('[roomService createRoom result]', {
       data,
       error,
       status,
       statusText,
     });
-    console.debug('[createRoom debug supabase result]', {
+    if (import.meta.env.DEV) console.debug('[createRoom debug supabase result]', {
       data,
       error,
       status,
@@ -546,7 +547,7 @@ export async function createRoom({
       code: schemaError?.code,
       raw: error,
     });
-    console.debug('[createRoom legacy fallback disabled]', {
+    if (import.meta.env.DEV) console.debug('[createRoom legacy fallback disabled]', {
       allowLegacyRoomFallback: ALLOW_LEGACY_ROOM_FALLBACK,
     });
     // Legacy fallback is intentionally disabled: old two-player rows break 2-4 player
@@ -577,7 +578,7 @@ export async function joinRoom({
 
   const maxPlayers = getRoomMaxPlayers(room);
   const players = getRoomPlayers(room);
-  console.debug('[room debug join before]', getRoomDebugSnapshot(room, players));
+  if (import.meta.env.DEV) console.debug('[room debug join before]', getRoomDebugSnapshot(room, players));
   // A reconnecting browser keeps its previous seat; seat indexes must not be recomputed
   // from array position because players[] can be patched or sorted independently.
   const existingPlayer = players.find((player) => player.id === playerId);
@@ -653,7 +654,7 @@ export async function joinRoom({
     throw error;
   }
 
-  console.debug('[room debug join after]', getRoomDebugSnapshot(data));
+  if (import.meta.env.DEV) console.debug('[room debug join after]', getRoomDebugSnapshot(data));
   return data;
 }
 
@@ -816,8 +817,8 @@ export function subscribeToRoom(
         filter: `id=eq.${roomId}`,
       },
       (payload) => {
-        console.log('[room realtime update raw]', payload);
-        console.log('[room realtime update room]', payload.new);
+        if (import.meta.env.DEV) console.log('[room realtime update raw]', payload);
+        if (import.meta.env.DEV) console.log('[room realtime update room]', payload.new);
         const nextRoom = payload.new as Room;
         if (!hasSupportedGameRelations(nextRoom.game_state)) {
           onStatusProblem?.();
@@ -835,13 +836,13 @@ export function subscribeToRoom(
         filter: `id=eq.${roomId}`,
       },
       (payload) => {
-        console.log('[room realtime delete raw]', payload);
+        if (import.meta.env.DEV) console.log('[room realtime delete raw]', payload);
         // DELETE means every client must leave the online room locally.
         onRoomDelete?.();
       }
     )
     .subscribe((status, error) => {
-      console.log('[room realtime status]', { roomId, status, error });
+      if (import.meta.env.DEV) console.log('[room realtime status]', { roomId, status, error });
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
         console.warn('[room realtime status error]', { roomId, status, error });
         onStatusProblem?.();

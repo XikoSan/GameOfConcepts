@@ -1,3 +1,4 @@
+// Deterministic teaching scenario. Prepared cards and opponent responses are tutorial constraints, not general legality rules.
 import { initializeGame, placeCard, upsertPendingSemanticEdge, removePendingSemanticEdge, submitPendingSemanticMove, confirmPendingCard, returnPendingCard } from '../game';
 import { EMOTIONS_DECK } from '../data/deckDefinitions';
 import { RELATION_PRESETS } from '../scoring/semanticRelations';

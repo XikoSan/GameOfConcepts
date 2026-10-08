@@ -1,3 +1,4 @@
+// Semantic scoring entry point. Accepted edge order matters for incremental node/path bonuses; physical adjacency alone never scores.
 import type { SemanticEdge, SemanticEdgeScore } from '../types';
 import { endMeasure, startMeasure } from '../debug/performanceDiagnostics';
 import { continuesSemanticNode } from './semanticNodes';

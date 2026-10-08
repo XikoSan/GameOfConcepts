@@ -213,11 +213,11 @@ export async function lookupWiktionary(term: string): Promise<DictionaryEntry | 
   const normalizedTerm = term.trim();
   if (!normalizedTerm) return null;
 
-  console.log('[wiktionary lookup start]', normalizedTerm);
+  if (import.meta.env.DEV) console.log('[wiktionary lookup start]', normalizedTerm);
   const cacheKey = normalizeDictionaryKey(normalizedTerm);
   if (lookupCache.has(cacheKey)) {
     const cachedEntry = lookupCache.get(cacheKey) ?? null;
-    console.log('[wiktionary lookup result]', {
+    if (import.meta.env.DEV) console.log('[wiktionary lookup result]', {
       title: cachedEntry?.title ?? null,
       hasDescription: Boolean(cachedEntry?.description),
       cached: true,
@@ -229,7 +229,7 @@ export async function lookupWiktionary(term: string): Promise<DictionaryEntry | 
     const exactEntry = await parseWiktionaryPage(normalizedTerm);
     if (exactEntry) {
       lookupCache.set(cacheKey, exactEntry);
-      console.log('[wiktionary lookup result]', {
+      if (import.meta.env.DEV) console.log('[wiktionary lookup result]', {
         title: exactEntry.title,
         hasDescription: Boolean(exactEntry.description),
       });
@@ -239,13 +239,13 @@ export async function lookupWiktionary(term: string): Promise<DictionaryEntry | 
     const [firstResult] = await searchWiktionary(normalizedTerm);
     if (!firstResult) {
       lookupCache.set(cacheKey, null);
-      console.log('[wiktionary lookup result]', null);
+      if (import.meta.env.DEV) console.log('[wiktionary lookup result]', null);
       return null;
     }
 
     const entry = await parseWiktionaryPage(firstResult.title);
     lookupCache.set(cacheKey, entry);
-    console.log('[wiktionary lookup result]', {
+    if (import.meta.env.DEV) console.log('[wiktionary lookup result]', {
       title: entry?.title ?? null,
       hasDescription: Boolean(entry?.description),
     });

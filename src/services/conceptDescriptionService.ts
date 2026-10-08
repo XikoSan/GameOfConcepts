@@ -85,7 +85,7 @@ export async function getConceptSummary(term: string): Promise<ConceptSummary | 
   const normalizedTerm = term.trim();
   if (!normalizedTerm) return null;
 
-  console.log('[concept summary start]', normalizedTerm);
+  if (import.meta.env.DEV) console.log('[concept summary start]', normalizedTerm);
   const cacheKey = normalizeConceptKey(normalizedTerm);
   if (summaryCache.has(cacheKey)) {
     return summaryCache.get(cacheKey) ?? null;
@@ -93,7 +93,7 @@ export async function getConceptSummary(term: string): Promise<ConceptSummary | 
 
   const exactSummary = await fetchWikipediaSummary(normalizedTerm);
   if (exactSummary) {
-    console.log('[concept summary result]', {
+    if (import.meta.env.DEV) console.log('[concept summary result]', {
       title: exactSummary.title,
       hasExtract: true,
       source: exactSummary.source,
@@ -107,7 +107,7 @@ export async function getConceptSummary(term: string): Promise<ConceptSummary | 
     ? await fetchWikipediaSummary(fallbackTitle)
     : null;
 
-  console.log(
+  if (import.meta.env.DEV) console.log(
     '[concept summary result]',
     fallbackSummary
       ? {

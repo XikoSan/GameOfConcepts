@@ -1,3 +1,4 @@
+// Online controller: resolve stable seats, merge votes and persist versioned room snapshots. Optimistic version checks prevent lost updates, not cheating.
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { applyGameAction } from '../gameActions';
 import { getHandRedrawAvailability } from '../game';
@@ -331,7 +332,7 @@ export function useMultiplayerGameState({
   useEffect(() => {
     if (!room) return;
 
-    console.debug('[game debug multiplayer state]', {
+    if (import.meta.env.DEV) console.debug('[game debug multiplayer state]', {
       maxPlayers: room.max_players,
       roomPlayersLength: room.players?.length ?? 0,
       roomPlayers: room.players?.map((player) => ({
@@ -388,9 +389,9 @@ export function useMultiplayerGameState({
         return;
       }
 
-      console.log('[online action]', action);
+      if (import.meta.env.DEV) console.log('[online action]', action);
       const currentGameState = syncGameStateToRoomTurn(room);
-      console.log('[online before]', currentGameState);
+      if (import.meta.env.DEV) console.log('[online before]', currentGameState);
 
       // TODO(MVP): Сейчас весь gameState синхронизируется целиком через JSONB.
       // FIXME(MVP): Руки и колоды обоих игроков доступны клиенту через gameState.
@@ -400,8 +401,8 @@ export function useMultiplayerGameState({
         applyGameAction(currentGameState, action),
         action
       );
-      console.log('[online after]', nextGameState);
-      console.log('[online pendingMove]', {
+      if (import.meta.env.DEV) console.log('[online after]', nextGameState);
+      if (import.meta.env.DEV) console.log('[online pendingMove]', {
         pendingMove: nextGameState.pendingMove,
         localPlayerIndex,
         pendingMovePlayerIndex: getPendingMovePlayerIndex(nextGameState.pendingMove),
@@ -419,7 +420,7 @@ export function useMultiplayerGameState({
           room.version,
           nextCurrentTurnIndex
         );
-        console.log('[online update result]', updatedRoom);
+        if (import.meta.env.DEV) console.log('[online update result]', updatedRoom);
         onRoomUpdate?.(updatedRoom);
       } catch (actionError) {
         const message =
@@ -536,7 +537,7 @@ export function useMultiplayerGameState({
         let nextGameState: GameState;
         let nextCurrentTurnIndex = latestRoom.current_turn_index;
 
-        console.log('[online pendingMove vote]', {
+        if (import.meta.env.DEV) console.log('[online pendingMove vote]', {
           vote,
           localPlayerId,
           requiredVoters,
@@ -581,7 +582,7 @@ export function useMultiplayerGameState({
             currentPlayerIndex: nextActiveSeatIndex,
             scores: nextScores,
           };
-          console.debug('[score debug accepted move]', {
+          if (import.meta.env.DEV) console.debug('[score debug accepted move]', {
             placedByPlayerId: latestPendingMove.placedByPlayerId,
             placedBySeatIndex: scoringSeatIndex,
             scoreBefore,
@@ -620,7 +621,7 @@ export function useMultiplayerGameState({
           latestRoom.version,
           nextCurrentTurnIndex
         );
-        console.log('[online vote update result]', updatedRoom);
+        if (import.meta.env.DEV) console.log('[online vote update result]', updatedRoom);
         onRoomUpdate?.(updatedRoom);
       } catch (voteError) {
         const message =

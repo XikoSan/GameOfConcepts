@@ -1,0 +1,8 @@
+.feedback-form { display: grid; gap: 12px; }
+.feedback-form p { margin: 0; }
+.feedback-form label { display: grid; gap: 5px; }
+.feedback-form input, .feedback-form textarea { box-sizing: border-box; width: 100%; padding: 10px; color: inherit; background: #232a2c; border: 1px solid #657174; border-radius: 5px; font: inherit; }
+.feedback-form textarea { resize: vertical; }
+.feedback-form small { line-height: 1.5; color: #bfc7c7; }
+.feedback-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.feedback-form button { min-height: 40px; padding: 7px 12px; }

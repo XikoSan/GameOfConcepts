@@ -4,7 +4,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 export function getSupabaseClient() {
-  console.log('[supabase config]', {
+  if (import.meta.env.DEV) console.log('[supabase config]', {
     hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
     hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
   });

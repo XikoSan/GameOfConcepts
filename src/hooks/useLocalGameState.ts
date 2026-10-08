@@ -1,4 +1,7 @@
-import { useCallback, useState } from 'react';
+// Local reducer controller and accepted-relation collection. Training owns a separate controller and must not contribute research samples.
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getAcceptedRelationSamples } from '../services/acceptedRelations';
+import { enqueueAcceptedRelations, flushAcceptedRelations } from '../services/relationCollection';
 import { applyGameAction } from '../gameActions';
 import { initializeGame } from '../game';
 import { getDeckDefinitionById, DEFAULT_DECK } from '../data/deckDefinitions';
@@ -97,6 +100,24 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
   const [localPlayerCount, setLocalPlayerCount] = useState(2);
   const [localDeckId, setLocalDeckId] = useState(DEFAULT_DECK.id);
   const [gameState, setGameState] = useState<GameState>(() => initializeGame(2));
+  const collected = useRef(new Set<string>());
+  useEffect(() => {
+    const samples = getAcceptedRelationSamples(gameState).filter(sample => {
+      const key = sample.session_id + ':' + sample.edge_id;
+      if (collected.current.has(key)) return false;
+      collected.current.add(key);
+      return true;
+    });
+    if (samples.length) enqueueAcceptedRelations(samples);
+  }, [gameState]);
+  useEffect(() => {
+    const retry = () => { void flushAcceptedRelations(); };
+    retry();
+    window.addEventListener('online', retry);
+    const timer = window.setInterval(retry, 30000);
+    return () => { window.removeEventListener('online', retry); window.clearInterval(timer); };
+  }, []);
+
 
   const handlePlaceCard = useCallback(
     (cardName: RegularCardName, coordinates: Coordinates) => {

@@ -1,3 +1,4 @@
+// Versioned local save format, distinct from the application release version. Preserve this schema across app updates or add an explicit migration.
 import type { GameState } from '../game';
 import type { TrainingState } from '../tutorial/trainingGame';
 

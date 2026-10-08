@@ -71,3 +71,7 @@ export default defineConfig([
   },
 ])
 ```
+
+## Разработка версии 1.0.0
+
+Начните с [карты архитектуры](docs/ARCHITECTURE.md). Результаты проверки и ограничения онлайн-режима: [безопасность](docs/SECURITY-REVIEW.md).

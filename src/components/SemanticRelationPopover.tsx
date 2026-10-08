@@ -16,6 +16,7 @@ import {
 import './SemanticRelationPopover.css';
 
 interface SemanticRelationPopoverProps {
+  movable?: boolean;
   pendingCard: PlacedCard;
   relationPresets: readonly SemanticRelation[];
   neighborCard: PlacedCard;
@@ -35,6 +36,7 @@ interface SemanticRelationPopoverProps {
 }
 
 export function SemanticRelationPopover({
+  movable = true,
   pendingCard,
   relationPresets,
   neighborCard,
@@ -49,6 +51,23 @@ export function SemanticRelationPopover({
   incrementCounter('render:SemanticRelationPopover');
   const popoverRef = useRef<HTMLDivElement>(null);
   const onMeasuredRectRef = useRef(onMeasuredRect);
+  const [manualPosition, setManualPosition] = useState<{ left: number; top: number } | null>(null);
+  const dragRef = useRef<{ id: number; x: number; y: number; left: number; top: number } | null>(null);
+  const clampPosition = (left: number, top: number) => {
+    const rect = popoverRef.current?.getBoundingClientRect();
+    return {
+      left: Math.max(8, Math.min(left, window.innerWidth - (rect?.width ?? 330) - 8)),
+      top: Math.max(8, Math.min(top, window.innerHeight - (rect?.height ?? 0) - 8)),
+    };
+  };
+  useEffect(() => {
+    if (!movable) return;
+    const keepVisible = () => setManualPosition(current => current ? clampPosition(current.left, current.top) : current);
+    const observer = new ResizeObserver(keepVisible);
+    if (popoverRef.current) observer.observe(popoverRef.current);
+    window.addEventListener('resize', keepVisible);
+    return () => { observer.disconnect(); window.removeEventListener('resize', keepVisible); };
+  }, [movable]);
   const [selectedFamily, setSelectedFamily] = useState<RelationFamily | null>(
     selectedEdge?.relation.family ?? null
   );
@@ -84,8 +103,8 @@ export function SemanticRelationPopover({
         )
       : 'Выберите тип связи';
   const style = {
-    left: `${position.left}px`,
-    top: `${position.top}px`,
+    left: `${manualPosition?.left ?? position.left}px`,
+    top: `${manualPosition?.top ?? position.top}px`,
   } satisfies CSSProperties;
 
   useEffect(() => {
@@ -145,7 +164,29 @@ export function SemanticRelationPopover({
       role="dialog"
       style={style}
     >
-      <header>
+      <header
+        className={movable ? 'relation-drag-handle' : undefined}
+        title={movable ? 'Перетащите, чтобы переместить окно' : undefined}
+        onPointerDown={event => {
+          if (!movable || event.button !== 0 || (event.target as HTMLElement).closest('button')) return;
+          const rect = popoverRef.current!.getBoundingClientRect();
+          dragRef.current = { id: event.pointerId, x: event.clientX, y: event.clientY, left: rect.left, top: rect.top };
+          event.currentTarget.setPointerCapture(event.pointerId);
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onPointerMove={event => {
+          const drag = dragRef.current;
+          if (!drag || drag.id !== event.pointerId) return;
+          setManualPosition(clampPosition(drag.left + event.clientX - drag.x, drag.top + event.clientY - drag.y));
+        }}
+        onPointerUp={event => {
+          dragRef.current = null;
+          if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+        }}
+        onPointerCancel={() => { dragRef.current = null; }}
+        onLostPointerCapture={() => { dragRef.current = null; }}
+      >
         <strong>{pendingCard.cardName} — {neighborCard.cardName}</strong>
         <button type="button" onClick={onClose}>Закрыть</button>
       </header>

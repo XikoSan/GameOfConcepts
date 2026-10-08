@@ -1,3 +1,4 @@
+// Board interaction and camera presentation. Coordinates and drag state are local UI concerns and must never be persisted to multiplayer rooms.
 import React, {
   useCallback,
   useEffect,
@@ -81,7 +82,7 @@ const GRID_SIZE = GRID_MAX - GRID_MIN + 1;
 const CELL_SIZE = 96;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 2;
-const INITIAL_ZOOM = 1.25;
+const INITIAL_ZOOM = 1;
 const ZOOM_STEP = 0.1;
 
 const getCellCenter = (coordinates: Coordinates) => ({
@@ -861,6 +862,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     activeRelationNeighbor && activeRelationEditorForCurrentMove && canEditSemanticMove ?
       <SemanticRelationPopover
         key={activeRelationNeighbor.id}
+        movable={false}
         relationPresets={getRelationPresets(gameState.deckSnapshot)}
         pendingCard={pendingCard} neighborCard={activeRelationNeighbor}
         selectedEdge={activeRelationEdge} selectedScore={activeRelationScore}
@@ -985,7 +987,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             const pendingCenter = getCellCenter(pendingCard.coordinates);
             const neighborCenter = getCellCenter(neighbor.coordinates);
             const left = (pendingCenter.x + neighborCenter.x) / 2;
-            const top = (pendingCenter.y + neighborCenter.y) / 2;
+            const top = (pendingCenter.y + neighborCenter.y) / 2
+              - (pendingCard.coordinates.y === neighbor.coordinates.y ? CELL_SIZE * 0.3 : 0);
 
             return (
               <button
@@ -1019,7 +1022,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             const pendingCenter = getCellCenter(pendingCard.coordinates);
             const neighborCenter = getCellCenter(neighbor.coordinates);
             const left = (pendingCenter.x + neighborCenter.x) / 2;
-            const top = (pendingCenter.y + neighborCenter.y) / 2;
+            const top = (pendingCenter.y + neighborCenter.y) / 2
+              - (pendingCard.coordinates.y === neighbor.coordinates.y ? CELL_SIZE * 0.3 : 0);
 
             return (
               <span
@@ -1074,6 +1078,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         relationEditorRect &&
         createPortal(
           <SemanticRelationPopover
+            key={`${pendingCard.id}:${activeRelationNeighbor.id}`}
             relationPresets={getRelationPresets(gameState.deckSnapshot)}
             neighborCard={activeRelationNeighbor}
             pendingCard={pendingCard}

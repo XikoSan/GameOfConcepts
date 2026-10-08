@@ -1,9 +1,11 @@
+// Application composition: menus, session lifecycle and local/online UI routing. Game rules live in game.ts and scoring/, not in modal handlers.
 import { readSavedSession, writeSavedSession, type SavedSession } from './services/savedSession';
 import type { TrainingState } from './tutorial/trainingGame';
 import { Capacitor } from '@capacitor/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent } from 'react';
 import type { RealtimeChannel } from '@supabase/supabase-js';
+import { FeedbackForm } from './components/FeedbackForm';
 import { DictionaryModal } from './components/DictionaryModal';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
 import { GameBoard } from './components/GameBoard';
@@ -189,7 +191,7 @@ interface DragPreview {
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
 }
 
-type ActiveModal = 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | 'leave-game' | null;
+type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | 'leave-game' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -536,7 +538,7 @@ function App() {
     const currentRoom = onlineRoomRef.current;
     if (!currentRoom) return;
 
-    console.log('[online polling fetch]', {
+    if (import.meta.env.DEV) console.log('[online polling fetch]', {
       reason,
       roomId: currentRoom.id,
       currentVersion: currentRoom.version,
@@ -544,7 +546,7 @@ function App() {
 
     try {
       const fetchedRoom = await getRoomById(currentRoom.id);
-      console.log('[manual sync room]', { reason, room: fetchedRoom });
+      if (import.meta.env.DEV) console.log('[manual sync room]', { reason, room: fetchedRoom });
 
       if (!fetchedRoom) {
         console.warn('[online room missing]', {
@@ -559,7 +561,7 @@ function App() {
       }
 
       if (fetchedRoom.version > currentRoom.version) {
-        console.log('[online polling update applied]', {
+        if (import.meta.env.DEV) console.log('[online polling update applied]', {
           reason,
           previousVersion: currentRoom.version,
           nextVersion: fetchedRoom.version,
@@ -568,7 +570,7 @@ function App() {
         return;
       }
 
-      console.log('[online polling no changes]', {
+      if (import.meta.env.DEV) console.log('[online polling no changes]', {
         reason,
         currentVersion: currentRoom.version,
         fetchedVersion: fetchedRoom.version,
@@ -589,7 +591,7 @@ function App() {
       setActiveModal('new-game');
     }
     roomSubscriptionRef.current = subscribeToRoom(room.id, (updatedRoom) => {
-      console.log('[app room update]', {
+      if (import.meta.env.DEV) console.log('[app room update]', {
         code: updatedRoom.code,
         version: updatedRoom.version,
         pendingMove: updatedRoom.game_state.pendingMove,
@@ -651,23 +653,23 @@ function App() {
     setOnlineError(null);
 
     try {
-      console.log('[create room click]');
-      console.log('[create room playerId]', playerId);
-      console.log('[create room nickname]', nickname);
-      console.log('[create room maxPlayers]', maxPlayers);
-      console.log('[create room deckId]', onlineDeckId);
-      console.debug('[create room click debug]', {
+      if (import.meta.env.DEV) console.log('[create room click]');
+      if (import.meta.env.DEV) console.log('[create room playerId]', playerId);
+      if (import.meta.env.DEV) console.log('[create room nickname]', nickname);
+      if (import.meta.env.DEV) console.log('[create room maxPlayers]', maxPlayers);
+      if (import.meta.env.DEV) console.log('[create room deckId]', onlineDeckId);
+      if (import.meta.env.DEV) console.debug('[create room click debug]', {
         playerId,
         nickname,
         maxPlayers,
       });
-      console.log('[create room env check]', {
+      if (import.meta.env.DEV) console.log('[create room env check]', {
         hasUrl: Boolean(import.meta.env.VITE_SUPABASE_URL),
         hasKey: Boolean(import.meta.env.VITE_SUPABASE_ANON_KEY),
       });
       const deckDefinition = getDeckDefinitionById(onlineDeckId) ?? DEFAULT_DECK;
       const initialGameState = initializeGame(maxPlayers, deckDefinition, 0);
-      console.log('[create room initialGameState]', initialGameState);
+      if (import.meta.env.DEV) console.log('[create room initialGameState]', initialGameState);
       // TODO(MVP): Пока UI комнаты не подключён к синхронизации ходов.
       const room = await createRoom({
         playerId,
@@ -834,7 +836,7 @@ function App() {
   useEffect(() => {
     if (!onlineRoom) return;
 
-    console.debug('[game debug local hand]', {
+    if (import.meta.env.DEV) console.debug('[game debug local hand]', {
       localPlayerId: playerId,
       localSeatIndex: localPlayerIndex,
       handsLength: gameState.players.length,
@@ -1124,7 +1126,7 @@ function App() {
           </div>
         </nav>
         <footer className="main-menu-footer">
-          <a href="https://github.com/XikoSan/GameOfConcepts/issues/new" target="_blank" rel="noreferrer">Обратная связь</a>
+          <button className="feedback-link" type="button" onClick={() => setActiveModal('feedback')}>Обратная связь</button>
           <span>Версия {packageInfo.version}</span>
         </footer>
       </main>}
@@ -1136,6 +1138,7 @@ function App() {
           playerColor={dragPreview.playerColor}
         />
       )}
+      {activeModal === 'feedback' && <Modal title="Обратная связь" onClose={() => setActiveModal(null)}><FeedbackForm /></Modal>}
       {activeModal === 'local-game' && (
         <>
           {trainingSetup && <aside className="training-local-annotation-window" aria-label="Пояснение к обучению"><h2>Добро пожаловать в обучение</h2><p>Для того чтобы начать локальную игру, нужно выбрать количество игроков, тему игральной колоды и ввести никнеймы.</p><div className="training-local-callout">В обучении параметры заданы заранее. Введите свой никнейм и начните партию.</div></aside>}

@@ -1,3 +1,4 @@
+// Device-local reconnect identity, not proof of identity. Server authorization must use authenticated claims rather than this editable value.
 import { useMemo } from 'react';
 
 const PLAYER_ID_STORAGE_KEY = 'game-of-concepts-player-id';

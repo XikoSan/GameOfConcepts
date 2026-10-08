@@ -1,3 +1,4 @@
+// Pure game-state transitions shared by local play and the online controller. Keep deck snapshots authoritative when restoring older sessions.
 import { CARD_NAMES, START_CARD_NAMES } from './types';
 import {
   CARD_CATALOG,
@@ -647,7 +648,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
   nextScores[playerIndex] = (nextScores[playerIndex] ?? 0) + scorePreview.total;
 
   if (import.meta.env.DEV) {
-    console.debug('[semantic move score]', {
+    if (import.meta.env.DEV) console.debug('[semantic move score]', {
       moveId: gameState.pendingMove.moveId,
       placedBySeatIndex: playerIndex,
       edgeCount: scorePreview.edges.length,

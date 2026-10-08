@@ -1,3 +1,4 @@
+// Resolve stable definition IDs into a self-contained deck snapshot. Existing matches must survive changes to the live catalog.
 import {
   EMPTY_DIFFICULTY_COUNTS,
   getEnabledCards,

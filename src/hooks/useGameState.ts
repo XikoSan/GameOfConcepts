@@ -27,7 +27,7 @@ export function useGameState({
   const shouldUseMultiplayer = Boolean(room && localPlayerId);
 
   useEffect(() => {
-    console.log('[useGameState room changed]', {
+    if (import.meta.env.DEV) console.log('[useGameState room changed]', {
       code: room?.code,
       version: room?.version,
       pendingMove: room?.game_state?.pendingMove,

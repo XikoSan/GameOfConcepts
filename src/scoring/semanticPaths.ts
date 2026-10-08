@@ -66,7 +66,7 @@ const logPathCheck = (payload: {
   reason: PathCheckReason;
 }) => {
   if (!import.meta.env.DEV) return;
-  console.debug('[semantic path check]', payload);
+  if (import.meta.env.DEV) console.debug('[semantic path check]', payload);
 };
 
 export function checkSemanticPathContinuation(

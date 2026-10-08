@@ -1,3 +1,4 @@
+// Action boundary for game mutations. Client validation prevents UI mistakes; it is not server authorization for online rooms.
 import {
   approvePendingCross,
   confirmPendingCard,
