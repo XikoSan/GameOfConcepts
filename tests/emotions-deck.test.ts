@@ -4,7 +4,7 @@ import { CARD_CATALOG } from '../src/data/cardCatalog';
 import { EMOTIONS_PLAY_CARDS, EMOTIONS_NEUTRAL_CARDS } from '../src/data/emotionsCatalog';
 import { DEFAULT_DECK, EMOTIONS_DECK, USER_SELECTABLE_DECKS, DECK_DEFINITIONS, MIXED_ALL_DECK } from '../src/data/deckDefinitions';
 import { buildDeck, validateDeckDefinitions } from '../src/decks/deckBuilder';
-import { initializeGame, createPlayerDeckFromSnapshot, placeCard, upsertPendingSemanticEdge, submitPendingSemanticMove, confirmPendingCard } from '../src/game';
+import { redrawPlayerHand, getHandRedrawAvailability, returnPendingCard, initializeGame, createPlayerDeckFromSnapshot, placeCard, upsertPendingSemanticEdge, submitPendingSemanticMove, confirmPendingCard } from '../src/game';
 import { getRelationPresets, isSymmetricRelation, hasSupportedGameRelations } from '../src/scoring/semanticRelations';
 import { calculateSemanticMoveScore } from '../src/scoring/calculateSemanticMoveScore';
 import type { GameState, PlacedCard, SemanticEdge, SemanticRelation } from '../src/types';
@@ -30,11 +30,13 @@ test('Revised catalog is separate; all existing standard decks keep their compos
   }
 });
 
-test('two to four players each receive a complete personal deck and a dedicated neutral start', () => {
+test('two to four players share one unique deck and a dedicated neutral start', () => {
   const seen = new Set<string>();
   for (let i = 0; i < 80; i++) {
     const count = 2 + i % 3;
     const state = initializeGame(count, EMOTIONS_DECK);
+    assert.equal(state.sharedDeck!.length, 57 - count * 5);
+    assert.deepEqual([...state.players.flatMap(p => p.cards), ...state.sharedDeck!].sort(), playingNames);
     seen.add(state.startCard.cardName);
     assert.ok(neutralNames.includes(state.startCard.cardName));
     assert.equal(state.startCard.playerId, null);
@@ -42,8 +44,7 @@ test('two to four players each receive a complete personal deck and a dedicated 
     assert.equal(state.players.length, count);
     for (let p = 0; p < count; p++) {
       assert.equal(state.players[p].cards.length, 5);
-      assert.equal(state.deck[p].length, 52);
-      assert.deepEqual([...state.players[p].cards, ...state.deck[p]].sort(), playingNames);
+      assert.equal(state.deck[p].length, 0);
     }
   }
   assert.ok(seen.size > 1);
@@ -141,4 +142,41 @@ test('classic families keep path and node direction semantics and the +3 cap', (
   }
   const opposite = getRelationPresets().find(r => r.family === 'opposite')!;
   assert.ok(isSymmetricRelation(opposite));
+});
+
+test('shared redraw conserves cards, returns the old hand to the bottom, and is once per player', () => {
+  const game = initializeGame(4, EMOTIONS_DECK, 0);
+  const old = [...game.players[0].cards];
+  const pile = [...game.sharedDeck!];
+  const next = redrawPlayerHand(game, 0);
+  assert.deepEqual(next.players[0].cards, pile.slice(-5));
+  assert.deepEqual(next.sharedDeck, [...old, ...pile.slice(0, -5)]);
+  assert.deepEqual(next.players.slice(1), game.players.slice(1));
+  assert.deepEqual([...next.players.flatMap(p => p.cards), ...next.sharedDeck!].sort(), playingNames);
+  assert.equal(redrawPlayerHand(next, 0), next);
+  assert.deepEqual(game.sharedDeck, pile);
+  assert.equal(getHandRedrawAvailability({ ...game, sharedDeck: pile.slice(0, 4) }, 0).canRedraw, false);
+});
+
+test('accepted moves draw once from the shared pile; rejected moves do not consume cards', () => {
+  const game = initializeGame(3, EMOTIONS_DECK, 0);
+  const move = pending(game);
+  const rejected = returnPendingCard(move);
+  assert.deepEqual(rejected.sharedDeck, game.sharedDeck);
+  assert.deepEqual([...rejected.players[0].cards].sort(), [...game.players[0].cards].sort());
+  const relation = getRelationPresets(game.deckSnapshot)[0];
+  const accepted = confirmPendingCard(submitPendingSemanticMove(upsertPendingSemanticEdge(move, game.startCard.id, relation, 'new-to-neighbor')));
+  assert.deepEqual(accepted.sharedDeck, game.sharedDeck!.slice(0, -1));
+  assert.ok(accepted.players[0].cards.includes(game.sharedDeck!.at(-1)!));
+  assert.deepEqual(accepted.players.slice(1), game.players.slice(1));
+  assert.deepEqual([...accepted.players.flatMap(p => p.cards), ...accepted.sharedDeck!, ...Object.values(accepted.board).filter(c => c.playerId !== null).map(c => c.cardName)].sort(), playingNames);
+});
+
+test('empty shared pile stops draws and redraws without preventing a valid move', () => {
+  const game = { ...initializeGame(2, EMOTIONS_DECK, 0), sharedDeck: [] };
+  const move = pending(game);
+  const accepted = confirmPendingCard(submitPendingSemanticMove(upsertPendingSemanticEdge(move, game.startCard.id, getRelationPresets(game.deckSnapshot)[0], 'new-to-neighbor')));
+  assert.equal(accepted.players[0].cards.length, 4);
+  assert.deepEqual(accepted.sharedDeck, []);
+  assert.equal(getHandRedrawAvailability(game, 0).canRedraw, false);
 });

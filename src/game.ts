@@ -136,19 +136,17 @@ export function initializeGame(
   if (!relationFamilies.length || getRelationPresets(snapshot).length !== relationFamilies.length) {
     throw new Error('Набор связей выбранной колоды недоступен.');
   }
-  const capacity = validateDeckCapacity(cards.length, 1, HAND_SIZE);
+  const capacity = validateDeckCapacity(cards.length, normalizedPlayerCount, HAND_SIZE);
   if (!capacity.valid) {
     throw new Error(capacity.message);
   }
   const deckTemplate = cards.map((card) => card.name);
-  // Hands, decks, scores, and card ownership are all indexed by this stable seat count.
-  const decks = Array.from({ length: normalizedPlayerCount }, () =>
-    shuffleCards(deckTemplate)
-  );
-  const players = decks.map((deck, playerId) => ({
+  const sharedDeck = shuffleCards(deckTemplate);
+  const players = Array.from({ length: normalizedPlayerCount }, (_, playerId) => ({
     playerId,
-    cards: deck.splice(0, HAND_SIZE),
+    cards: sharedDeck.splice(-HAND_SIZE),
   }));
+  const decks = players.map(() => [] as RegularCardName[]);
   const startDefinition = neutralCards[Math.floor(Math.random() * neutralCards.length)];
   const startCardName = startDefinition.name;
   const startCard: PlacedCard = {
@@ -169,6 +167,7 @@ export function initializeGame(
     players,
     currentPlayerIndex: normalizedStartingPlayerIndex,
     deck: decks,
+    sharedDeck,
     // A deck id is configuration; the snapshot is the immutable
     // card composition owned by the running game.
     deckSnapshot: snapshot,
@@ -293,7 +292,7 @@ export function getHandRedrawAvailability(
   }
 
   const currentHandSize = gameState.players[playerIndex]?.cards.length ?? 0;
-  const deckSize = gameState.deck[playerIndex]?.length ?? 0;
+  const deckSize = (gameState.sharedDeck ?? gameState.deck[playerIndex])?.length ?? 0;
 
   if (currentHandSize <= 0) {
     return { canRedraw: false, reason: 'В руке нет карт для пересдачи.' };
@@ -317,17 +316,18 @@ export function redrawPlayerHand(
 
   const oldHand = gameState.players[playerIndex].cards;
   const handSize = oldHand.length;
-  const currentDeck = gameState.deck[playerIndex];
-  const newHand = currentDeck.slice(0, handSize);
-  const remainingDeck = currentDeck.slice(handSize);
-  const nextDeckForPlayer = [...remainingDeck, ...oldHand];
+  const currentDeck = gameState.sharedDeck ?? gameState.deck[playerIndex];
+  const newHand = currentDeck.slice(-handSize);
+  const remainingDeck = currentDeck.slice(0, -handSize);
+  const nextDeckForPlayer = [...oldHand, ...remainingDeck];
 
   return {
     ...gameState,
     players: gameState.players.map((player, index) =>
       index === playerIndex ? { ...player, cards: newHand } : player
     ),
-    deck: gameState.deck.map((deck, index) =>
+    sharedDeck: gameState.sharedDeck !== undefined ? nextDeckForPlayer : undefined,
+    deck: gameState.sharedDeck !== undefined ? gameState.deck : gameState.deck.map((deck, index) =>
       index === playerIndex ? nextDeckForPlayer : deck
     ),
     handRedrawUsedByPlayerId: {
@@ -618,7 +618,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
 
     return {
       ...player,
-      cards: drawToHand(player.cards, gameState.deck[index]),
+      cards: drawToHand(player.cards, gameState.sharedDeck ?? gameState.deck[index]),
     };
   });
   const newDeck = gameState.deck.map((deck, index) => {
@@ -668,7 +668,11 @@ export function confirmPendingCard(gameState: GameState): GameState {
     ...gameState,
     board: newBoard,
     players: newPlayers,
-    deck: newDeck,
+    deck: gameState.sharedDeck !== undefined ? gameState.deck : newDeck,
+    sharedDeck: gameState.sharedDeck !== undefined
+      ? (newPlayers[playerIndex].cards.length > gameState.players[playerIndex].cards.length
+        ? gameState.sharedDeck.slice(0, -1) : gameState.sharedDeck)
+      : undefined,
     pendingMove: null,
     pendingCross: null,
     pendingTurnScore: null,

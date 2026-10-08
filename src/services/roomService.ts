@@ -171,6 +171,19 @@ function ensureGameStateCapacity(
     return gameState;
   }
 
+  if (gameState.sharedDeck !== undefined) {
+    const sharedDeck = [...gameState.sharedDeck];
+    const players = [...currentPlayers];
+    while (players.length < normalizedCount) {
+      if (sharedDeck.length < 5) throw new Error('В общей колоде недостаточно карт для нового игрока.');
+      players.push({ playerId: players.length, cards: sharedDeck.splice(-5) });
+    }
+    return {
+      ...gameState, players, sharedDeck,
+      deck: players.map(() => []),
+      scores: players.map((_, index) => currentScores[index] ?? 0),
+    };
+  }
   const fallbackGameState = initializeGame(normalizedCount);
   const snapshotSeats = Array.from({ length: normalizedCount }, (_, index) =>
     createPlayerDeckFromSnapshot(gameState.deckSnapshot, index)

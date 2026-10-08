@@ -210,7 +210,10 @@ export interface GameState {
   players: PlayerHand[];
   /** Active seat index in local game state; online derives the active seat from room turn_order. */
   currentPlayerIndex: number;
+  /** Personal reserves only for training and pre-shared-deck saves. */
   deck: RegularCardName[][];
+  /** Shared draw pile; the last element is the top card. */
+  sharedDeck?: RegularCardName[];
   /** A running game owns a fixed deck snapshot; later catalog edits affect only new games. */
   deckSnapshot?: GameDeckSnapshot;
   handRedrawUsedByPlayerId?: Record<number, boolean>;

@@ -12,6 +12,7 @@ export function readSavedSession(): SavedSession | null {
     if (saved.kind !== 'local' && saved.kind !== 'training') return null;
     const game = saved.kind === 'local' ? saved.game : saved.training?.game;
     if (!game || !game.board || !game.startCard || !Array.isArray(game.players) || game.players.length < 2 || game.players.length > 4 || !game.players.every(player => Array.isArray(player.cards)) || !Array.isArray(game.deck) || game.deck.length !== game.players.length || !Array.isArray(game.scores) || !Array.isArray(game.log) || !Array.isArray(game.crosses)) return null;
+    if (game.sharedDeck !== undefined && (!Array.isArray(game.sharedDeck) || !game.sharedDeck.every(card => typeof card === 'string'))) return null;
     if (saved.kind === 'training' && !['intro','hand','deck','redraw','place','relation','explain','voting','result','score','reminder','log','opponent','opponent-result','complete'].includes(saved.training.phase)) return null;
     return saved;
   } catch { return null; }

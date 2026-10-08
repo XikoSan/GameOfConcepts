@@ -978,7 +978,7 @@ function App() {
     forceInactive = false
   ) => {
     const player = gameState.players[playerIndex];
-    const deck = gameState.deck[playerIndex];
+    const deck = gameState.sharedDeck ?? gameState.deck[playerIndex];
     if (!player || !deck) return null;
     const handMeta = getHandMeta(playerIndex);
     const isControllableActiveHand =

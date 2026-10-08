@@ -38,6 +38,7 @@ export function isTrainingRelation(from: string, to: string, family: RelationFam
 export function createTrainingState(): TrainingState {
   const neutral = EMOTIONS_DECK.neutralCards!.find(c => c.name === 'Эмоция')!;
   const game = initializeGame(2, { ...EMOTIONS_DECK, neutralCards: [neutral] }, 0);
+  delete game.sharedDeck;
   game.players[0].cards = [...TRAINING_HAND];
   game.deck[0] = [...TRAINING_RESERVE].reverse();
   game.players[1].cards = opponentCards.slice(0, 5);
