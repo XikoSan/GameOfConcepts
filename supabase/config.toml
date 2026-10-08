@@ -1,0 +1,5 @@
+project_id = "game-of-concepts"
+[auth]
+enable_anonymous_sign_ins = true
+[functions.room-command]
+verify_jwt = false

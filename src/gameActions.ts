@@ -48,8 +48,7 @@ export function applyGameAction(
   gameState: GameState,
   action: GameAction
 ): GameState {
-  // TODO(MVP): In multiplayer mode this action should be validated server-side
-  // before the resulting GameState is persisted to the room.
+  // Online callers must pass through applyAuthenticatedAction before persistence.
   switch (action.type) {
     case 'resetGame':
       return initializeGame();

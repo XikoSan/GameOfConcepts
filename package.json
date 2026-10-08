@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "android:sync": "npm run build && cap sync android",
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug",
-    "android:open": "cap open android"
+    "android:open": "cap open android",
+    "build:server": "node server/build.mjs",
+    "test": "node tests/run.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

@@ -204,7 +204,7 @@ function App() {
   const music = useBackgroundMusic(musicAudioRef);
   incrementCounter('render:App');
   // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
-  // localStorage playerId.
+  // Identity comes from the authenticated guest session.
   const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const compactTable = useCompactTable();

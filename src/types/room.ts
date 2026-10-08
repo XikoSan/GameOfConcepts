@@ -39,7 +39,7 @@ export interface Room {
   // TODO(MVP): Сейчас весь gameState хранится в JSONB. Позже нужно разделить
   // публичное состояние и приватные данные игроков.
   // FIXME(MVP): Рука оппонента технически доступна в клиенте через gameState.
-  // Для настоящего мультиплеера нужна серверная валидация.
+  // Server validation protects actions; private hand storage is a separate migration.
   game_state: GameState;
   version: number;
   created_at: string;

@@ -1,4 +1,5 @@
 // Device outbox for accepted local edges. Retry is at-least-once; the database unique key makes retransmission idempotent.
+import { ensureGuestIdentity } from '../lib/onlineAuth';
 import { getSupabaseClient } from '../lib/supabaseClient';
 import type { AcceptedRelationSample } from './acceptedRelations';
 
@@ -33,6 +34,7 @@ export async function flushAcceptedRelations() {
   if (running || !navigator.onLine || !queue().length) return;
   running = true;
   try {
+    await ensureGuestIdentity();
     const client = getSupabaseClient();
     while (queue().length) {
       const batch = queue().slice(0, 50);
