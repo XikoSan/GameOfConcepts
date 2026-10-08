@@ -57,12 +57,8 @@ interface CellProps {
   onRelationLeave?: () => void;
 }
 
-const getFontSize = (cardName: string) => {
-  if (cardName.length <= 5) return 10;
-  if (cardName.length <= 8) return 9;
-  if (cardName.length <= 10) return 7.5;
-  return 8;
-};
+const CARD_TITLE_MAX_SIZE = 18;
+const CARD_TITLE_MIN_SIZE = 10;
 
 const getOwnerLabel = (playerId: PlacedCard['playerId']) => {
   if (playerId !== null) return `Игрок ${playerId + 1}`;
@@ -192,12 +188,14 @@ export const Cell: React.FC<CellProps> = ({
     const title = titleRef.current;
     if (!card || !title) return;
     const fitTitle = () => {
-      title.style.fontSize = '';
-      const style = getComputedStyle(card);
-      const available = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 2;
-      const baseSize = parseFloat(getComputedStyle(title).fontSize);
-      if (available > 0 && title.scrollWidth > available) {
-        title.style.fontSize = `${baseSize * available / title.scrollWidth * 0.98}px`;
+      let size = CARD_TITLE_MAX_SIZE;
+      title.style.fontSize = `${size}px`;
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const availableWidth = title.getBoundingClientRect().width * 0.96;
+      while (range.getBoundingClientRect().width > availableWidth && size > CARD_TITLE_MIN_SIZE) {
+        size = Math.max(CARD_TITLE_MIN_SIZE, size - 0.25);
+        title.style.fontSize = `${size}px`;
       }
     };
     const observer = new ResizeObserver(fitTitle);
@@ -731,7 +729,7 @@ export const Cell: React.FC<CellProps> = ({
           onPointerLeave={handleCardPointerLeave}
           onPointerDown={handleCardPointerDown}
           onClick={openPinnedPopover}
-          style={{ fontSize: `${getFontSize(placedCard.cardName)}px` }}
+          style={{ fontSize: `${CARD_TITLE_MAX_SIZE}px` }}
         >
           <span ref={titleRef} className="card-title" lang="ru">
             {placedCard.cardName}

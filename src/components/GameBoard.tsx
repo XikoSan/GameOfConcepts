@@ -78,10 +78,10 @@ interface ViewportSize {
 const GRID_MIN = -40;
 const GRID_MAX = 40;
 const GRID_SIZE = GRID_MAX - GRID_MIN + 1;
-const CELL_SIZE = 56;
+const CELL_SIZE = 96;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 2;
-const INITIAL_ZOOM = 1.5;
+const INITIAL_ZOOM = 1.25;
 const ZOOM_STEP = 0.1;
 
 const getCellCenter = (coordinates: Coordinates) => ({
