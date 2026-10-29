@@ -1,6 +1,7 @@
 import type { CardDefinition, CardDifficulty } from './cardCatalog';
 import type { RelationFamily } from '../types';
 import { EMOTIONS_PLAY_CARDS, EMOTIONS_NEUTRAL_CARDS } from './emotionsCatalog';
+import { DISCUSSION_PLAY_CARDS, DISCUSSION_NEUTRAL_CARDS } from './discussionCatalog';
 
 export type DeckKind = 'preset' | 'custom';
 
@@ -88,10 +89,22 @@ export const EMOTIONS_DECK: DeckDefinition = {
   relationFamilies: ['kind', 'part', 'cause', 'property', 'opposite'],
 };
 
+export const DISCUSSION_DECK: DeckDefinition = {
+  id: 'discussion',
+  name: 'Дискуссионная',
+  kind: 'preset',
+  description: `${DISCUSSION_PLAY_CARDS.length} игральных и ${DISCUSSION_NEUTRAL_CARDS.length} нейтральных карт.`,
+  source: { type: 'custom', cardIds: DISCUSSION_PLAY_CARDS.map((card) => card.id) },
+  catalog: DISCUSSION_PLAY_CARDS,
+  neutralCards: DISCUSSION_NEUTRAL_CARDS,
+  relationFamilies: ['kind', 'part', 'cause', 'property', 'opposite'],
+};
+
 // Standard difficulty decks are derived from catalog metadata;
 // their size must never be duplicated as a constant.
 export const USER_SELECTABLE_DECKS: readonly DeckDefinition[] = [
   EMOTIONS_DECK,
+  DISCUSSION_DECK,
 ];
 
 export const DEFAULT_DECK = EMOTIONS_DECK;

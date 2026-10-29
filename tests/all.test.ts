@@ -1,4 +1,5 @@
 import './emotions-deck.test';
+import './discussion-deck.test';
 import './training-game.test';
 import './saved-session.test';
 
