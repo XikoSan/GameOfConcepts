@@ -1,77 +1,23 @@
-# React + TypeScript + Vite
+# Игра понятий
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Найдите связь. Объясните её. Убедите других игроков.**
 
-Currently, two official plugins are available:
+«Игра понятий» — соревновательная карточная игра для 2–4 человек, в которой общее поле складывается из слов и связей между ними. Вы размещаете карту, выбираете, как её понятие связано с соседними, и обосновываете свой ход вслух. Остальные игроки голосуют: принятая связь остаётся на поле и приносит очки.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+В обычной партии нет готового списка правильных сочетаний. Одна карта может подсказать очевидную связь, а может начать спор, в котором всё решает сила объяснения. При этом каждое принятое решение меняет поле и открывает возможности для следующих ходов.
 
-## React Compiler
+## От идеи к ходу
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Например, «Радость» можно связать с «Эмоцией» как **вид**. Разместите карту рядом с уже выложенной, выберите тип и направление связи, объясните свой выбор и отправьте ход на голосование. Если другие игроки его примут, карта останется на поле.
 
-## Expanding the ESLint configuration
+В игре есть пять типов связей: **вид, часть, причина, свойство и противоположность**. За принятые связи начисляются очки, а продолжение смыслового пути или построение узла даёт дополнительные. Так обсуждение понятий становится ещё и задачей на стратегию.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Играйте вместе
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Локально** — партия на одном устройстве.
+- **Онлайн** — общая комната для игроков с разных устройств.
+- **Обучение** — знакомство с правилами в партии с учебным соперником.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Игра доступна в браузере; для Android есть тестовая APK-сборка. В текущей версии можно выбрать колоду **«Эмоции и чувства»** или новую **«Дискуссионную»**: её понятия пересекаются между общественной жизнью, знанием, ценностями и личным опытом.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-## Разработка версии 1.0.0
-
-Начните с [карты архитектуры](docs/ARCHITECTURE.md). Результаты проверки и ограничения онлайн-режима: [безопасность](docs/SECURITY-REVIEW.md).
+[Полные правила](game-rules.md) · [Разработка и сборка](docs/DEVELOPMENT.md)
