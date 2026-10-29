@@ -19,6 +19,7 @@ import { MusicControls, MusicSettings } from './components/MusicSettings';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { TableReminder } from './components/TableReminder';
 import packageInfo from '../package.json';
+import { MENU_RELEASE_NOTES } from './data/releaseNotes';
 import './MainMenu.css';
 import { TrainingGame } from './components/TrainingGame';
 import {
@@ -211,6 +212,7 @@ function App() {
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [showMainMenu, setShowMainMenu] = useState(true);
+  const [showMenuUpdates, setShowMenuUpdates] = useState(true);
   const [savedSession, setSavedSession] = useState(readSavedSession);
   const [saveError, setSaveError] = useState('');
   const [trainingInitialState, setTrainingInitialState] = useState<TrainingState>();
@@ -1110,6 +1112,14 @@ function App() {
       {showMainMenu && activeModal !== 'tutorial' && <main className="main-menu" aria-label="Главное меню" inert={activeModal !== null}
         onPointerDownCapture={event => { if (event.button === 0) startMenuMusic(); }}
         onKeyDownCapture={event => { if (event.key === 'Enter' || event.key === ' ') startMenuMusic(); }}>
+        <aside className="main-menu-updates" aria-label="Обновления игры">
+          <button className="main-menu-updates-toggle" type="button" aria-expanded={showMenuUpdates} aria-controls="main-menu-updates-list" onClick={() => setShowMenuUpdates((visible) => !visible)}>
+            <span>Что нового</span><span aria-hidden="true">{showMenuUpdates ? '−' : '+'}</span>
+          </button>
+          <ul id="main-menu-updates-list" className="main-menu-updates-list" hidden={!showMenuUpdates}>
+            {MENU_RELEASE_NOTES.map(({ label, text }) => <li key={label}><strong>{label}:</strong> {text}</li>)}
+          </ul>
+        </aside>
         <h1>Игра понятий</h1>
         <nav className="main-menu-actions" aria-label="Главное меню">
           <div className="main-menu-row">
