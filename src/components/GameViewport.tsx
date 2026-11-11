@@ -32,9 +32,9 @@ export function GameViewport() {
       requested = true;
       try {
         await document.documentElement.requestFullscreen();
-        await orientation.lock('portrait');
+        await orientation.lock('landscape');
       } catch {
-        // Unsupported browsers keep the device's natural orientation.
+        // Unsupported browsers retain the CSS landscape layout.
         requested = false;
       }
     };

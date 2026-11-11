@@ -7,6 +7,18 @@
   background: #202425;
 }
 
+@media (max-width: 900px) and (orientation: portrait) {
+  .game-viewport {
+    inset: auto;
+    top: 0;
+    left: 100%;
+    width: 100dvh;
+    height: 100dvw;
+    transform-origin: top left;
+    transform: rotate(90deg);
+  }
+}
+
 .game-viewport.is-editing {
   inset: auto;
   left: 0;
