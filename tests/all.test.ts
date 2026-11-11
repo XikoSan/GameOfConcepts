@@ -7,3 +7,4 @@ import './relation-collection.test';
 
 import './server-security.test';
 import './game-finish.test';
+import './match-statistics.test';

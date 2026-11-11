@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { getPassAvailability, isDrawPileExhausted, type GameState } from '../game';
 import { Modal } from './Modal';
+import { MatchResultsDialog } from './MatchResultsDialog';
+import { useDesktopStatistics } from '../hooks/useDesktopStatistics';
 import './MatchFinishControls.css';
 
 interface MatchFinishControlsProps {
   game: GameState;
-  players: { seatIndex: number; nickname: string }[];
+  players: { seatIndex: number; nickname: string; color?: string }[];
   localPlayerIndex: number | null;
   online: boolean;
   active: boolean;
@@ -28,6 +30,12 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
   const [busy, setBusy] = useState(false);
   const [attemptedAction, setAttemptedAction] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const desktopStatistics = useDesktopStatistics();
+  const resultsButtonRef = useRef<HTMLButtonElement>(null);
+  const closeResults = () => {
+    setResultHidden(true);
+    window.requestAnimationFrame(() => resultsButtonRef.current?.focus());
+  };
   const pending = game.pendingFinish;
   const exhausted = isDrawPileExhausted(game);
   const actingSeat = online ? localPlayerIndex : game.currentPlayerIndex;
@@ -70,7 +78,7 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
 
   return <>
     <div className="match-finish-tools">
-      {game.gameOver ? <button type="button" onClick={() => setResultHidden(false)}>Итоги партии</button>
+      {game.gameOver ? <button ref={resultsButtonRef} type="button" onClick={() => setResultHidden(false)}>Итоги партии</button>
         : pending ? <button type="button" onClick={() => setHiddenVoteId(null)}>Голосование о завершении</button>
           : exhausted ? <button type="button" disabled={!enabled || !availability.canPass || busy} title={availability.reason || 'Пропустить ход'} onClick={() => openConfirmation('pass')}>Пас</button>
             : <button type="button" disabled={!canRequest || busy} title={canRequest ? 'Предложить всем игрокам завершить партию' : 'Доступно в свой ход, после завершения текущих решений'} onClick={() => openConfirmation('finish')}>Завершить по согласию</button>}
@@ -103,7 +111,11 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
         </div>}
       </div>
     </Modal>}
-    {active && game.gameOver && !resultHidden && <Modal title="Партия завершена" onClose={() => setResultHidden(true)}>
+    {game.gameOver && desktopStatistics && <MatchResultsDialog
+      game={game} players={players} open={active && !resultHidden}
+      onClose={closeResults} onMenu={onMenu} onNewGame={onNewGame}
+    />}
+    {active && game.gameOver && !resultHidden && !desktopStatistics && <Modal title="Партия завершена" onClose={closeResults}>
       <div className="match-finish-dialog">
         <p className="match-finish-winner"><strong>{leaders.length === 1 ? `Победитель — ${leaders[0].nickname}` : `Ничья: ${leaders.map(player => player.nickname).join(', ')}`}</strong></p>
         <p>{game.endReason === 'agreement' ? 'Все игроки согласились завершить партию.' : game.endReason === 'empty-hands' ? 'В колоде и на руках не осталось карт.' : game.endReason === 'consecutive-passes' ? 'Колода закончилась. Остальные игроки спасовали или остались без карт.' : 'Итоговый счёт партии.'}</p>
