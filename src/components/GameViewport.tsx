@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import './GameViewport.css';
 
-// Keep one browsing context so rotation never restarts the current match.
+// Keep one browsing context so viewport and keyboard changes never restart the match.
 export function GameViewport() {
   const frame = useRef<HTMLIFrameElement>(null);
   const cleanup = useRef<(() => void) | undefined>(undefined);
@@ -32,9 +32,9 @@ export function GameViewport() {
       requested = true;
       try {
         await document.documentElement.requestFullscreen();
-        await orientation.lock('landscape');
+        await orientation.lock('portrait');
       } catch {
-        // Unsupported browsers retain the CSS landscape layout.
+        // Unsupported browsers keep the device's natural orientation.
         requested = false;
       }
     };

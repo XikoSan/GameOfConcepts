@@ -10,6 +10,7 @@ import { MatchLogEntry } from './MatchLogEntry';
 import './TrainingGame.css';
 import { TrainingHint } from './TrainingHint';
 import { TableSidebar } from './TableSidebar';
+import { TableMenu } from './TableMenu';
 import { useCompactTable } from '../hooks/useCompactTable';
 
 const noop = () => {};
@@ -70,11 +71,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
             </div></div>
           </div>)}
         </div>
-        <nav className="table-menu" aria-label="Меню игры">
-          <button className="table-menu-tutorial" type="button" onClick={onClose}>Меню</button>
-          <button className="table-menu-rules" type="button" onClick={onOpenRules}>Правила</button>
-          <button className="table-menu-settings" type="button" onClick={onOpenSettings}>Настройки</button>
-        </nav>
+        <TableMenu onMenu={onClose} onRules={onOpenRules} onSettings={onOpenSettings} />
       </header>
       <div className="table-workspace"><div className="table-center">
         <div className="board-section">

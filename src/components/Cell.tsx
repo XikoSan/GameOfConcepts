@@ -728,6 +728,7 @@ export const Cell: React.FC<CellProps> = ({
           onPointerEnter={handleCardPointerEnter}
           onPointerLeave={handleCardPointerLeave}
           onPointerDown={handleCardPointerDown}
+          onContextMenu={event => event.preventDefault()}
           onClick={openPinnedPopover}
           style={{ fontSize: `${CARD_TITLE_MAX_SIZE}px` }}
         >

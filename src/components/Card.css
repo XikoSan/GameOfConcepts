@@ -1,4 +1,7 @@
 .card {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   width: clamp(120px, 7.2vw, 170px);
   min-height: clamp(50px, 4vw, 88px);
   padding: clamp(5px, 0.55vw, 9px);
@@ -24,6 +27,10 @@
 }
 
 .card .card-title {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  pointer-events: none;
   display: block;
   max-width: 100%;
   overflow: hidden;

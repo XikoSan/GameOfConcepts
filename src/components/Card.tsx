@@ -59,6 +59,13 @@ export const Card: React.FC<CardProps> = ({
   const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const current = pointer.current;
     if (!current || current.id !== event.pointerId || !draggable) return;
+    // Portrait hands scroll horizontally; only a vertical touch starts a card drag.
+    if (!current.dragging && event.pointerType !== 'mouse' &&
+        getComputedStyle(event.currentTarget).touchAction === 'pan-x' &&
+        Math.abs(event.clientX - current.x) > 8 && Math.abs(event.clientX - current.x) > Math.abs(event.clientY - current.y)) {
+      pointer.current = null;
+      return;
+    }
     if (!current.dragging && Math.hypot(event.clientX - current.x, event.clientY - current.y) > 8) {
       current.dragging = true;
       window.dispatchEvent(new CustomEvent('card-info-close'));
@@ -100,7 +107,7 @@ export const Card: React.FC<CardProps> = ({
       onPointerMove={handlePointerMove}
       onPointerCancel={handlePointerCancel}
       onLostPointerCapture={handlePointerCancel}
-      onContextMenu={event => { if (draggable) event.preventDefault(); }}
+      onContextMenu={event => event.preventDefault()}
     >
       <span ref={titleRef} className="card-title">{cardName}</span>
     </div>

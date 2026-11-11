@@ -13,6 +13,13 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
   const docked = Boolean(actionDock && (phase === 'explain' || phase === 'opponent'));
   const ready = Boolean(game.pendingMove?.semanticEdges?.length);
   const suggestion = useMemo(() => phase === 'place' ? suggestedTrainingMove(state) : undefined, [state, phase]);
+  const suggestedName = suggestion?.name;
+  useEffect(() => {
+    if (!actionDock || phase !== 'place' || !suggestedName) return;
+    const card = Array.from(document.querySelectorAll<HTMLElement>('.training-session .card'))
+      .find(element => element.textContent?.trim() === suggestedName);
+    card?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [actionDock, phase, suggestedName]);
   const box = useRef<HTMLElement>(null);
   const arrow = useRef<HTMLSpanElement>(null);
   const ring = useRef<HTMLDivElement>(null);

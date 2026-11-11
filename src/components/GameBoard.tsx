@@ -34,6 +34,7 @@ import {
   toOverlayRect,
 } from './boardOverlayPositioning';
 import './GameBoard.css';
+import { useCompactTable } from '../hooks/useCompactTable';
 
 interface GameBoardProps {
   actionDock?: HTMLElement | null;
@@ -82,7 +83,7 @@ const GRID_SIZE = GRID_MAX - GRID_MIN + 1;
 const CELL_SIZE = 96;
 const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 2;
-const INITIAL_ZOOM = 1;
+const INITIAL_ZOOM = 0.88;
 const ZOOM_STEP = 0.1;
 
 const getCellCenter = (coordinates: Coordinates) => ({
@@ -249,6 +250,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   onCancelPendingMove,
 }) => {
   incrementCounter('render:GameBoard');
+  const compact = useCompactTable();
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
   );
@@ -258,6 +260,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     setCamera(getCenteredCamera(gameState.startCard.coordinates));
   }
   const [viewport, setViewport] = useState<ViewportSize>({ width: 0, height: 0 });
+  // On phones the minimum scale fits two more columns than the old 0.6 limit.
+  const minZoom = compact && viewport.width > 0
+    ? viewport.width / (viewport.width / MIN_ZOOM + 2 * CELL_SIZE)
+    : MIN_ZOOM;
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     isDragging: boolean;
@@ -380,7 +386,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     setCamera((currentCamera) => {
       const nextZoom = Math.min(
         MAX_ZOOM,
-        Math.max(MIN_ZOOM, currentCamera.zoom + direction * ZOOM_STEP)
+        Math.max(minZoom, currentCamera.zoom + direction * ZOOM_STEP)
       );
       const worldX =
         (pointerX - viewportCenterX - currentCamera.offsetX) / currentCamera.zoom;
@@ -393,7 +399,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         zoom: nextZoom,
       };
     });
-  }, [viewport.height, viewport.width]);
+  }, [minZoom, viewport.height, viewport.width]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -468,7 +474,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         if (!container) return;
         const rect = container.getBoundingClientRect();
         setCamera(camera => {
-          const zoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, camera.zoom * next.distance / previous.distance));
+          const zoom = Math.max(minZoom, Math.min(MAX_ZOOM, camera.zoom * next.distance / previous.distance));
           const x = previous.x - rect.left - rect.width / 2;
           const y = previous.y - rect.top - rect.height / 2;
           return { zoom, offsetX: next.x - rect.left - rect.width / 2 - (x - camera.offsetX) * zoom / camera.zoom,
@@ -492,7 +498,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       offsetX: currentCamera.offsetX + deltaX,
       offsetY: currentCamera.offsetY + deltaY,
     }));
-  }, []);
+  }, [minZoom]);
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     touchPoints.current.delete(event.pointerId);

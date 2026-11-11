@@ -14,6 +14,7 @@ import { MatchFinishControls } from './components/MatchFinishControls';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { TableSidebar } from './components/TableSidebar';
+import { TableMenu } from './components/TableMenu';
 import { useCompactTable } from './hooks/useCompactTable';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
@@ -1095,11 +1096,7 @@ function App() {
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
           <header className="table-status-bar">
             {renderPlayers()}
-            <nav className="table-menu" aria-label="Меню игры">
-              <button className="table-menu-tutorial" type="button" onClick={requestMainMenu}>Меню</button>
-              <button className="table-menu-rules" type="button" onClick={() => { setActiveModal('rules'); }}>Правила</button>
-              <button className="table-menu-settings" type="button" onClick={() => { setActiveModal('settings'); }}>Настройки</button>
-            </nav>
+            <TableMenu onMenu={requestMainMenu} onRules={() => setActiveModal('rules')} onSettings={() => setActiveModal('settings')} />
           </header>
           <div className="table-workspace">
             <div className="table-center">
