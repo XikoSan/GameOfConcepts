@@ -6,13 +6,26 @@ import { getRelationPresets, isRelationAllowed } from '../scoring/semanticRelati
 export function applyAuthenticatedAction(room: Room, actor: string, action: GameAction, expectedMoveId?: string): Room {
   const member = room.players.find(player => player.id === actor);
   if (!member || room.status !== 'playing') throw Error('Нет доступа к действиям в этой партии.');
+  if (room.game_state.gameOver) throw Error('Партия завершена.');
   const activeId = room.turn_order[room.current_turn_index];
   const active = room.players.find(player => player.id === activeId);
   if (!active) throw Error('Неверная очередь ходов.');
+  const turnOrder = room.turn_order.map(id => {
+    const player = room.players.find(member => member.id === id);
+    if (!player) throw Error('Неверная очередь ходов.');
+    return player.seatIndex;
+  });
   let game = { ...room.game_state, currentPlayerIndex: active.seatIndex };
   const pending = game.pendingMove;
-  let turn = room.current_turn_index;
-  if (action.type === 'confirmCard' || action.type === 'returnCard') {
+  const turn = room.current_turn_index;
+  if (game.pendingFinish && action.type !== 'voteFinish') throw Error('Дождитесь решения о завершении партии.');
+  if (action.type === 'voteFinish') {
+    if (!game.pendingFinish || action.finishId !== game.pendingFinish.id || typeof action.accept !== 'boolean') throw Error('Это предложение о завершении уже изменилось.');
+    const before = game;
+    // Identity comes exclusively from the authenticated actor, never the payload seat.
+    game = applyGameAction(game, { type: 'voteFinish', playerIndex: member.seatIndex, accept: action.accept, finishId: action.finishId }, turnOrder);
+    if (game === before) throw Error('Голос недоступен или уже учтён.');
+  } else if (action.type === 'confirmCard' || action.type === 'returnCard') {
     if (!pending || pending.semanticStatus !== 'voting' || expectedMoveId !== pending.cardId) throw Error('Этот ход уже изменился.');
     const author = room.players.find(player => player.seatIndex === pending.playerIndex)?.id;
     const voters = room.turn_order.filter(id => id !== author);
@@ -23,14 +36,13 @@ export function applyAuthenticatedAction(room: Room, actor: string, action: Game
     const remaining = voters.filter(id => !votes[id]).length;
     const majority = Math.floor(voters.length / 2) + 1;
     if (accepts >= majority) {
-      game = applyGameAction(game, { type: 'confirmCard' });
-      turn = (turn + 1) % room.turn_order.length;
+      game = applyGameAction(game, { type: 'confirmCard' }, turnOrder);
     } else if (accepts + remaining < majority) {
       game = applyGameAction(game, { type: 'returnCard' });
     }
   } else {
     if (actor !== activeId) throw Error('Сейчас ход другого игрока.');
-    if (!['placeCard', 'redrawHand', 'upsertSemanticEdge', 'removeSemanticEdge', 'submitSemanticMove', 'cancelPendingMove'].includes(action.type)) throw Error('Неизвестное действие.');
+    if (!['placeCard', 'redrawHand', 'upsertSemanticEdge', 'removeSemanticEdge', 'submitSemanticMove', 'cancelPendingMove', 'passTurn', 'requestFinish'].includes(action.type)) throw Error('Неизвестное действие.');
     if (pending?.semanticStatus === 'voting') throw Error('Дождитесь голосования.');
     if (action.type === 'placeCard') {
       const c = action.coordinates;
@@ -38,6 +50,8 @@ export function applyAuthenticatedAction(room: Room, actor: string, action: Game
       if (pending) throw Error('Сначала завершите текущий ход.');
     } else if (action.type === 'redrawHand') {
       action = { type: 'redrawHand', playerIndex: member.seatIndex };
+    } else if (action.type === 'passTurn' || action.type === 'requestFinish') {
+      action = { type: action.type, playerIndex: member.seatIndex };
     } else {
       if (!pending || pending.playerIndex !== member.seatIndex || expectedMoveId !== pending.cardId) throw Error('Этот ход уже изменился.');
       if (action.type === 'upsertSemanticEdge') {
@@ -47,7 +61,7 @@ export function applyAuthenticatedAction(room: Room, actor: string, action: Game
       }
     }
     const before = game;
-    game = applyGameAction(game, action);
+    game = applyGameAction(game, action, turnOrder);
     if (game === before) throw Error('Действие нарушает правила игры.');
     if (game.pendingMove && ['placeCard','submitSemanticMove'].includes(action.type)) {
       const reviewer = room.players.find(player => player.id === room.turn_order[(turn + 1) % room.turn_order.length])!;
@@ -56,6 +70,6 @@ export function applyAuthenticatedAction(room: Room, actor: string, action: Game
         votes: {}, reviewerIndex: reviewer.seatIndex, reviewerId: reviewer.seatIndex } };
     }
   }
-  const nextSeat = room.players.find(player => player.id === room.turn_order[turn])!.seatIndex;
-  return { ...room, game_state: { ...game, currentPlayerIndex: nextSeat }, current_turn_index: turn, version: room.version + 1 };
+  const nextTurn = turnOrder.indexOf(game.currentPlayerIndex);
+  return { ...room, game_state: game, current_turn_index: nextTurn, version: room.version + 1 };
 }

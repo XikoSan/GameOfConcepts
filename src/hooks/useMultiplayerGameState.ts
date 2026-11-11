@@ -29,6 +29,9 @@ export function useMultiplayerGameState({room,fallbackGameState,localPlayerId,on
     error,
     localPlayerIndex,
     activePlayerIndex,
+    passTurn: () => dispatchAction({ type: 'passTurn' }),
+    requestFinish: () => dispatchAction({ type: 'requestFinish' }),
+    voteFinish: (accept: boolean) => dispatchAction({ type: 'voteFinish', accept, finishId: gameState.pendingFinish?.id }),
     placeCard: (cardName: RegularCardName, coordinates: Coordinates) => {
       void dispatchAction({ type: 'placeCard', cardName, coordinates });
     },

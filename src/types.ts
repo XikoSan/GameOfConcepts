@@ -230,6 +230,10 @@ export interface GameState {
   /** Score snapshots keyed by log index; optional for existing saved rooms. */
   logDetails?: Record<number, { score: TurnScoreResult; relations: string[] }>;
   gameOver: boolean;
+  consecutivePasses?: number;
+  endReason?: 'consecutive-passes' | 'empty-hands' | 'agreement';
+  /** Finish votes use stable seat keys in both local and online games. */
+  pendingFinish?: { id: string; requestedBy: number; votes: Record<string, boolean> } | null;
 }
 
 /** Visible board bounds used for rendering optimizations. */

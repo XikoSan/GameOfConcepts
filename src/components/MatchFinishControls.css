@@ -1,0 +1,36 @@
+.match-finish-tools { margin-right: auto; display: flex; align-items: flex-end; gap: 8px; max-width: calc(100% - 54px); }
+.match-finish-tools > button { white-space: normal; text-align: left; }
+.match-finish-error { color: #ffb8ad; overflow-wrap: anywhere; }
+.match-finish-tools .match-finish-error { pointer-events: auto; max-width: 280px; margin: 0; padding: 7px; border-radius: 6px; background: #292d2ef2; font-size: 12px; }
+.modal-window:has(.match-finish-dialog) { width: min(500px, 100%); }
+.match-finish-dialog { text-align: left; }
+.match-finish-dialog > p:first-child { margin-top: 0; }
+.match-finish-dialog .match-finish-error { color: #ffb8ad; }
+.match-finish-voters, .match-finish-standings { list-style: none; padding: 0 !important; margin: 16px 0 !important; }
+.match-finish-voters li, .match-finish-standings li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 9px 12px; border: 1px solid #ffffff16; border-radius: 6px; }
+.match-finish-voters span, .match-finish-standings span { overflow-wrap: anywhere; min-width: 0; }
+.match-finish-voters strong, .match-finish-standings strong { flex-shrink: 0; }
+.match-finish-standings .is-leader { border-color: #b7a06c; background: #b7a06c16; }
+.match-finish-dialog .match-finish-winner { font-size: 20px; color: #f3d9a6; overflow-wrap: anywhere; }
+.match-finish-dialog .modal-actions { flex-wrap: wrap; }
+@media (max-width: 600px) { .match-finish-tools { flex-wrap: wrap; gap: 4px; } .match-finish-tools .match-finish-error { max-width: 220px; } }
+
+@media (max-height: 440px), (max-width: 440px) and (orientation: portrait) {
+  .match-finish-voters,
+  .match-finish-standings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .match-finish-voters li,
+  .match-finish-standings li {
+    gap: 8px;
+    margin-top: 0;
+    padding: 6px 8px;
+  }
+
+  .match-finish-dialog .modal-actions {
+    margin-top: 10px;
+  }
+}

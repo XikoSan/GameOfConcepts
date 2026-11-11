@@ -10,6 +10,7 @@ import { DictionaryModal } from './components/DictionaryModal';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
 import { GameBoard } from './components/GameBoard';
 import { MatchLogEntry } from './components/MatchLogEntry';
+import { MatchFinishControls } from './components/MatchFinishControls';
 import { Modal } from './components/Modal';
 import { PlayerHand } from './components/PlayerHand';
 import { TableSidebar } from './components/TableSidebar';
@@ -210,6 +211,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const compactTable = useCompactTable();
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
+  const [finishModalRoot, setFinishModalRoot] = useState<HTMLDivElement | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [showMainMenu, setShowMainMenu] = useState(true);
   const [showMenuUpdates, setShowMenuUpdates] = useState(true);
@@ -257,6 +259,9 @@ function App() {
     confirmCard,
     returnCard,
     redrawHand,
+    passTurn,
+    requestFinish,
+    voteFinish,
     approveCross,
     rejectCross,
     resetGame,
@@ -277,7 +282,8 @@ function App() {
     if (log) log.scrollTop = log.scrollHeight;
   }, [moveLog.length, latestLogEntry, showMainMenu]);
 
-  const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross);
+  const isMatchLocked = Boolean(gameState.gameOver || gameState.pendingFinish);
+  const hasPendingDecision = Boolean(gameState.pendingMove || gameState.pendingCross || isMatchLocked);
   const activeSelectedCard = hasPendingDecision ? null : selectedCard;
   const canControlPlayer = (playerIndex: number) =>
     mode === 'local' || localPlayerIndex === playerIndex;
@@ -286,7 +292,7 @@ function App() {
   useEffect(() => {
     if (isOnlineGameStarted) startMusic();
   }, [isOnlineGameStarted, onlineRoom?.id, startMusic]);
-  const isOnlineTable = isOnlineGameStarted;
+  const isOnlineTable = Boolean(onlineRoom && (isOnlineGameStarted || gameState.gameOver));
   const canUseGameActions = !onlineRoom || isOnlineGameStarted;
   const bottomTablePlayerIndex: number | null = isOnlineTable
     ? localPlayerIndex
@@ -296,6 +302,7 @@ function App() {
     playerId
   );
   const canReviewPendingMove =
+    !isMatchLocked &&
     gameState.pendingMove?.semanticStatus === 'voting' &&
     (mode === 'local'
       ? true
@@ -336,20 +343,21 @@ function App() {
         ? activePlayerIndex
         : pendingMoveReviewerIndex ?? activePlayerIndex;
   const scoreStateLabel =
-    gameState.pendingMove?.semanticStatus === 'defining-relations'
+    gameState.gameOver ? 'итог' : gameState.pendingFinish ? 'решение' : gameState.pendingMove?.semanticStatus === 'defining-relations'
       ? 'связи'
       : gameState.pendingMove
         ? 'решение'
         : 'ход';
   const canReviewPendingCross =
-    mode === 'local' ||
+    !isMatchLocked && (mode === 'local' ||
     (localPlayerIndex !== null &&
       Boolean(gameState.pendingCross) &&
-      activePlayerIndex === localPlayerIndex);
+      activePlayerIndex === localPlayerIndex));
   const getSeatScore = (seatIndex: number) => gameState.scores?.[seatIndex] ?? 0;
   const pendingSemanticEdges = gameState.pendingMove?.semanticEdges ?? [];
   const isSubmittingSemanticMove = false;
   const canEditSemanticMove =
+    !isMatchLocked &&
     Boolean(gameState.pendingMove) &&
     gameState.pendingMove?.semanticStatus === 'defining-relations' &&
     (mode === 'local' ||
@@ -375,7 +383,7 @@ function App() {
   };
 
   const handleRedrawHand = () => {
-    if (activeCardDragRef.current) return;
+    if (activeCardDragRef.current || !canUseHandRedraw) return;
 
     setIsRedrawConfirmOpen(false);
     redrawHand();
@@ -475,7 +483,7 @@ function App() {
     if (!onlineRoom) {
       return {
         displayName: localPlayerNames[playerIndex] || `Игрок ${playerIndex + 1}`,
-        statusLabel: gameState.pendingMove
+        statusLabel: gameState.gameOver ? 'Партия завершена' : gameState.pendingFinish ? 'Решение о завершении' : gameState.pendingMove
           ? 'Нужно решение'
           : activePlayerIndex === playerIndex
             ? 'Ход активен'
@@ -495,7 +503,11 @@ function App() {
       getPendingMovePlayerIndex(gameState.pendingMove) === playerIndex;
     let statusLabel = 'Ожидает';
 
-    if (gameState.pendingMove && isPendingAuthor) {
+    if (gameState.gameOver) {
+      statusLabel = 'Партия завершена';
+    } else if (gameState.pendingFinish) {
+      statusLabel = 'Решение о завершении';
+    } else if (gameState.pendingMove && isPendingAuthor) {
       statusLabel = gameState.pendingMove.semanticStatus === 'defining-relations'
         ? 'Выбор связей'
         : 'Ожидаем голоса';
@@ -586,7 +598,7 @@ function App() {
     roomSubscriptionRef.current?.unsubscribe();
     setOnlineRoom(room);
     setOnlineError(null);
-    if (room.status === 'playing') {
+    if (room.status === 'playing' || room.game_state.gameOver) {
       setShowMainMenu(false);
       setActiveModal(null);
     } else {
@@ -600,7 +612,7 @@ function App() {
         board: updatedRoom.game_state.board,
       });
       setOnlineRoom(updatedRoom);
-      if (updatedRoom.status === 'playing') {
+      if (updatedRoom.status === 'playing' && !updatedRoom.game_state.gameOver) {
         setActiveModal(null);
       }
     }, () => {
@@ -825,7 +837,7 @@ function App() {
   }, [onlineRoom, syncOnlineRoom]);
 
   useEffect(() => {
-    if (onlineRoom?.status !== 'playing' || activeModal !== 'new-game') return;
+    if (onlineRoom?.status !== 'playing' || onlineRoom.game_state.gameOver || activeModal !== 'new-game') return;
 
     const closeTimer = window.setTimeout(() => {
       setShowMainMenu(false);
@@ -833,7 +845,7 @@ function App() {
     }, 0);
 
     return () => window.clearTimeout(closeTimer);
-  }, [activeModal, onlineRoom?.status]);
+  }, [activeModal, onlineRoom?.status, onlineRoom?.game_state.gameOver]);
 
   useEffect(() => {
     if (!onlineRoom) return;
@@ -1033,7 +1045,22 @@ function App() {
     setShowMainMenu(true);
   };
 
-  const requestMainMenu = () => { setSaveError(''); setActiveModal('leave-game'); };
+  const requestMainMenu = () => {
+    if (!trainingRunning && gameState.gameOver) { openMainMenu(); return; }
+    setSaveError(''); setActiveModal('leave-game');
+  };
+  const setupNextMatch = () => {
+    setSelectedCard(null);
+    setDragPreview(null);
+    setTrainingSetup(false);
+    if (onlineRoom) {
+      handleOpenNewGameModal();
+    } else {
+      setLocalNameDrafts(Array.from({ length: 4 }, (_, seat) => localPlayerNames[seat] || ''));
+      setMaxPlayers(gameState.players.length as MaxPlayers);
+      setActiveModal('local-game');
+    }
+  };
   const leaveGame = (save: boolean) => {
     if (onlineRoom) { openMainMenu(); return; }
     try {
@@ -1062,7 +1089,7 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="app-container" ref={setFinishModalRoot}>
       <audio ref={musicAudioRef} src={music.activeTrack.src} preload="none" hidden loop={showMainMenu && activeModal !== 'tutorial'} onEnded={() => { if (!showMainMenu || activeModal === 'tutorial') music.skip(1); }} onPlaying={music.loaded} onError={music.failed} />
       {!showMainMenu && <main className="game-table" inert={trainingRunning} aria-hidden={trainingRunning ? true : undefined}>
         <section className={`play-area ${isOnlineTable ? 'play-area-online' : ''}`} aria-label="Игровой стол">
@@ -1079,6 +1106,22 @@ function App() {
               <div className="board-section">
                 {renderBoard()}
                 <div className="board-tools">
+                  <MatchFinishControls
+                    key={`${onlineRoom?.id ?? 'local'}-${gameState.startCard.id}`}
+                    game={{ ...gameState, currentPlayerIndex: activePlayerIndex }}
+                    players={onlineRoom ? onlinePlayers : localPlayers}
+                    localPlayerIndex={localPlayerIndex}
+                    online={Boolean(onlineRoom)}
+                    active={!showMainMenu && !trainingRunning && activeModal === null && !isDictionaryOpen}
+                    enabled={canUseGameActions && (!onlineRoom || onlinePlayers.length >= 2)}
+                    modalRoot={finishModalRoot}
+                    error={gameControllerError ?? onlineError}
+                    onPass={() => { setSelectedCard(null); setDragPreview(null); return passTurn(); }}
+                    onRequestFinish={requestFinish}
+                    onVote={voteFinish}
+                    onNewGame={setupNextMatch}
+                    onMenu={openMainMenu}
+                  />
                   <button className="center-board-button" type="button" onClick={handleResetCamera} aria-label="Центрировать поле" title="Центрировать поле">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
                       <circle cx="12" cy="12" r="6" />
@@ -1444,7 +1487,7 @@ function App() {
         {saveError && <p role="alert">{saveError}</p>}
         <div className="modal-actions leave-game-actions">
           <button type="button" onClick={() => setActiveModal(trainingRunning ? 'tutorial' : null)}>Остаться в игре</button>
-          {!onlineRoom && <button type="button" onClick={() => leaveGame(false)}>Завершить партию</button>}
+          {!onlineRoom && <button type="button" onClick={() => leaveGame(false)}>Выйти без сохранения</button>}
           <button className="save-game-button" type="button" onClick={() => leaveGame(true)}>{onlineRoom ? 'В меню' : 'Сохранить и выйти'}</button>
         </div>
       </Modal>}

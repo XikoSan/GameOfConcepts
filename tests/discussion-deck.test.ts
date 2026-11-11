@@ -21,7 +21,7 @@ const neutralNames = [
 test('discussion deck exposes exactly the curated 38 playing cards and 8 separate neutral cards', () => {
   assert.ok(USER_SELECTABLE_DECKS.some((deck) => deck.id === DISCUSSION_DECK.id));
   assert.equal(getDeckDefinitionById('discussion'), DISCUSSION_DECK);
-  assert.equal(DISCUSSION_DECK.name, 'Дискуссионная');
+  assert.equal(DISCUSSION_DECK.name, 'Человек и общество');
   assert.deepEqual(DISCUSSION_PLAY_CARDS.map((card) => card.name).sort(), playingNames);
   assert.deepEqual(DISCUSSION_NEUTRAL_CARDS.map((card) => card.name).sort(), neutralNames);
   assert.deepEqual(validateCardCatalog([...DISCUSSION_PLAY_CARDS, ...DISCUSSION_NEUTRAL_CARDS])

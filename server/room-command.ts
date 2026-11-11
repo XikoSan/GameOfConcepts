@@ -96,7 +96,7 @@ Deno.serve(async request => {
         continue;
       } else {
         if (!body.action || typeof body.action.type !== 'string') throw Error('Неверное действие.');
-        const vote = ['confirmCard','returnCard'].includes(body.action.type);
+        const vote = ['confirmCard','returnCard','voteFinish'].includes(body.action.type);
         if (!vote && body.expectedVersion !== room.version) throw Error('Состояние комнаты изменилось. Повторите действие.');
         next = applyAuthenticatedAction(room, actor, body.action as GameAction, body.moveId);
       }

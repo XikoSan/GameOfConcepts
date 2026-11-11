@@ -55,6 +55,78 @@ export interface HandRedrawAvailability {
   reason?: string;
 }
 
+export function isDrawPileExhausted(game: GameState): boolean {
+  return game.sharedDeck !== undefined
+    ? game.sharedDeck.length === 0
+    : game.deck.every(deck => deck.length === 0);
+}
+
+function finishGame(game: GameState, endReason: NonNullable<GameState['endReason']>): GameState {
+  return { ...game, gameOver: true, endReason, pendingFinish: null };
+}
+
+function nextSeat(game: GameState, turnOrder: number[]): number {
+  return turnOrder[(turnOrder.indexOf(game.currentPlayerIndex) + 1) % turnOrder.length];
+}
+
+export function getPassAvailability(game: GameState, playerIndex: number): { canPass: boolean; reason: string } {
+  if (game.gameOver) return { canPass: false, reason: 'Партия завершена.' };
+  if (game.pendingFinish) return { canPass: false, reason: 'Дождитесь решения о завершении партии.' };
+  if (game.pendingMove || game.pendingCross) return { canPass: false, reason: 'Сначала завершите текущий ход.' };
+  if (!game.players[playerIndex] || playerIndex !== game.currentPlayerIndex) return { canPass: false, reason: 'Пас доступен только в свой ход.' };
+  if (!isDrawPileExhausted(game)) return { canPass: false, reason: 'Пас доступен после исчерпания колоды.' };
+  return { canPass: true, reason: '' };
+}
+
+function recordPass(game: GameState, turnOrder: number[], automatic = false): GameState {
+  const consecutivePasses = (game.consecutivePasses ?? 0) + 1;
+  const next = { ...game, consecutivePasses,
+    log: [...game.log, `${getPlayerLabel(game.currentPlayerIndex)}: пас${automatic ? ' (пустая рука)' : ''}.`] };
+  // Stop before advancing: the sole remaining player never receives an extra turn.
+  if (consecutivePasses >= turnOrder.length - 1) return finishGame(next, 'consecutive-passes');
+  return { ...next, currentPlayerIndex: nextSeat(next, turnOrder) };
+}
+
+/** Apply automatic passes only between moves, using the room's actual order online. */
+export function resolveEmptyHands(game: GameState, turnOrder = game.players.map((_, index) => index)): GameState {
+  if (game.gameOver || game.pendingMove || game.pendingCross || game.pendingFinish || !isDrawPileExhausted(game)) return game;
+  if (turnOrder.every(seat => game.players[seat].cards.length === 0)) return finishGame(game, 'empty-hands');
+  let next = game;
+  while (!next.gameOver && next.players[next.currentPlayerIndex].cards.length === 0) {
+    next = recordPass(next, turnOrder, true);
+  }
+  // Empty hands cannot rejoin play after exhaustion, even when the sole hand is
+  // encountered before every empty seat in the cyclic order.
+  if (!next.gameOver && turnOrder.filter(seat => next.players[seat].cards.length > 0).length === 1) {
+    return finishGame(next, 'consecutive-passes');
+  }
+  return next;
+}
+
+export function passTurn(game: GameState, playerIndex = game.currentPlayerIndex,
+  turnOrder = game.players.map((_, index) => index)): GameState {
+  if (!getPassAvailability(game, playerIndex).canPass) return game;
+  if (turnOrder.every(seat => game.players[seat].cards.length === 0)) return finishGame(game, 'empty-hands');
+  return resolveEmptyHands(recordPass(game, turnOrder), turnOrder);
+}
+
+export function requestFinish(game: GameState, playerIndex = game.currentPlayerIndex): GameState {
+  if (game.gameOver || game.pendingFinish || game.pendingMove || game.pendingCross ||
+    playerIndex !== game.currentPlayerIndex || !game.players[playerIndex] || isDrawPileExhausted(game)) return game;
+  return { ...game, pendingFinish: { id: `finish_${Date.now()}_${Math.random()}`,
+    requestedBy: playerIndex, votes: { [String(playerIndex)]: true } } };
+}
+
+export function voteFinish(game: GameState, playerIndex: number, accept: boolean, finishId?: string): GameState {
+  const pending = game.pendingFinish;
+  if (game.gameOver || !pending || !game.players[playerIndex] || typeof accept !== 'boolean' ||
+    (finishId !== undefined && finishId !== pending.id) || Object.hasOwn(pending.votes, String(playerIndex))) return game;
+  if (!accept) return { ...game, pendingFinish: null };
+  const votes = { ...pending.votes, [String(playerIndex)]: true };
+  if (game.players.every((_, index) => votes[String(index)] === true)) return finishGame(game, 'agreement');
+  return { ...game, pendingFinish: { ...pending, votes } };
+}
+
 export function getRandomStartingPlayerIndex(
   playerCount: number,
   randomSource: () => number = Math.random
@@ -186,6 +258,8 @@ export function initializeGame(
     scores: Array.from({ length: normalizedPlayerCount }, () => 0),
     log: [],
     gameOver: false,
+    consecutivePasses: 0,
+    pendingFinish: null,
   };
 }
 
@@ -219,10 +293,6 @@ function getPlayerLabel(playerId: number): string {
 
 function getPendingMovePlayerIndex(pendingMove: PendingMove): number | null {
   return pendingMove.playerIndex ?? pendingMove.playerId ?? null;
-}
-
-function getPendingMoveReviewerIndex(pendingMove: PendingMove): number | null {
-  return pendingMove.reviewerIndex ?? pendingMove.reviewerId ?? null;
 }
 
 function isPlacedAnchor(card: PlacedCard): boolean {
@@ -266,7 +336,6 @@ function drawToHand(
   const newCards = [...cards];
   const drawnCard = deck.at(-1);
 
-  // TODO(rules): Define the official end-of-game condition for exhausted decks.
   if (newCards.length < HAND_SIZE && drawnCard) {
     newCards.push(drawnCard);
   }
@@ -279,6 +348,7 @@ export function getHandRedrawAvailability(
   playerIndex: number
 ): HandRedrawAvailability {
   if (gameState.gameOver) return { canRedraw: false, reason: 'Партия завершена.' };
+  if (gameState.pendingFinish) return { canRedraw: false, reason: 'Дождитесь решения о завершении партии.' };
   if (gameState.pendingMove || gameState.pendingCross) {
     return {
       canRedraw: false,
@@ -409,6 +479,7 @@ export function upsertPendingSemanticEdge(
   relation: SemanticRelation,
   direction: PendingSemanticEdge['direction']
 ): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   if (!gameState.pendingMove) return gameState;
   if (gameState.pendingMove.semanticStatus === 'voting') return gameState;
   if (!isRelationAllowed(relation, gameState.deckSnapshot)) return gameState;
@@ -453,6 +524,7 @@ export function removePendingSemanticEdge(
   gameState: GameState,
   neighborCardInstanceId: string
 ): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   if (!gameState.pendingMove) return gameState;
   if (gameState.pendingMove.semanticStatus === 'voting') return gameState;
 
@@ -474,6 +546,7 @@ export function removePendingSemanticEdge(
 }
 
 export function submitPendingSemanticMove(gameState: GameState): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   if (!gameState.pendingMove) return gameState;
   if (!gameState.pendingMove.semanticEdges?.length) return gameState;
   if (!gameState.pendingMove.semanticEdges.every((edge) =>
@@ -500,7 +573,7 @@ export function canPlaceCard(
   coordinates: Coordinates,
   cardName?: CardName
 ): boolean {
-  if (gameState.pendingMove || gameState.pendingCross) return false;
+  if (gameState.gameOver || gameState.pendingFinish || gameState.pendingMove || gameState.pendingCross) return false;
 
   const key = getBoardKey(coordinates);
   if (gameState.board[key]) return false;
@@ -593,7 +666,8 @@ export function placeCard(
   };
 }
 
-export function confirmPendingCard(gameState: GameState): GameState {
+export function confirmPendingCard(gameState: GameState, turnOrder = gameState.players.map((_, index) => index)): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   if (!gameState.pendingMove) return gameState;
   if (gameState.pendingMove.semanticStatus !== 'voting') return gameState;
   if (!gameState.pendingMove.semanticEdges?.length) return gameState;
@@ -604,9 +678,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
 
   const { cardId, cardName } = gameState.pendingMove;
   const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
-  const reviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
-
-  if (playerIndex === null || reviewerIndex === null) return gameState;
+  if (playerIndex === null) return gameState;
 
   const newBoard = Object.fromEntries(
     Object.entries(gameState.board).map(([key, card]) => [
@@ -665,7 +737,7 @@ export function confirmPendingCard(gameState: GameState): GameState {
     nextScores[playerIndex]
   );
 
-  return {
+  return resolveEmptyHands({
     ...gameState,
     board: newBoard,
     players: newPlayers,
@@ -679,7 +751,8 @@ export function confirmPendingCard(gameState: GameState): GameState {
     pendingTurnScore: null,
     semanticEdges: [...getSemanticEdges(gameState), ...acceptedSemanticEdges],
     scores: nextScores,
-    currentPlayerIndex: reviewerIndex,
+    currentPlayerIndex: nextSeat({ ...gameState, currentPlayerIndex: playerIndex }, turnOrder),
+    consecutivePasses: 0,
     log: [...gameState.log, formatTurnScoreLog(turnScore)],
     logDetails: {
       ...gameState.logDetails,
@@ -690,10 +763,11 @@ export function confirmPendingCard(gameState: GameState): GameState {
         )),
       },
     },
-  };
+  }, turnOrder);
 }
 
 export function returnPendingCard(gameState: GameState): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   if (!gameState.pendingMove) return gameState;
 
   const { cardId, cardName } = gameState.pendingMove;
@@ -732,6 +806,7 @@ export function returnPendingCard(gameState: GameState): GameState {
 }
 
 export function approvePendingCross(gameState: GameState): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   return {
     ...gameState,
     pendingCross: null,
@@ -740,6 +815,7 @@ export function approvePendingCross(gameState: GameState): GameState {
 }
 
 export function rejectPendingCross(gameState: GameState): GameState {
+  if (gameState.gameOver || gameState.pendingFinish) return gameState;
   return {
     ...gameState,
     pendingCross: null,

@@ -718,6 +718,196 @@ const EMOTIONS_NEUTRAL_CARDS = [
 		"enabled": true
 	}
 ];
+//#endregion
+//#region src/data/discussionCatalog.ts
+const DISCUSSION_PLAY_CARDS = [
+	{
+		id: "discussion-politics",
+		name: "Политика"
+	},
+	{
+		id: "discussion-protest",
+		name: "Протест"
+	},
+	{
+		id: "discussion-justice",
+		name: "Справедливость"
+	},
+	{
+		id: "discussion-equality",
+		name: "Равенство"
+	},
+	{
+		id: "discussion-inequality",
+		name: "Неравенство"
+	},
+	{
+		id: "discussion-legitimacy",
+		name: "Легитимность"
+	},
+	{
+		id: "discussion-data",
+		name: "Данные"
+	},
+	{
+		id: "discussion-objectivity",
+		name: "Объективность"
+	},
+	{
+		id: "discussion-interpretation",
+		name: "Интерпретация"
+	},
+	{
+		id: "discussion-research",
+		name: "Исследование"
+	},
+	{
+		id: "discussion-expertise",
+		name: "Экспертиза"
+	},
+	{
+		id: "discussion-technology",
+		name: "Технология"
+	},
+	{
+		id: "discussion-privacy",
+		name: "Приватность"
+	},
+	{
+		id: "discussion-art",
+		name: "Искусство"
+	},
+	{
+		id: "discussion-tradition",
+		name: "Традиция"
+	},
+	{
+		id: "discussion-worldview",
+		name: "Мировоззрение"
+	},
+	{
+		id: "discussion-progress",
+		name: "Прогресс"
+	},
+	{
+		id: "discussion-reform",
+		name: "Реформа"
+	},
+	{
+		id: "discussion-sustainability",
+		name: "Устойчивость"
+	},
+	{
+		id: "discussion-identity",
+		name: "Идентичность"
+	},
+	{
+		id: "discussion-goal",
+		name: "Цель"
+	},
+	{
+		id: "discussion-habit",
+		name: "Привычка"
+	},
+	{
+		id: "discussion-belief",
+		name: "Убеждение"
+	},
+	{
+		id: "discussion-freedom",
+		name: "Свобода"
+	},
+	{
+		id: "discussion-dependence",
+		name: "Зависимость"
+	},
+	{
+		id: "discussion-communication",
+		name: "Общение"
+	},
+	{
+		id: "discussion-trust",
+		name: "Доверие"
+	},
+	{
+		id: "discussion-solidarity",
+		name: "Солидарность"
+	},
+	{
+		id: "discussion-cooperation",
+		name: "Сотрудничество"
+	},
+	{
+		id: "discussion-agreement",
+		name: "Договор"
+	},
+	{
+		id: "discussion-community",
+		name: "Сообщество"
+	},
+	{
+		id: "discussion-discrimination",
+		name: "Дискриминация"
+	},
+	{
+		id: "discussion-labor",
+		name: "Труд"
+	},
+	{
+		id: "discussion-production",
+		name: "Производство"
+	},
+	{
+		id: "discussion-property",
+		name: "Собственность"
+	},
+	{
+		id: "discussion-debt",
+		name: "Долг"
+	},
+	{
+		id: "discussion-price",
+		name: "Цена"
+	},
+	{
+		id: "discussion-exchange",
+		name: "Обмен"
+	}
+];
+const DISCUSSION_NEUTRAL_CARDS = [
+	{
+		id: "discussion-neutral-decision",
+		name: "Решение"
+	},
+	{
+		id: "discussion-neutral-knowledge",
+		name: "Знание"
+	},
+	{
+		id: "discussion-neutral-relationships",
+		name: "Отношения"
+	},
+	{
+		id: "discussion-neutral-culture",
+		name: "Культура"
+	},
+	{
+		id: "discussion-neutral-change",
+		name: "Изменение"
+	},
+	{
+		id: "discussion-neutral-power",
+		name: "Власть"
+	},
+	{
+		id: "discussion-neutral-value",
+		name: "Ценность"
+	},
+	{
+		id: "discussion-neutral-society",
+		name: "Общество"
+	}
+];
 const EMOTIONS_DECK = {
 	id: "emotions",
 	name: "Эмоции и чувства",
@@ -737,7 +927,25 @@ const EMOTIONS_DECK = {
 		"opposite"
 	]
 };
-const USER_SELECTABLE_DECKS = [EMOTIONS_DECK];
+const USER_SELECTABLE_DECKS = [EMOTIONS_DECK, {
+	id: "discussion",
+	name: "Человек и общество",
+	kind: "preset",
+	description: `${DISCUSSION_PLAY_CARDS.length} игральных и ${DISCUSSION_NEUTRAL_CARDS.length} нейтральных карт.`,
+	source: {
+		type: "custom",
+		cardIds: DISCUSSION_PLAY_CARDS.map((card) => card.id)
+	},
+	catalog: DISCUSSION_PLAY_CARDS,
+	neutralCards: DISCUSSION_NEUTRAL_CARDS,
+	relationFamilies: [
+		"kind",
+		"part",
+		"cause",
+		"property",
+		"opposite"
+	]
+}];
 const DEFAULT_DECK = EMOTIONS_DECK;
 [...USER_SELECTABLE_DECKS];
 //#endregion
@@ -1115,6 +1323,104 @@ const BOARD_CENTER = {
 const HAND_SIZE = 5;
 const SCORING_VERSION = 3;
 const SAME_NAME_PLACEMENT_WARNING = "Нельзя ставить одинаковые понятия рядом.";
+function isDrawPileExhausted(game) {
+	return game.sharedDeck !== void 0 ? game.sharedDeck.length === 0 : game.deck.every((deck) => deck.length === 0);
+}
+function finishGame(game, endReason) {
+	return {
+		...game,
+		gameOver: true,
+		endReason,
+		pendingFinish: null
+	};
+}
+function nextSeat(game, turnOrder) {
+	return turnOrder[(turnOrder.indexOf(game.currentPlayerIndex) + 1) % turnOrder.length];
+}
+function getPassAvailability(game, playerIndex) {
+	if (game.gameOver) return {
+		canPass: false,
+		reason: "Партия завершена."
+	};
+	if (game.pendingFinish) return {
+		canPass: false,
+		reason: "Дождитесь решения о завершении партии."
+	};
+	if (game.pendingMove || game.pendingCross) return {
+		canPass: false,
+		reason: "Сначала завершите текущий ход."
+	};
+	if (!game.players[playerIndex] || playerIndex !== game.currentPlayerIndex) return {
+		canPass: false,
+		reason: "Пас доступен только в свой ход."
+	};
+	if (!isDrawPileExhausted(game)) return {
+		canPass: false,
+		reason: "Пас доступен после исчерпания колоды."
+	};
+	return {
+		canPass: true,
+		reason: ""
+	};
+}
+function recordPass(game, turnOrder, automatic = false) {
+	const consecutivePasses = (game.consecutivePasses ?? 0) + 1;
+	const next = {
+		...game,
+		consecutivePasses,
+		log: [...game.log, `${getPlayerLabel(game.currentPlayerIndex)}: пас${automatic ? " (пустая рука)" : ""}.`]
+	};
+	if (consecutivePasses >= turnOrder.length - 1) return finishGame(next, "consecutive-passes");
+	return {
+		...next,
+		currentPlayerIndex: nextSeat(next, turnOrder)
+	};
+}
+/** Apply automatic passes only between moves, using the room's actual order online. */
+function resolveEmptyHands(game, turnOrder = game.players.map((_, index) => index)) {
+	if (game.gameOver || game.pendingMove || game.pendingCross || game.pendingFinish || !isDrawPileExhausted(game)) return game;
+	if (turnOrder.every((seat) => game.players[seat].cards.length === 0)) return finishGame(game, "empty-hands");
+	let next = game;
+	while (!next.gameOver && next.players[next.currentPlayerIndex].cards.length === 0) next = recordPass(next, turnOrder, true);
+	if (!next.gameOver && turnOrder.filter((seat) => next.players[seat].cards.length > 0).length === 1) return finishGame(next, "consecutive-passes");
+	return next;
+}
+function passTurn(game, playerIndex = game.currentPlayerIndex, turnOrder = game.players.map((_, index) => index)) {
+	if (!getPassAvailability(game, playerIndex).canPass) return game;
+	if (turnOrder.every((seat) => game.players[seat].cards.length === 0)) return finishGame(game, "empty-hands");
+	return resolveEmptyHands(recordPass(game, turnOrder), turnOrder);
+}
+function requestFinish(game, playerIndex = game.currentPlayerIndex) {
+	if (game.gameOver || game.pendingFinish || game.pendingMove || game.pendingCross || playerIndex !== game.currentPlayerIndex || !game.players[playerIndex] || isDrawPileExhausted(game)) return game;
+	return {
+		...game,
+		pendingFinish: {
+			id: `finish_${Date.now()}_${Math.random()}`,
+			requestedBy: playerIndex,
+			votes: { [String(playerIndex)]: true }
+		}
+	};
+}
+function voteFinish(game, playerIndex, accept, finishId) {
+	const pending = game.pendingFinish;
+	if (game.gameOver || !pending || !game.players[playerIndex] || typeof accept !== "boolean" || finishId !== void 0 && finishId !== pending.id || Object.hasOwn(pending.votes, String(playerIndex))) return game;
+	if (!accept) return {
+		...game,
+		pendingFinish: null
+	};
+	const votes = {
+		...pending.votes,
+		[String(playerIndex)]: true
+	};
+	if (game.players.every((_, index) => votes[String(index)] === true)) return finishGame(game, "agreement");
+	return {
+		...game,
+		pendingFinish: {
+			...pending,
+			votes
+		}
+	};
+}
 function getRandomStartingPlayerIndex(playerCount, randomSource = Math.random) {
 	const normalizedPlayerCount = Math.max(1, Math.floor(playerCount));
 	return Math.min(normalizedPlayerCount - 1, Math.floor(randomSource() * normalizedPlayerCount));
@@ -1188,7 +1494,9 @@ function initializeGame(playerCount = 2, deckDefinition = DEFAULT_DECK, starting
 		scoringVersion: SCORING_VERSION,
 		scores: Array.from({ length: normalizedPlayerCount }, () => 0),
 		log: [],
-		gameOver: false
+		gameOver: false,
+		consecutivePasses: 0,
+		pendingFinish: null
 	};
 }
 function getBoardKey(coordinates) {
@@ -1225,9 +1533,6 @@ function getPlayerLabel(playerId) {
 function getPendingMovePlayerIndex(pendingMove) {
 	return pendingMove.playerIndex ?? pendingMove.playerId ?? null;
 }
-function getPendingMoveReviewerIndex(pendingMove) {
-	return pendingMove.reviewerIndex ?? pendingMove.reviewerId ?? null;
-}
 function isPlacedAnchor(card) {
 	return card.playerId === null || card.status === "confirmed";
 }
@@ -1259,6 +1564,10 @@ function getHandRedrawAvailability(gameState, playerIndex) {
 	if (gameState.gameOver) return {
 		canRedraw: false,
 		reason: "Партия завершена."
+	};
+	if (gameState.pendingFinish) return {
+		canRedraw: false,
+		reason: "Дождитесь решения о завершении партии."
 	};
 	if (gameState.pendingMove || gameState.pendingCross) return {
 		canRedraw: false,
@@ -1345,6 +1654,7 @@ function getPendingScorePreview(gameState, pendingMove) {
 	});
 }
 function upsertPendingSemanticEdge(gameState, neighborCardInstanceId, relation, direction) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	if (!gameState.pendingMove) return gameState;
 	if (gameState.pendingMove.semanticStatus === "voting") return gameState;
 	if (!isRelationAllowed(relation, gameState.deckSnapshot)) return gameState;
@@ -1376,6 +1686,7 @@ function upsertPendingSemanticEdge(gameState, neighborCardInstanceId, relation, 
 	};
 }
 function removePendingSemanticEdge(gameState, neighborCardInstanceId) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	if (!gameState.pendingMove) return gameState;
 	if (gameState.pendingMove.semanticStatus === "voting") return gameState;
 	const semanticEdges = (gameState.pendingMove.semanticEdges ?? []).filter((edge) => edge.neighborCardInstanceId !== neighborCardInstanceId).map((edge, index) => ({
@@ -1395,6 +1706,7 @@ function removePendingSemanticEdge(gameState, neighborCardInstanceId) {
 	};
 }
 function submitPendingSemanticMove(gameState) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	if (!gameState.pendingMove) return gameState;
 	if (!gameState.pendingMove.semanticEdges?.length) return gameState;
 	if (!gameState.pendingMove.semanticEdges.every((edge) => isRelationAllowed(edge.relation, gameState.deckSnapshot) && (edge.direction === "new-to-neighbor" || edge.direction === "neighbor-to-new"))) return gameState;
@@ -1411,7 +1723,7 @@ function submitPendingSemanticMove(gameState) {
 	};
 }
 function canPlaceCard(gameState, coordinates, cardName) {
-	if (gameState.pendingMove || gameState.pendingCross) return false;
+	if (gameState.gameOver || gameState.pendingFinish || gameState.pendingMove || gameState.pendingCross) return false;
 	const key = getBoardKey(coordinates);
 	if (gameState.board[key]) return false;
 	if (cardName && hasSameNameOrthogonalNeighbor(gameState.board, coordinates, cardName)) return false;
@@ -1475,15 +1787,15 @@ function placeCard(gameState, cardName, coordinates) {
 		lastPlacedCardId: placedCard.id
 	};
 }
-function confirmPendingCard(gameState) {
+function confirmPendingCard(gameState, turnOrder = gameState.players.map((_, index) => index)) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	if (!gameState.pendingMove) return gameState;
 	if (gameState.pendingMove.semanticStatus !== "voting") return gameState;
 	if (!gameState.pendingMove.semanticEdges?.length) return gameState;
 	if (!gameState.pendingMove.semanticEdges.every((edge) => isRelationAllowed(edge.relation, gameState.deckSnapshot) && (edge.direction === "new-to-neighbor" || edge.direction === "neighbor-to-new"))) return gameState;
 	const { cardId, cardName } = gameState.pendingMove;
 	const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
-	const reviewerIndex = getPendingMoveReviewerIndex(gameState.pendingMove);
-	if (playerIndex === null || reviewerIndex === null) return gameState;
+	if (playerIndex === null) return gameState;
 	const newBoard = Object.fromEntries(Object.entries(gameState.board).map(([key, card]) => [key, card.id === cardId ? {
 		...card,
 		status: "confirmed"
@@ -1509,7 +1821,7 @@ function confirmPendingCard(gameState) {
 	const nextScores = ensureScoreCapacity(gameState.scores, gameState.players.length);
 	nextScores[playerIndex] = (nextScores[playerIndex] ?? 0) + scorePreview.total;
 	const turnScore = createTurnScoreResult(playerIndex, cardName, scorePreview, nextScores[playerIndex]);
-	return {
+	return resolveEmptyHands({
 		...gameState,
 		board: newBoard,
 		players: newPlayers,
@@ -1520,7 +1832,11 @@ function confirmPendingCard(gameState) {
 		pendingTurnScore: null,
 		semanticEdges: [...getSemanticEdges(gameState), ...acceptedSemanticEdges],
 		scores: nextScores,
-		currentPlayerIndex: reviewerIndex,
+		currentPlayerIndex: nextSeat({
+			...gameState,
+			currentPlayerIndex: playerIndex
+		}, turnOrder),
+		consecutivePasses: 0,
 		log: [...gameState.log, formatTurnScoreLog(turnScore)],
 		logDetails: {
 			...gameState.logDetails,
@@ -1529,9 +1845,10 @@ function confirmPendingCard(gameState) {
 				relations: acceptedSemanticEdges.map((edge) => formatSemanticRelation(edge, new Map(Object.values(newBoard).map((card) => [card.id, card.cardName]))))
 			}
 		}
-	};
+	}, turnOrder);
 }
 function returnPendingCard(gameState) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	if (!gameState.pendingMove) return gameState;
 	const { cardId, cardName } = gameState.pendingMove;
 	const playerIndex = getPendingMovePlayerIndex(gameState.pendingMove);
@@ -1560,6 +1877,7 @@ function returnPendingCard(gameState) {
 	};
 }
 function approvePendingCross(gameState) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	return {
 		...gameState,
 		pendingCross: null,
@@ -1567,6 +1885,7 @@ function approvePendingCross(gameState) {
 	};
 }
 function rejectPendingCross(gameState) {
+	if (gameState.gameOver || gameState.pendingFinish) return gameState;
 	return {
 		...gameState,
 		pendingCross: null,
@@ -1575,11 +1894,15 @@ function rejectPendingCross(gameState) {
 }
 //#endregion
 //#region src/gameActions.ts
-function applyGameAction(gameState, action) {
+function applyGameAction(gameState, action, turnOrder) {
+	if (action.type !== "resetGame" && (gameState.gameOver || gameState.pendingFinish && action.type !== "voteFinish")) return gameState;
 	switch (action.type) {
 		case "resetGame": return initializeGame();
 		case "placeCard": return placeCard(gameState, action.cardName, action.coordinates);
-		case "confirmCard": return confirmPendingCard(gameState);
+		case "confirmCard": return confirmPendingCard(gameState, turnOrder);
+		case "passTurn": return passTurn(gameState, action.playerIndex, turnOrder);
+		case "requestFinish": return requestFinish(gameState, action.playerIndex);
+		case "voteFinish": return action.playerIndex === void 0 ? gameState : voteFinish(gameState, action.playerIndex, action.accept, action.finishId);
 		case "returnCard": return returnPendingCard(gameState);
 		case "redrawHand": return redrawPlayerHand(gameState, action.playerIndex ?? gameState.currentPlayerIndex);
 		case "upsertSemanticEdge": return upsertPendingSemanticEdge(gameState, action.neighborCardInstanceId, action.relation, action.direction);
@@ -1595,16 +1918,33 @@ function applyGameAction(gameState, action) {
 function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 	const member = room.players.find((player) => player.id === actor);
 	if (!member || room.status !== "playing") throw Error("Нет доступа к действиям в этой партии.");
+	if (room.game_state.gameOver) throw Error("Партия завершена.");
 	const activeId = room.turn_order[room.current_turn_index];
 	const active = room.players.find((player) => player.id === activeId);
 	if (!active) throw Error("Неверная очередь ходов.");
+	const turnOrder = room.turn_order.map((id) => {
+		const player = room.players.find((member) => member.id === id);
+		if (!player) throw Error("Неверная очередь ходов.");
+		return player.seatIndex;
+	});
 	let game = {
 		...room.game_state,
 		currentPlayerIndex: active.seatIndex
 	};
 	const pending = game.pendingMove;
-	let turn = room.current_turn_index;
-	if (action.type === "confirmCard" || action.type === "returnCard") {
+	const turn = room.current_turn_index;
+	if (game.pendingFinish && action.type !== "voteFinish") throw Error("Дождитесь решения о завершении партии.");
+	if (action.type === "voteFinish") {
+		if (!game.pendingFinish || action.finishId !== game.pendingFinish.id || typeof action.accept !== "boolean") throw Error("Это предложение о завершении уже изменилось.");
+		const before = game;
+		game = applyGameAction(game, {
+			type: "voteFinish",
+			playerIndex: member.seatIndex,
+			accept: action.accept,
+			finishId: action.finishId
+		}, turnOrder);
+		if (game === before) throw Error("Голос недоступен или уже учтён.");
+	} else if (action.type === "confirmCard" || action.type === "returnCard") {
 		if (!pending || pending.semanticStatus !== "voting" || expectedMoveId !== pending.cardId) throw Error("Этот ход уже изменился.");
 		const author = room.players.find((player) => player.seatIndex === pending.playerIndex)?.id;
 		const voters = room.turn_order.filter((id) => id !== author);
@@ -1624,10 +1964,8 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 		const accepts = voters.filter((id) => votes[id] === "accept").length;
 		const remaining = voters.filter((id) => !votes[id]).length;
 		const majority = Math.floor(voters.length / 2) + 1;
-		if (accepts >= majority) {
-			game = applyGameAction(game, { type: "confirmCard" });
-			turn = (turn + 1) % room.turn_order.length;
-		} else if (accepts + remaining < majority) game = applyGameAction(game, { type: "returnCard" });
+		if (accepts >= majority) game = applyGameAction(game, { type: "confirmCard" }, turnOrder);
+		else if (accepts + remaining < majority) game = applyGameAction(game, { type: "returnCard" });
 	} else {
 		if (actor !== activeId) throw Error("Сейчас ход другого игрока.");
 		if (![
@@ -1636,7 +1974,9 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 			"upsertSemanticEdge",
 			"removeSemanticEdge",
 			"submitSemanticMove",
-			"cancelPendingMove"
+			"cancelPendingMove",
+			"passTurn",
+			"requestFinish"
 		].includes(action.type)) throw Error("Неизвестное действие.");
 		if (pending?.semanticStatus === "voting") throw Error("Дождитесь голосования.");
 		if (action.type === "placeCard") {
@@ -1645,6 +1985,10 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 			if (pending) throw Error("Сначала завершите текущий ход.");
 		} else if (action.type === "redrawHand") action = {
 			type: "redrawHand",
+			playerIndex: member.seatIndex
+		};
+		else if (action.type === "passTurn" || action.type === "requestFinish") action = {
+			type: action.type,
 			playerIndex: member.seatIndex
 		};
 		else {
@@ -1658,7 +2002,7 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 			}
 		}
 		const before = game;
-		game = applyGameAction(game, action);
+		game = applyGameAction(game, action, turnOrder);
 		if (game === before) throw Error("Действие нарушает правила игры.");
 		if (game.pendingMove && ["placeCard", "submitSemanticMove"].includes(action.type)) {
 			const reviewer = room.players.find((player) => player.id === room.turn_order[(turn + 1) % room.turn_order.length]);
@@ -1676,14 +2020,11 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 			};
 		}
 	}
-	const nextSeat = room.players.find((player) => player.id === room.turn_order[turn]).seatIndex;
+	const nextTurn = turnOrder.indexOf(game.currentPlayerIndex);
 	return {
 		...room,
-		game_state: {
-			...game,
-			currentPlayerIndex: nextSeat
-		},
-		current_turn_index: turn,
+		game_state: game,
+		current_turn_index: nextTurn,
 		version: room.version + 1
 	};
 }
@@ -1856,7 +2197,11 @@ Deno.serve(async (request) => {
 				continue;
 			} else {
 				if (!body.action || typeof body.action.type !== "string") throw Error("Неверное действие.");
-				if (!["confirmCard", "returnCard"].includes(body.action.type) && body.expectedVersion !== room.version) throw Error("Состояние комнаты изменилось. Повторите действие.");
+				if (![
+					"confirmCard",
+					"returnCard",
+					"voteFinish"
+				].includes(body.action.type) && body.expectedVersion !== room.version) throw Error("Состояние комнаты изменилось. Повторите действие.");
 				next = applyAuthenticatedAction(room, actor, body.action, body.moveId);
 			}
 			const { id: _id, created_at: _created, ...patch } = next;

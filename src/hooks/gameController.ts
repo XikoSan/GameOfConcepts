@@ -28,6 +28,9 @@ export interface GameController {
   confirmCard: () => void;
   returnCard: () => void;
   redrawHand: () => void;
+  passTurn: () => void | Promise<void>;
+  requestFinish: () => void | Promise<void>;
+  voteFinish: (accept: boolean) => void | Promise<void>;
   approveCross: () => void;
   rejectCross: () => void;
   resetGame: (playerCount?: number, deckId?: string) => void;

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAcceptedRelationSamples } from '../services/acceptedRelations';
 import { enqueueAcceptedRelations, flushAcceptedRelations } from '../services/relationCollection';
 import { applyGameAction } from '../gameActions';
-import { initializeGame } from '../game';
+import { initializeGame, resolveEmptyHands } from '../game';
 import { getDeckDefinitionById, DEFAULT_DECK } from '../data/deckDefinitions';
 import type {
   Coordinates,
@@ -45,6 +45,10 @@ const getNextLocalVoter = (gameState: GameState): number | null => {
 
   return typeof nextVoter === 'number' ? nextVoter : null;
 };
+
+const getNextFinishVoter = (game: GameState): number | null => game.pendingFinish
+  ? game.players.findIndex((_, index) => !Object.hasOwn(game.pendingFinish!.votes, String(index)))
+  : null;
 
 const getVoteResolution = (requiredVoters: number[], votes: Record<string, LocalVote>) => {
   const totalVoters = requiredVoters.length;
@@ -172,6 +176,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
 
   const voteOnPendingMove = useCallback((vote: LocalVote) => {
     setGameState((prev) => {
+      if (prev.gameOver || prev.pendingFinish) return prev;
       if (!prev.pendingMove) return prev;
       if (prev.pendingMove.semanticStatus !== 'voting') return prev;
 
@@ -224,6 +229,20 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
     );
   }, []);
 
+  const handlePassTurn = useCallback(() => {
+    setGameState(prev => applyGameAction(prev, { type: 'passTurn' }));
+  }, []);
+  const handleRequestFinish = useCallback(() => {
+    setGameState(prev => applyGameAction(prev, { type: 'requestFinish' }));
+  }, []);
+  const handleVoteFinish = useCallback((accept: boolean) => {
+    setGameState(prev => {
+      const playerIndex = getNextFinishVoter(prev);
+      return playerIndex === null || playerIndex < 0 ? prev
+        : applyGameAction(prev, { type: 'voteFinish', playerIndex, accept });
+    });
+  }, []);
+
   const handleApproveCross = useCallback(() => {
     setGameState((prev) => applyGameAction(prev, { type: 'approveCross' }));
   }, []);
@@ -234,7 +253,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
 
   return {
     restoreLocalGame: (saved) => {
-      setGameState(saved);
+      setGameState(resolveEmptyHands(saved));
       setLocalPlayerCount(saved.players.length);
     },
     gameState,
@@ -244,7 +263,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
     localPlayerIndex: null,
     // During pendingMove the active local participant is the next voter, so only one
     // hand is shown while hot-seat players pass the device around.
-    activePlayerIndex: getNextLocalVoter(gameState) ?? gameState.currentPlayerIndex,
+    activePlayerIndex: getNextFinishVoter(gameState) ?? getNextLocalVoter(gameState) ?? gameState.currentPlayerIndex,
     placeCard: handlePlaceCard,
     upsertSemanticEdge: handleUpsertSemanticEdge,
     removeSemanticEdge: handleRemoveSemanticEdge,
@@ -253,6 +272,9 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
     confirmCard: handleConfirmCard,
     returnCard: handleReturnCard,
     redrawHand: handleRedrawHand,
+    passTurn: handlePassTurn,
+    requestFinish: handleRequestFinish,
+    voteFinish: handleVoteFinish,
     approveCross: handleApproveCross,
     rejectCross: handleRejectCross,
     resetGame,

@@ -10,6 +10,9 @@ import {
   returnPendingCard,
   submitPendingSemanticMove,
   upsertPendingSemanticEdge,
+  passTurn,
+  requestFinish,
+  voteFinish,
 } from './game';
 import type {
   Coordinates,
@@ -29,6 +32,9 @@ export type GameAction =
   | { type: 'confirmCard' }
   | { type: 'returnCard' }
   | { type: 'redrawHand'; playerIndex?: number }
+  | { type: 'passTurn'; playerIndex?: number }
+  | { type: 'requestFinish'; playerIndex?: number }
+  | { type: 'voteFinish'; playerIndex?: number; accept: boolean; finishId?: string }
   | {
       type: 'upsertSemanticEdge';
       neighborCardInstanceId: string;
@@ -46,9 +52,11 @@ export type GameAction =
 
 export function applyGameAction(
   gameState: GameState,
-  action: GameAction
+  action: GameAction,
+  turnOrder?: number[]
 ): GameState {
   // Online callers must pass through applyAuthenticatedAction before persistence.
+  if (action.type !== 'resetGame' && (gameState.gameOver || (gameState.pendingFinish && action.type !== 'voteFinish'))) return gameState;
   switch (action.type) {
     case 'resetGame':
       return initializeGame();
@@ -57,7 +65,16 @@ export function applyGameAction(
       return placeCard(gameState, action.cardName, action.coordinates);
 
     case 'confirmCard':
-      return confirmPendingCard(gameState);
+      return confirmPendingCard(gameState, turnOrder);
+
+    case 'passTurn':
+      return passTurn(gameState, action.playerIndex, turnOrder);
+
+    case 'requestFinish':
+      return requestFinish(gameState, action.playerIndex);
+
+    case 'voteFinish':
+      return action.playerIndex === undefined ? gameState : voteFinish(gameState, action.playerIndex, action.accept, action.finishId);
 
     case 'returnCard':
       return returnPendingCard(gameState);

@@ -91,7 +91,7 @@ export const EMOTIONS_DECK: DeckDefinition = {
 
 export const DISCUSSION_DECK: DeckDefinition = {
   id: 'discussion',
-  name: 'Дискуссионная',
+  name: 'Человек и общество',
   kind: 'preset',
   description: `${DISCUSSION_PLAY_CARDS.length} игральных и ${DISCUSSION_NEUTRAL_CARDS.length} нейтральных карт.`,
   source: { type: 'custom', cardIds: DISCUSSION_PLAY_CARDS.map((card) => card.id) },

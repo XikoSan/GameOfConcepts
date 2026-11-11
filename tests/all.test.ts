@@ -6,3 +6,4 @@ import './saved-session.test';
 import './relation-collection.test';
 
 import './server-security.test';
+import './game-finish.test';
