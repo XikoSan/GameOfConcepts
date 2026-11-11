@@ -35,6 +35,7 @@ import {
 } from './boardOverlayPositioning';
 import './GameBoard.css';
 import { useCompactTable } from '../hooks/useCompactTable';
+import { usePortraitHand } from '../hooks/usePortraitHand';
 
 interface GameBoardProps {
   actionDock?: HTMLElement | null;
@@ -85,6 +86,10 @@ const MIN_ZOOM = 0.6;
 const MAX_ZOOM = 2;
 const INITIAL_ZOOM = 0.88;
 const ZOOM_STEP = 0.1;
+
+// Keep the initial focus above the portrait hand while overlays preserve board geometry.
+const getViewportCenterY = (height: number, portrait: boolean) =>
+  (height - (portrait ? Math.min(176, height * 0.35) : 0)) / 2;
 
 const getCellCenter = (coordinates: Coordinates) => ({
   x: (coordinates.x - GRID_MIN) * CELL_SIZE + CELL_SIZE / 2,
@@ -251,6 +256,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 }) => {
   incrementCounter('render:GameBoard');
   const compact = useCompactTable();
+  const portrait = usePortraitHand();
   const [camera, setCamera] = useState<CameraState>(() =>
     getCenteredCamera(gameState.startCard.coordinates)
   );
@@ -307,7 +313,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       incrementCounter('dom:getBoundingClientRect:drop-coordinates');
       const rect = container.getBoundingClientRect();
       const viewportCenterX = (viewport.width || rect.width) / 2;
-      const viewportCenterY = (viewport.height || rect.height) / 2;
+      const viewportCenterY = getViewportCenterY(viewport.height || rect.height, portrait);
       const pointerX = event.clientX - rect.left;
       const pointerY = event.clientY - rect.top;
       const worldX = (pointerX - viewportCenterX - camera.offsetX) / camera.zoom;
@@ -321,7 +327,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
       return { x, y };
     },
-    [camera.offsetX, camera.offsetY, camera.zoom, viewport.height, viewport.width]
+    [camera.offsetX, camera.offsetY, camera.zoom, viewport.height, viewport.width, portrait]
   );
 
   const handleDragOver = useCallback(
@@ -378,7 +384,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     incrementCounter('dom:getBoundingClientRect:wheel');
     const rect = container.getBoundingClientRect();
     const viewportCenterX = (viewport.width || rect.width) / 2;
-    const viewportCenterY = (viewport.height || rect.height) / 2;
+    const viewportCenterY = getViewportCenterY(viewport.height || rect.height, portrait);
     const pointerX = event.clientX - rect.left;
     const pointerY = event.clientY - rect.top;
     const direction = event.deltaY > 0 ? -1 : 1;
@@ -399,7 +405,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         zoom: nextZoom,
       };
     });
-  }, [minZoom, viewport.height, viewport.width]);
+  }, [minZoom, viewport.height, viewport.width, portrait]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -476,9 +482,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         setCamera(camera => {
           const zoom = Math.max(minZoom, Math.min(MAX_ZOOM, camera.zoom * next.distance / previous.distance));
           const x = previous.x - rect.left - rect.width / 2;
-          const y = previous.y - rect.top - rect.height / 2;
+          const y = previous.y - rect.top - getViewportCenterY(rect.height, portrait);
           return { zoom, offsetX: next.x - rect.left - rect.width / 2 - (x - camera.offsetX) * zoom / camera.zoom,
-            offsetY: next.y - rect.top - rect.height / 2 - (y - camera.offsetY) * zoom / camera.zoom };
+            offsetY: next.y - rect.top - getViewportCenterY(rect.height, portrait) - (y - camera.offsetY) * zoom / camera.zoom };
         });
         drag.lastX = event.clientX; drag.lastY = event.clientY;
         return;
@@ -498,7 +504,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       offsetX: currentCamera.offsetX + deltaX,
       offsetY: currentCamera.offsetY + deltaY,
     }));
-  }, [minZoom]);
+  }, [minZoom, portrait]);
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     touchPoints.current.delete(event.pointerId);
@@ -516,7 +522,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     gridTemplateRows: `repeat(${GRID_SIZE}, var(--cell-size))`,
     '--cell-size': `${CELL_SIZE}px`,
     transform: `translate(${viewport.width / 2 + camera.offsetX}px, ${
-      viewport.height / 2 + camera.offsetY
+      getViewportCenterY(viewport.height, portrait) + camera.offsetY
     }px) scale(${camera.zoom})`,
   } as CSSProperties;
   const pendingOverlayRefreshKey = `${camera.offsetX}:${camera.offsetY}:${camera.zoom}:${viewport.width}:${viewport.height}`;
@@ -533,7 +539,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const visibleCells = useMemo(() => {
     const step = CELL_SIZE * camera.zoom;
     const left = viewport.width / 2 + camera.offsetX;
-    const top = viewport.height / 2 + camera.offsetY;
+    const top = getViewportCenterY(viewport.height, portrait) + camera.offsetY;
     const minX = Math.max(GRID_MIN, GRID_MIN + Math.floor(-left / step) - 2);
     const maxX = Math.min(GRID_MAX, GRID_MIN + Math.floor((viewport.width - left) / step) + 2);
     const minY = Math.max(GRID_MIN, GRID_MIN + Math.floor(-top / step) - 2);
@@ -547,7 +553,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       cells.set(`${x},${y}`, card.coordinates);
     }
     return [...cells.values()];
-  }, [camera, viewport, boardCards]);
+  }, [camera, viewport, boardCards, portrait]);
   const pendingMove = gameState.pendingMove;
   const pendingCard = pendingMove
     ? boardCards.find((card) => card.id === pendingMove.cardId)
@@ -705,7 +711,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       (coordinates.x - GRID_MIN) * CELL_SIZE * camera.zoom;
     const cellTop =
       boardViewportRect.top +
-      viewport.height / 2 +
+      getViewportCenterY(viewport.height, portrait) +
       camera.offsetY +
       (coordinates.y - GRID_MIN) * CELL_SIZE * camera.zoom;
     const cellSize = CELL_SIZE * camera.zoom;

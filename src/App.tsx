@@ -1157,7 +1157,7 @@ function App() {
             <span>Что нового</span><span aria-hidden="true">{showMenuUpdates ? '−' : '+'}</span>
           </button>
           <ul id="main-menu-updates-list" className="main-menu-updates-list" hidden={!showMenuUpdates}>
-            {MENU_RELEASE_NOTES.map(({ label, text }) => <li key={label}><strong>{label}:</strong> {text}</li>)}
+            {MENU_RELEASE_NOTES.map(({ label, text }) => <li key={text}><strong>{label}:</strong> {text}</li>)}
           </ul>
         </aside>
         <h1>Игра понятий</h1>

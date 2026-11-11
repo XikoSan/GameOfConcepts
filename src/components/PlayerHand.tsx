@@ -2,6 +2,8 @@ import React from 'react';
 import type { RegularCardName } from '../game';
 import { incrementCounter } from '../debug/performanceDiagnostics';
 import { Card } from './Card';
+import { usePortraitHand } from '../hooks/usePortraitHand';
+import { useFanHand } from '../hooks/useFanHand';
 import './PlayerHand.css';
 
 interface PlayerHandProps {
@@ -14,6 +16,7 @@ interface PlayerHandProps {
   hideCards?: boolean;
   displayName?: string;
   statusLabel?: string;
+  suggestedCard?: string;
   onStartCardDrag: (
     cardName: RegularCardName,
     playerColor: 'blue' | 'orange' | 'green' | 'purple',
@@ -40,12 +43,18 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
   hideCards = false,
   displayName,
   statusLabel,
+  suggestedCard,
   onStartCardDrag,
   onCancelCardDrag,
   onOpenDictionary,
 }) => {
   incrementCounter('render:PlayerHand');
   const playerColor = playerColors[playerNumber as keyof typeof playerColors] ?? 'blue';
+  const portrait = usePortraitHand() && !hideCards;
+  const fan = useFanHand({ enabled: portrait, active: isActive, cards, preferred: suggestedCard,
+    onStart: (index, event) => onStartCardDrag(cards[index], playerColor, event),
+    onEnd: onCancelCardDrag, onInfo: index => onOpenDictionary(cards[index]),
+  });
   const playerColorLabels = {
     blue: 'Синий',
     orange: 'Оранжевый',
@@ -67,7 +76,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
             <p>Колода</p>
           </div>
 
-          <div className="cards-container">
+          <div className={`cards-container ${portrait ? 'fan-hand' : ''} ${fan.dragging ? 'is-hand-dragging' : ''}`} {...fan.handlers}>
             {/* FIXME(MVP): Рука оппонента скрыта только в UI, но технически остаётся доступна в gameState. */}
             {hideCards
               ? cards.map((_, index) => (
@@ -79,6 +88,11 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({
                 ))
               : cards.map((card, index) => (
                   <Card
+                  managedPointer={portrait}
+                  inspected={portrait && fan.inspected === index}
+                  onInspect={() => fan.inspect(index)}
+                  handIndex={index}
+                  style={{ '--fan-offset': index - (cards.length - 1) / 2, '--fan-count': cards.length, '--fan-index': index } as React.CSSProperties}
                   key={`${card}-${index}`}
                   cardName={card}
                   playerColor={playerColor}

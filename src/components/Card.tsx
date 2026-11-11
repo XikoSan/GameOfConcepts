@@ -3,6 +3,11 @@ import { incrementCounter } from '../debug/performanceDiagnostics';
 import './Card.css';
 
 interface CardProps {
+  style?: React.CSSProperties;
+  handIndex?: number;
+  managedPointer?: boolean;
+  inspected?: boolean;
+  onInspect?: () => void;
   cardName: string;
   draggable?: boolean;
   isSelected?: boolean;
@@ -13,6 +18,7 @@ interface CardProps {
 }
 
 export const Card: React.FC<CardProps> = ({
+  style, handIndex, managedPointer = false, inspected = false, onInspect,
   cardName,
   draggable,
   isSelected,
@@ -98,15 +104,26 @@ export const Card: React.FC<CardProps> = ({
   return (
     <div
       ref={cardRef}
-      className={`card ${isSelected ? 'selected' : ''} player-${playerColor}`}
+      className={`card ${isSelected ? 'selected' : ''} ${inspected ? 'is-inspected' : ''} player-${playerColor}`}
+      style={style}
+      data-hand-index={handIndex}
+      role={managedPointer ? 'button' : undefined}
+      tabIndex={managedPointer ? 0 : undefined}
+      aria-label={managedPointer ? cardName : undefined}
+      aria-pressed={managedPointer ? inspected : undefined}
+      onKeyDown={event => {
+        if (!managedPointer || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        if (inspected) onOpenDictionary?.(cardName); else onInspect?.();
+      }}
       draggable={false}
       data-draggable={draggable}
       onDragStart={event => event.preventDefault()}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerMove={handlePointerMove}
-      onPointerCancel={handlePointerCancel}
-      onLostPointerCapture={handlePointerCancel}
+      onPointerDown={managedPointer ? undefined : handlePointerDown}
+      onPointerUp={managedPointer ? undefined : handlePointerUp}
+      onPointerMove={managedPointer ? undefined : handlePointerMove}
+      onPointerCancel={managedPointer ? undefined : handlePointerCancel}
+      onLostPointerCapture={managedPointer ? undefined : handlePointerCancel}
       onContextMenu={event => event.preventDefault()}
     >
       <span ref={titleRef} className="card-title">{cardName}</span>

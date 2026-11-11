@@ -18,7 +18,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
     if (!actionDock || phase !== 'place' || !suggestedName) return;
     const card = Array.from(document.querySelectorAll<HTMLElement>('.training-session .card'))
       .find(element => element.textContent?.trim() === suggestedName);
-    card?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    if (!card?.closest('.fan-hand')) card?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }, [actionDock, phase, suggestedName]);
   const box = useRef<HTMLElement>(null);
   const arrow = useRef<HTMLSpanElement>(null);

@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { TableReminder } from './TableReminder';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { createTrainingState, trainingReducer, type TrainingState } from '../tutorial/trainingGame';
+import { createTrainingState, suggestedTrainingMove, trainingReducer, type TrainingState } from '../tutorial/trainingGame';
 import { GameBoard } from './GameBoard';
 import { PlayerHand } from './PlayerHand';
 import { DragPreviewLayer } from './DragPreviewLayer';
@@ -95,6 +95,7 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
         <div className={`table-hand-tray ${compact && game.pendingMove ? 'has-mobile-actions' : ''}`} aria-label="Ваша учебная рука">
           <div className="mobile-action-dock" ref={setActionDock} />
           <PlayerHand playerNumber={0} cards={game.players[0].cards} deckCount={game.deck[0].length}
+            suggestedCard={phase === 'place' ? suggestedTrainingMove(state)?.name : undefined}
             selectedCard={phase === 'place' ? (selected ?? null) : null} isActive={phase === 'place'} displayName={playerName}
             onStartCardDrag={(cardName, playerColor, event) => {
               if (phase !== 'place') { event.preventDefault(); return; }

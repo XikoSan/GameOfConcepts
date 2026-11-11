@@ -187,9 +187,9 @@
 /* Android already lays out the WebView edge-to-edge; do not reserve a full cutout column. */
 .native-app .app-container .game-table { padding-left: 6px; padding-right: 6px; }
 
-/* A stable dock keeps the camera still while the player defines or votes on a move. */
+/* Portrait controls overlay the board so changing a move never resizes the camera. */
 @media (max-width: 900px) and (orientation: portrait) {
-  .app-container { --mobile-dock-height: clamp(290px, 36dvh, 340px); }
+  .app-container { --mobile-dock-height: 176px; }
   .app-container .table-status-bar { grid-template-columns: minmax(0, 1fr) 58px; gap: 5px; min-height: 42px; }
   .app-container .table-players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
   .app-container .table-players .score-row { padding: 5px; min-height: 38px; }
@@ -198,17 +198,49 @@
   .app-container .table-menu-toggle { display: block; width: 100%; height: 100%; }
   .app-container .table-menu-items { display: none; }
   .app-container .table-menu.is-open .table-menu-items { position: absolute; top: calc(100% + 6px); right: 0; display: grid; grid-template-columns: 1fr; width: 180px; padding: 6px; gap: 6px; border: 1px solid #53595b; border-radius: 8px; background: #292e2f; box-shadow: 0 6px 20px #0005; }
-  .app-container .table-hand-tray { padding: 8px; align-items: stretch; }
-  .app-container .table-hand-tray .player-hand { padding-top: 42px; align-self: center; }
-  .app-container .table-hand-tray .cards-container { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 8px; overflow-x: auto; overflow-y: hidden; padding: 5px 3px 12px; overscroll-behavior-x: contain; scroll-snap-type: x proximity; touch-action: pan-x; }
-  .app-container .table-hand-tray .card,
-  .app-container .table-hand-tray .hidden-hand-card { flex: 0 0 31%; width: 31%; min-width: 0; height: 100px; min-height: 100px; touch-action: pan-x; scroll-snap-align: start; }
-  .app-container .table-hand-tray .deck-stack { left: 12px; top: 8px; bottom: auto; height: 34px; gap: 8px; }
-  .app-container .hand-actions { top: 8px; right: 12px; bottom: auto; height: 34px; flex-direction: row; }
+  .app-container .table-center { position: relative; gap: 0; }
+  .app-container .table-hand-tray {
+    position: absolute; inset: auto 0 0; z-index: 45; height: var(--mobile-dock-height);
+    padding: 0; align-items: stretch; border: 0; border-radius: 0; overflow: visible;
+    background: linear-gradient(0deg, #202425d9, #20242530 55%, transparent); pointer-events: none;
+  }
+  .app-container .table-hand-tray .player-hand { padding: 0; align-self: stretch; }
+  .app-container .table-hand-tray .hand-content,
+  .app-container .table-hand-tray .hand-main-group { height: 100%; }
+  .app-container .table-hand-tray .cards-container.fan-hand {
+    --fan-card-width: clamp(96px, 29vw, 128px); --fan-step: min(58px, 14vw);
+    position: relative; display: block; height: 100%; width: 100%; padding: 0; overflow: visible;
+    touch-action: none; scroll-snap-type: none;
+  }
+  .app-container .table-hand-tray .fan-hand .card,
+  .app-container .table-hand-tray .fan-hand .hidden-hand-card {
+    position: absolute; left: calc(50% + var(--fan-offset) * var(--fan-step) - var(--fan-card-width) / 2);
+    bottom: 16px; flex: none; width: var(--fan-card-width); min-width: 0; height: 130px; min-height: 130px;
+    padding: 10px 8px; touch-action: none; pointer-events: auto; z-index: calc(10 + var(--fan-index));
+    transform-origin: 50% 135%; transform: translateY(calc(var(--fan-offset) * var(--fan-offset) * 2px)) rotate(calc(var(--fan-offset) * 3deg));
+    transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
+    border-radius: 8px; box-shadow: 0 5px 14px #0005, inset 0 1px 0 #ffffff21;
+  }
+  .app-container .table-hand-tray .fan-hand .card.is-inspected {
+    --fan-card-width: clamp(150px, 46vw, 184px);
+    left: clamp(8px, calc(50% + var(--fan-offset) * var(--fan-step) - var(--fan-card-width) / 2), calc(100% - var(--fan-card-width) - 8px));
+    z-index: 30; transform: translateY(-30px) rotate(0deg);
+    box-shadow: 0 0 0 1px #ead39a, 0 12px 24px #0007; filter: brightness(1.12);
+  }
+  .app-container .table-hand-tray .fan-hand.is-hand-dragging .card:not(.is-inspected) { transform: translateY(16px) rotate(calc(var(--fan-offset) * 3deg)); }
+  .app-container .table-hand-tray .fan-hand.is-hand-dragging .card { pointer-events: none; }
+  .app-container .table-hand-tray .deck-stack { left: 12px; top: 0; bottom: auto; height: 34px; gap: 8px; padding: 4px 7px; border-radius: 6px; background: #292e2feb; box-sizing: border-box; z-index: 40; }
+  .app-container .table-hand-tray .deck-card-back { width: 25px; height: 28px; font-size: 13px; }
+  .app-container .hand-actions { top: 0; right: 12px; bottom: auto; height: 34px; flex-direction: row; pointer-events: auto; padding: 0 6px 0 0; border-radius: 6px; background: #292e2feb; z-index: 40; }
   .app-container .hand-actions > .hand-redraw-button { width: 34px; height: 34px; min-height: 34px; }
-  .app-container .hand-redraw-caption { margin: 0; }
-  .app-container .mobile-sidebar { width: min(320px, calc(100% - 36px)); }
-  .mobile-action-dock .semantic-relation-popover { display: flex; flex-direction: column; gap: 5px; min-height: 100%; }
+  .app-container .hand-redraw-caption { margin: 0; font-size: 10px; }
+  .app-container .board-tools { bottom: calc(var(--mobile-dock-height) + 10px); }
+  .app-container .table-hand-tray.has-mobile-actions { height: auto; max-height: 52dvh; padding: 10px; border: 1px solid #535d60; border-radius: 12px 12px 7px 7px; background: #2b3236f5; box-shadow: 0 -6px 24px #0003; pointer-events: auto; overflow: hidden; }
+  .app-container .has-mobile-actions .mobile-action-dock { height: auto; max-height: calc(52dvh - 22px); }
+  .app-container .table-center:has(.has-mobile-actions) .board-tools { bottom: auto; top: 56px; }
+  .app-container .mobile-sidebar { width: min(320px, calc(100% - 36px)); bottom: 0; }
+  .app-container .mobile-sidebar-dismiss { bottom: 0; }
+  .mobile-action-dock .semantic-relation-popover { display: flex; flex-direction: column; gap: 7px; min-height: 0; }
   .mobile-action-dock .semantic-relation-popover button { min-height: 36px; padding: 5px 6px; }
   .mobile-action-dock .semantic-relation-popover header button { min-height: 28px; }
   .mobile-action-dock .semantic-relation-popover section > span { line-height: 1.2; font-size: 12px; }
@@ -222,12 +254,13 @@
   .mobile-action-dock .semantic-popover-chips button:nth-last-child(-n+2) { grid-column: span 3; }
   .mobile-action-dock .semantic-popover-source { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
   .mobile-action-dock .semantic-popover-source button { min-width: 0; overflow-wrap: anywhere; }
+  .mobile-action-dock .mobile-move-actions { min-height: 0; gap: 10px; }
   .mobile-action-dock .semantic-relation-popover footer,
-  .mobile-move-actions footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: auto; position: sticky; bottom: 0; padding-top: 6px; background: #2b3236; }
+  .mobile-move-actions footer { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 3px; position: sticky; bottom: 0; padding-top: 6px; background: #2b3236; }
   .mobile-action-dock .semantic-relation-popover footer .semantic-popover-primary,
   .mobile-action-dock .semantic-submit-popover button:first-child { order: 1; }
-  .mobile-action-dock .training-guide-docked { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-  .mobile-action-dock .training-guide-docked > [aria-live] { flex: 1; min-height: 0; overflow-y: auto; }
+  .mobile-action-dock .training-guide-docked { display: flex; flex-direction: column; height: auto; min-height: 0; }
+  .mobile-action-dock .training-guide-docked > [aria-live] { flex: 1; min-height: 0; max-height: 32dvh; overflow-y: auto; }
   .mobile-action-dock .training-guide-docked > button.training-primary,
   .mobile-action-dock .training-vote-actions { flex-shrink: 0; margin-top: 8px; }
   .app-container .training-local-annotation-window { top: 12px; left: 12px; transform: none; width: calc(100% - 24px); max-height: 28dvh; padding: 12px; }
