@@ -1,4 +1,5 @@
-import { Fragment, useMemo, useState } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { getDeckDefinitionById } from '../data/deckDefinitions';
 import { getRelationFamilyLabel, formatRelationCount } from '../scoring/semanticRelations';
 import {
@@ -32,6 +33,27 @@ const seatColors: Record<string, string> = {
   green: '#79c889',
   purple: '#b89bea',
 };
+
+function ResultsDetails({ label, children, className = '', color }: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+  color?: string;
+}) {
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
+  const id = useId();
+  return <>
+    <button type="button" className={className} style={{ color }} aria-haspopup="dialog"
+      aria-expanded={Boolean(portalRoot)} aria-controls={portalRoot ? id : undefined}
+      onClick={event => setPortalRoot(event.currentTarget.closest<HTMLElement>('.app-container') ?? document.body)}>
+      {label}
+    </button>
+    {portalRoot && createPortal(
+      <Modal title={label} onClose={() => setPortalRoot(null)} trapFocus>
+        <div id={id} className="match-results match-results-popup">{children}</div>
+      </Modal>, portalRoot)}
+  </>;
+}
 
 function metric(value: number | null | undefined, bonus = false) {
   return value == null ? '—' : `${bonus ? '+' : ''}${value}`;
@@ -69,10 +91,9 @@ function MoveDetails({ move, player }: { move: MoveStatistics; player: MatchResu
       {player.nickname}
     </span>
     <p className="match-results-breakdown">За связи: {metric(move.base)} · За пути: {metric(move.pathBonus, true)} · За узлы: {metric(move.nodeBonus, true)}</p>
-    <details className="match-results-details">
-      <summary>Связи этого хода</summary>
+    <ResultsDetails className="match-results-details" label="Связи этого хода">
       <RelationList relations={move.relations} />
-    </details>
+    </ResultsDetails>
   </div>;
 }
 
@@ -85,10 +106,9 @@ function BestMoves({ moves, available, playerForSeat }: {
   if (!moves.length) return <p className="match-results-muted">В партии нет принятых ходов.</p>;
   return <>
     <MoveDetails move={moves[0]} player={playerForSeat(moves[0].seatIndex)} />
-    {moves.length > 1 && <details className="match-results-details match-results-ties">
-      <summary>Другие ходы с таким результатом ({moves.length - 1})</summary>
+    {moves.length > 1 && <ResultsDetails className="match-results-details" label={`Другие ходы с таким результатом (${moves.length - 1})`}>
       {moves.slice(1).map(move => <MoveDetails key={move.logIndex} move={move} player={playerForSeat(move.seatIndex)} />)}
-    </details>}
+    </ResultsDetails>}
   </>;
 }
 
@@ -101,16 +121,14 @@ function CentralCard({ card, playerForSeat }: {
     <span className="match-results-owner">{card.ownerSeatIndex === null
       ? <span className="match-results-neutral">Нейтральная карта</span>
       : playerForSeat(card.ownerSeatIndex).nickname}</span>
-    <details className="match-results-details">
-      <summary>{formatRelationCount(card.edgeCount)} · посмотреть список</summary>
+    <ResultsDetails className="match-results-details" label={`${formatRelationCount(card.edgeCount)} · посмотреть список`}>
       <RelationList relations={card.relations} />
-    </details>
+    </ResultsDetails>
   </div>;
 }
 
 export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNewGame }: MatchResultsDialogProps) {
   const [section, setSection] = useState<'overview' | 'players'>('overview');
-  const [expandedSeat, setExpandedSeat] = useState<number | null>(null);
   const { board, players: gamePlayers, semanticEdges, logDetails, scores, deckSnapshot, scoringVersion } = game;
   const statistics = useMemo(() => open ? buildMatchStatistics({
     board, players: gamePlayers, semanticEdges, logDetails, scores, deckSnapshot, scoringVersion,
@@ -164,10 +182,9 @@ export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNew
               : !statistics.centralCards.length ? <p className="match-results-muted">Нет принятых связей для выбора главного понятия.</p>
                 : <>
                   <CentralCard card={statistics.centralCards[0]} playerForSeat={playerForSeat} />
-                  {statistics.centralCards.length > 1 && <details className="match-results-details match-results-ties">
-                    <summary>Другие понятия с таким числом связей ({statistics.centralCards.length - 1})</summary>
+                  {statistics.centralCards.length > 1 && <ResultsDetails className="match-results-details" label={`Другие понятия с таким числом связей (${statistics.centralCards.length - 1})`}>
                     {statistics.centralCards.slice(1).map(card => <CentralCard key={card.id} card={card} playerForSeat={playerForSeat} />)}
-                  </details>}
+                  </ResultsDetails>}
                 </>}
           </section>
           <section className="match-results-panel">
@@ -184,23 +201,19 @@ export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNew
             <thead><tr><th scope="col">Игрок</th><th scope="col">Счёт</th><th scope="col">Ходы</th><th scope="col">Связи</th><th scope="col">Любимый тип</th><th scope="col">Типов</th><th scope="col">За пути</th><th scope="col">За узлы</th></tr></thead>
             <tbody>{statistics.players.map(player => {
               const identity = playerForSeat(player.seatIndex);
-              const expanded = expandedSeat === player.seatIndex;
-              return <Fragment key={player.seatIndex}>
-                <tr>
-                  <th scope="row"><button type="button" aria-expanded={expanded} aria-controls={`match-results-player-${player.seatIndex}`} onClick={() => setExpandedSeat(expanded ? null : player.seatIndex)} style={{ color: seatColors[identity.color ?? ''] ?? identity.color }}><span aria-hidden="true">{expanded ? '▾' : '▸'}</span> {identity.nickname}</button></th>
+              return <tr key={player.seatIndex}>
+                  <th scope="row"><ResultsDetails label={identity.nickname} color={seatColors[identity.color ?? ''] ?? identity.color}>
+                    <div className="match-results-player-details">
+                      <section><h4>Принятые связи</h4><RelationChart relations={player.relations} available={statistics.graphAvailable} /></section>
+                      <section><h4>Лучший ход игрока</h4><BestMoves moves={player.bestMoves} available={statistics.historyAvailable} playerForSeat={playerForSeat} /></section>
+                    </div>
+                  </ResultsDetails></th>
                   <td className="match-results-score">{metric(scores[player.seatIndex])}</td>
                   <td>{player.moveCount}</td><td>{metric(player.edgeCount)}</td>
                   <td>{!statistics.graphAvailable ? '—' : player.favoriteFamilies.length ? player.favoriteFamilies.map(getRelationFamilyLabel).join(', ') : 'Нет связей'}</td>
                   <td>{statistics.graphAvailable ? `${player.relations.filter(relation => relation.count > 0).length} из ${player.relations.length}` : '—'}</td>
                   <td>{metric(player.pathBonus, true)}</td><td>{metric(player.nodeBonus, true)}</td>
-                </tr>
-                <tr id={`match-results-player-${player.seatIndex}`} hidden={!expanded} className="match-results-player-detail-row"><td colSpan={8}>
-                  {expanded && <div className="match-results-player-details">
-                    <section><h4>Принятые связи</h4><RelationChart relations={player.relations} available={statistics.graphAvailable} /></section>
-                    <section><h4>Лучший ход игрока</h4><BestMoves moves={player.bestMoves} available={statistics.historyAvailable} playerForSeat={playerForSeat} /></section>
-                  </div>}
-                </td></tr>
-              </Fragment>;
+                </tr>;
             })}</tbody>
           </table>
         </div>}

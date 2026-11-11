@@ -29,11 +29,10 @@ export function Modal({
     const dialog = dialogRef.current;
     if (!overlay || !dialog) return;
     const previous = document.activeElement;
-    // Portalled dialogs share the app root with the table. Preserve prior inert
-    // values so opening statistics cannot accidentally unlock another UI flow.
+    // Own only newly locked siblings. Nested layers must not restore another
+    // layer's stale locks if both dialogs unmount in the same render.
     const siblings = Array.from(overlay.parentElement?.children ?? [])
-      .filter((element): element is HTMLElement => element instanceof HTMLElement && element !== overlay);
-    const inertValues = siblings.map(element => element.inert);
+      .filter((element): element is HTMLElement => element instanceof HTMLElement && element !== overlay && !element.inert);
     siblings.forEach(element => { element.inert = true; });
     const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>(
       'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]'
@@ -55,13 +54,17 @@ export function Modal({
     dialog.addEventListener('keydown', cycleFocus);
     return () => {
       dialog.removeEventListener('keydown', cycleFocus);
-      siblings.forEach((element, index) => { element.inert = inertValues[index]; });
+      siblings.forEach(element => { element.inert = false; });
       if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
     };
   }, [trapFocus]);
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key !== 'Escape') return;
+      // A detail panel can sit above another modal. Only the active layer closes.
+      const layers = Array.from(document.querySelectorAll('.modal-overlay'))
+        .filter(element => !element.closest('[inert]'));
+      if (layers.at(-1) === overlayRef.current) onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -75,7 +78,10 @@ export function Modal({
     <div
       ref={overlayRef}
       className="modal-overlay"
-      onMouseDown={closeOnOverlayClick ? onClose : undefined}
+      onMouseDown={(event) => {
+        event.stopPropagation();
+        if (closeOnOverlayClick) onClose();
+      }}
       role="presentation"
     >
       <section
