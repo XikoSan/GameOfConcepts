@@ -4,7 +4,6 @@ import type { TrainingState } from './tutorial/trainingGame';
 import { Capacitor } from '@capacitor/core';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent } from 'react';
-import type { RealtimeChannel } from '@supabase/supabase-js';
 import { FeedbackForm } from './components/FeedbackForm';
 import { DictionaryModal } from './components/DictionaryModal';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
@@ -16,6 +15,7 @@ import { PlayerHand } from './components/PlayerHand';
 import { TableSidebar } from './components/TableSidebar';
 import { TableMenu } from './components/TableMenu';
 import { useCompactTable } from './hooks/useCompactTable';
+import { useActionDockHeight } from './hooks/useActionDockHeight';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
@@ -39,6 +39,7 @@ import {
   joinRoom,
   startRoomGame,
   subscribeToRoom,
+  type RoomSubscription,
 } from './services/roomService';
 import { getHandRedrawAvailability, initializeGame } from './game';
 import { isSymmetricRelation } from './scoring/semanticRelations';
@@ -192,6 +193,7 @@ interface DragPreview {
   initialX: number;
   initialY: number;
   playerColor: 'blue' | 'orange' | 'green' | 'purple';
+  pointerType?: string;
 }
 
 type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | 'leave-game' | null;
@@ -212,6 +214,7 @@ function App() {
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const compactTable = useCompactTable();
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
+  useActionDockHeight(actionDock);
   const [finishModalRoot, setFinishModalRoot] = useState<HTMLDivElement | null>(null);
   const [dragPreview, setDragPreview] = useState<DragPreview | null>(null);
   const [showMainMenu, setShowMainMenu] = useState(true);
@@ -242,7 +245,7 @@ function App() {
   const [interfaceSettings, setInterfaceSettings] = useState(
     defaultInterfaceSettings
   );
-  const roomSubscriptionRef = useRef<RealtimeChannel | null>(null);
+  const roomSubscriptionRef = useRef<RoomSubscription | null>(null);
   const onlineRoomRef = useRef<Room | null>(null);
   const activeCardDragRef = useRef(false);
   const matchLogRef = useRef<HTMLOListElement>(null);
@@ -432,6 +435,7 @@ function App() {
       initialX: x,
       initialY: y,
       playerColor,
+      pointerType: 'pointerType' in event ? event.pointerType : 'mouse',
     });
   };
 
@@ -613,8 +617,11 @@ function App() {
         board: updatedRoom.game_state.board,
       });
       setOnlineRoom(updatedRoom);
-      if (updatedRoom.status === 'playing' && !updatedRoom.game_state.gameOver) {
-        setActiveModal(null);
+      if (updatedRoom.status === 'playing' || updatedRoom.game_state.gameOver) {
+        // Realtime can batch this update with closing the lobby. Enter the table
+        // here too, so a guest never remains behind the menu without its results.
+        setShowMainMenu(false);
+        setActiveModal(current => current === 'new-game' ? null : current);
       }
     }, () => {
       void syncOnlineRoom('realtime status problem');
@@ -838,7 +845,11 @@ function App() {
   }, [onlineRoom, syncOnlineRoom]);
 
   useEffect(() => {
-    if (onlineRoom?.status !== 'playing' || onlineRoom.game_state.gameOver || activeModal !== 'new-game') return;
+    if (!onlineRoom || activeModal !== 'new-game') return;
+    const leaveLobby = onlineRoom.game_state.gameOver ? showMainMenu : onlineRoom.status === 'playing';
+    // After closing the results, "Новая партия" intentionally opens this dialog
+    // over the finished table. Only a guest still in the menu needs redirecting.
+    if (!leaveLobby) return;
 
     const closeTimer = window.setTimeout(() => {
       setShowMainMenu(false);
@@ -846,7 +857,7 @@ function App() {
     }, 0);
 
     return () => window.clearTimeout(closeTimer);
-  }, [activeModal, onlineRoom?.status, onlineRoom?.game_state.gameOver]);
+  }, [activeModal, onlineRoom, showMainMenu]);
 
   useEffect(() => {
     if (!onlineRoom) return;
@@ -878,7 +889,7 @@ function App() {
   ]);
 
   const renderPlayers = () => (
-    <div className="table-players" aria-label="Игроки и счёт">
+    <div className="table-players" aria-label="Игроки и счёт" style={{ '--other-player-count': Math.max(1, (onlineRoom ? onlinePlayers : localPlayers).length - 1) } as React.CSSProperties}>
         {(onlineRoom ? onlinePlayers : localPlayers).map((player) => {
           const isActiveScore =
             currentPlayerId !== null
@@ -938,7 +949,7 @@ function App() {
 
   const renderHandActions = () => (<div className="hand-actions">
           <button
-            className="action-button action-button-quiet hand-redraw-button"
+            className="action-button action-button-quiet hand-redraw-button hand-redraw-text"
             aria-label={activeHandRedrawUsed ? "Пересдача использована" : "Пересдать руку"}
             disabled={!canUseHandRedraw}
             title={
@@ -951,12 +962,8 @@ function App() {
             type="button"
             onClick={() => setIsRedrawConfirmOpen(true)}
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M20 7v5h-5M4 17v-5h5" />
-              <path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17" />
-            </svg>
+            Пересдача руки
           </button>
-          <p className="hand-redraw-caption">Пересдача руки</p>
 
   </div>);
 
@@ -1142,7 +1149,7 @@ function App() {
                 <h3>Лог партии</h3>
                 {moveLog.length > 0 ? (
                   <ol className="match-log" ref={matchLogRef}>
-                    {moveLog.map(({ event, index }) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
+                    {moveLog.map(({ event, index }) => <MatchLogEntry key={`${index}-${event}`} event={event} detail={gameState.logDetails?.[index]} game={gameState} logIndex={index} names={onlineRoom ? Array.from({ length: 4 }, (_, seat) => onlinePlayers.find((player) => player.seatIndex === seat)?.nickname || `Игрок ${seat + 1}`) : localPlayerNames} />)}
                   </ol>
                 ) : <p>Принятые ходы появятся здесь.</p>}
               </section>} reminder={<TableReminder snapshot={gameState.deckSnapshot} />} />
@@ -1186,6 +1193,7 @@ function App() {
           initialX={dragPreview.initialX}
           initialY={dragPreview.initialY}
           playerColor={dragPreview.playerColor}
+          pointerType={dragPreview.pointerType}
         />
       )}
       {activeModal === 'feedback' && <Modal title="Обратная связь" onClose={() => setActiveModal(null)}><FeedbackForm /></Modal>}
@@ -1466,8 +1474,8 @@ function App() {
           </div>
         </Modal>
       )}
-      {trainingRunning && <TrainingGame initialState={trainingInitialState} onStateChange={rememberTrainingState} playerName={localNameDrafts[0].trim() || 'Вы'} paused={activeModal !== 'tutorial' && activeModal !== null} onClose={requestMainMenu} controls={null}
-        onOpenRules={() => setActiveModal('rules')} onOpenSettings={() => setActiveModal('settings')} />}
+      {trainingRunning && <TrainingGame initialState={trainingInitialState} onStateChange={rememberTrainingState} playerName={localNameDrafts[0].trim() || 'Вы'} paused={isDictionaryOpen || (activeModal !== 'tutorial' && activeModal !== null)} onClose={requestMainMenu} controls={null}
+        onOpenRules={() => setActiveModal('rules')} onOpenSettings={() => setActiveModal('settings')} onOpenDictionary={handleOpenDictionary} />}
       {isRedrawConfirmOpen && canUseHandRedraw && !showMainMenu && activeModal === null && (
         <Modal title="Пересдать руку?" onClose={() => setIsRedrawConfirmOpen(false)}>
           <div className="redraw-confirm-dialog">

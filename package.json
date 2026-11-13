@@ -1,7 +1,7 @@
 {
   "name": "gameofconcepts",
   "private": true,
-  "version": "1.2.1",
+  "version": "1.2.17",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug",
     "android:open": "cap open android",
     "build:server": "node server/build.mjs",
-    "test": "node tests/run.mjs"
+    "test": "node tests/run.mjs",
+    "diagnostics:export": "node scripts/export-diagnostics.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",

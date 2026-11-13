@@ -6,6 +6,7 @@ import {
   buildMatchStatistics,
   type CentralCardStatistics,
   type MoveStatistics,
+  type PlayerStatistics,
   type RelationUsage,
 } from '../statistics/buildMatchStatistics';
 import type { GameState } from '../types';
@@ -50,7 +51,10 @@ function ResultsDetails({ label, children, className = '', color }: {
     </button>
     {portalRoot && createPortal(
       <Modal title={label} onClose={() => setPortalRoot(null)} trapFocus>
-        <div id={id} className="match-results match-results-popup">{children}</div>
+        <div id={id} className="match-results match-results-popup">
+          {children}
+          <button type="button" className="match-results-back" onClick={() => setPortalRoot(null)}>Назад</button>
+        </div>
       </Modal>, portalRoot)}
   </>;
 }
@@ -127,6 +131,30 @@ function CentralCard({ card, playerForSeat }: {
   </div>;
 }
 
+function PlayerDetails({ player, identity, graphAvailable, historyAvailable, playerForSeat }: {
+  player: PlayerStatistics;
+  identity: MatchResultsPlayer;
+  graphAvailable: boolean;
+  historyAvailable: boolean;
+  playerForSeat: (seat: number) => MatchResultsPlayer;
+}) {
+  return <ResultsDetails label={identity.nickname} color={seatColors[identity.color ?? ''] ?? identity.color}>
+    <div className="match-results-player-details">
+      <section><h4>Принятые связи</h4><RelationChart relations={player.relations} available={graphAvailable} /></section>
+      <section><h4>Лучший ход игрока</h4><BestMoves moves={player.bestMoves} available={historyAvailable} playerForSeat={playerForSeat} /></section>
+    </div>
+  </ResultsDetails>;
+}
+
+function favoriteRelations(player: PlayerStatistics, available: boolean) {
+  return !available ? '—' : player.favoriteFamilies.length
+    ? player.favoriteFamilies.map(getRelationFamilyLabel).join(', ') : 'Нет связей';
+}
+
+function relationVariety(player: PlayerStatistics, available: boolean) {
+  return available ? `${player.relations.filter(relation => relation.count > 0).length} из ${player.relations.length}` : '—';
+}
+
 export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNewGame }: MatchResultsDialogProps) {
   const [section, setSection] = useState<'overview' | 'players'>('overview');
   const { board, players: gamePlayers, semanticEdges, logDetails, scores, deckSnapshot, scoringVersion } = game;
@@ -154,6 +182,10 @@ export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNew
             ? `Победитель — ${leaders[0].nickname}`
             : leaders.length > 1 ? `Ничья: ${leaders.map(player => player.nickname).join(', ')}` : 'Итоговый счёт недоступен'}</h3>
           <p className="match-results-meta">{deckName} · Принятых ходов: {statistics.moveCount} · Связей: {metric(statistics.edgeCount)}</p>
+          <p className="match-results-meta">{game.endReason === 'agreement' ? 'Все игроки согласились завершить партию.'
+            : game.endReason === 'empty-hands' ? 'В колоде и на руках не осталось карт.'
+              : game.endReason === 'consecutive-passes' ? 'Колода закончилась. Остальные игроки спасовали или остались без карт.'
+                : 'Партия завершена.'}</p>
           <ol className="match-results-scores" aria-label="Итоговый счёт">
             {standings.map(player => <li key={player.seatIndex} style={{ color: seatColors[player.color ?? ''] ?? player.color }}>
               <span>{player.nickname}</span><strong>{metric(player.score)}</strong>
@@ -195,28 +227,46 @@ export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNew
             </dl>
             <p className="match-results-caption">Бонусные очки за всю партию</p>
           </section>
-        </div> : <div className="match-results-table-wrap">
+        </div> : <>
+          <div className="match-results-mobile-players">
+            <p className="match-results-caption">Нажмите на имя игрока, чтобы посмотреть его связи и лучший ход.</p>
+            {statistics.players.map(player => {
+              const identity = playerForSeat(player.seatIndex);
+              return <section className="match-results-panel match-results-player-card" key={player.seatIndex}>
+                <div className="match-results-player-heading">
+                  <PlayerDetails player={player} identity={identity} graphAvailable={statistics.graphAvailable}
+                    historyAvailable={statistics.historyAvailable} playerForSeat={playerForSeat} />
+                  <strong className="match-results-score">{metric(scores[player.seatIndex])} очк.</strong>
+                </div>
+                <dl className="match-results-player-metrics">
+                  <div><dt>Принятых ходов</dt><dd>{player.moveCount}</dd></div>
+                  <div><dt>Связей</dt><dd>{metric(player.edgeCount)}</dd></div>
+                  <div className="match-results-player-favorite"><dt>Любимый тип связи</dt><dd>{favoriteRelations(player, statistics.graphAvailable)}</dd></div>
+                  <div><dt>Типов связи</dt><dd>{relationVariety(player, statistics.graphAvailable)}</dd></div>
+                  <div><dt>За пути</dt><dd>{metric(player.pathBonus, true)}</dd></div>
+                  <div><dt>За узлы</dt><dd>{metric(player.nodeBonus, true)}</dd></div>
+                </dl>
+              </section>;
+            })}
+          </div>
+          <div className="match-results-table-wrap">
           <table className="match-results-table">
             <caption>Сравнение игроков. Нажмите на имя, чтобы раскрыть детали.</caption>
             <thead><tr><th scope="col">Игрок</th><th scope="col">Счёт</th><th scope="col">Ходы</th><th scope="col">Связи</th><th scope="col">Любимый тип</th><th scope="col">Типов</th><th scope="col">За пути</th><th scope="col">За узлы</th></tr></thead>
             <tbody>{statistics.players.map(player => {
               const identity = playerForSeat(player.seatIndex);
               return <tr key={player.seatIndex}>
-                  <th scope="row"><ResultsDetails label={identity.nickname} color={seatColors[identity.color ?? ''] ?? identity.color}>
-                    <div className="match-results-player-details">
-                      <section><h4>Принятые связи</h4><RelationChart relations={player.relations} available={statistics.graphAvailable} /></section>
-                      <section><h4>Лучший ход игрока</h4><BestMoves moves={player.bestMoves} available={statistics.historyAvailable} playerForSeat={playerForSeat} /></section>
-                    </div>
-                  </ResultsDetails></th>
+                  <th scope="row"><PlayerDetails player={player} identity={identity} graphAvailable={statistics.graphAvailable}
+                    historyAvailable={statistics.historyAvailable} playerForSeat={playerForSeat} /></th>
                   <td className="match-results-score">{metric(scores[player.seatIndex])}</td>
                   <td>{player.moveCount}</td><td>{metric(player.edgeCount)}</td>
-                  <td>{!statistics.graphAvailable ? '—' : player.favoriteFamilies.length ? player.favoriteFamilies.map(getRelationFamilyLabel).join(', ') : 'Нет связей'}</td>
-                  <td>{statistics.graphAvailable ? `${player.relations.filter(relation => relation.count > 0).length} из ${player.relations.length}` : '—'}</td>
+                  <td>{favoriteRelations(player, statistics.graphAvailable)}</td>
+                  <td>{relationVariety(player, statistics.graphAvailable)}</td>
                   <td>{metric(player.pathBonus, true)}</td><td>{metric(player.nodeBonus, true)}</td>
                 </tr>;
             })}</tbody>
           </table>
-        </div>}
+        </div></>}
       </div>
       <footer className="match-results-footer">
         <button type="button" onClick={onClose}>Закрыть</button>

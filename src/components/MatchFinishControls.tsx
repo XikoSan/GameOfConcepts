@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { getPassAvailability, isDrawPileExhausted, type GameState } from '../game';
 import { Modal } from './Modal';
 import { MatchResultsDialog } from './MatchResultsDialog';
-import { useDesktopStatistics } from '../hooks/useDesktopStatistics';
 import './MatchFinishControls.css';
 
 interface MatchFinishControlsProps {
@@ -30,7 +29,6 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
   const [busy, setBusy] = useState(false);
   const [attemptedAction, setAttemptedAction] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
-  const desktopStatistics = useDesktopStatistics();
   const resultsButtonRef = useRef<HTMLButtonElement>(null);
   const closeResults = () => {
     setResultHidden(true);
@@ -50,9 +48,6 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
   const canVote = Boolean(pending && voter !== null && voter >= 0 && !Object.hasOwn(pending.votes, String(voter)));
   const passLimit = game.players.length - 1;
   const passWillFinish = (game.consecutivePasses ?? 0) + 1 >= passLimit;
-  const standings = players.map(player => ({ ...player, score: game.scores[player.seatIndex] ?? 0 }))
-    .sort((a, b) => b.score - a.score || a.seatIndex - b.seatIndex);
-  const leaders = standings.filter(player => player.score === standings[0]?.score);
   const visibleError = actionError || (attemptedAction ? error : null);
 
   const runAction = async (action: () => void | Promise<void>) => {
@@ -111,21 +106,10 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
         </div>}
       </div>
     </Modal>}
-    {game.gameOver && desktopStatistics && <MatchResultsDialog
+    {game.gameOver && <MatchResultsDialog
       game={game} players={players} open={active && !resultHidden}
       onClose={closeResults} onMenu={onMenu} onNewGame={onNewGame}
     />}
-    {active && game.gameOver && !resultHidden && !desktopStatistics && <Modal title="Партия завершена" onClose={closeResults}>
-      <div className="match-finish-dialog">
-        <p className="match-finish-winner"><strong>{leaders.length === 1 ? `Победитель — ${leaders[0].nickname}` : `Ничья: ${leaders.map(player => player.nickname).join(', ')}`}</strong></p>
-        <p>{game.endReason === 'agreement' ? 'Все игроки согласились завершить партию.' : game.endReason === 'empty-hands' ? 'В колоде и на руках не осталось карт.' : game.endReason === 'consecutive-passes' ? 'Колода закончилась. Остальные игроки спасовали или остались без карт.' : 'Итоговый счёт партии.'}</p>
-        <ol className="match-finish-standings" aria-label="Итоговый счёт">{standings.map(player => <li className={player.score === leaders[0]?.score ? 'is-leader' : ''} key={player.seatIndex}><span>{player.nickname}</span><strong>{player.score}</strong></li>)}</ol>
-        <div className="modal-actions">
-          <button type="button" onClick={onMenu}>В меню</button>
-          <button type="button" onClick={onNewGame}>Новая партия</button>
-        </div>
-      </div>
-    </Modal>}
     </>, modalRoot)}
   </>;
 }

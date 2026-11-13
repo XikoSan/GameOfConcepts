@@ -107,6 +107,38 @@ export interface SemanticEdge {
   createdOrder: number;
 }
 
+export interface SemanticScoreCard {
+  id: string;
+  name: string;
+  ownerSeatIndex: number | null;
+}
+
+export interface SemanticScoreEvidenceEdge {
+  id: string;
+  from: SemanticScoreCard;
+  to: SemanticScoreCard;
+  relation: SemanticRelation;
+  label: string;
+}
+
+/** Frozen witnesses explain the award at acceptance time, even after the board grows. */
+export interface SemanticScoreExplanation {
+  version: 1;
+  relation: string;
+  edge: SemanticScoreEvidenceEdge;
+  path?: {
+    cards: SemanticScoreCard[];
+    edges: SemanticScoreEvidenceEdge[];
+    sharedCardId: string;
+  };
+  node?: {
+    center: SemanticScoreCard;
+    outerCards: SemanticScoreCard[];
+    direction: 'toward-center' | 'from-center' | 'symmetric';
+    edges: SemanticScoreEvidenceEdge[];
+  };
+}
+
 export interface SemanticEdgeScore {
   pendingEdgeId: string;
   baseScore: 1;
@@ -115,6 +147,7 @@ export interface SemanticEdgeScore {
   total: 1 | 2 | 3;
   continuesPath: boolean;
   continuesNode: boolean;
+  explanation?: SemanticScoreExplanation;
 }
 
 export interface SemanticMoveScore {

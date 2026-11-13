@@ -1,10 +1,12 @@
-import type { RealtimeChannel } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../lib/supabaseClient';
+import { subscribeAfterAuthentication, type AuthenticatedSubscription } from '../lib/subscribeAfterAuthentication';
 import { ensureGuestIdentity, invokeRoomCommand } from '../lib/onlineAuth';
 import { hasSupportedGameRelations } from '../scoring/semanticRelations';
 import type { GameState } from '../game';
 import type { GameAction } from '../gameActions';
 import type { Room, MaxPlayers } from '../types/room';
+
+export type RoomSubscription = AuthenticatedSubscription;
 
 export async function getRoomById(id:string): Promise<Room|null> {
  await ensureGuestIdentity();
@@ -38,10 +40,18 @@ export function subscribeToRoom(
   onRoomUpdate: (room: Room) => void,
   onStatusProblem?: () => void,
   onRoomDelete?: () => void
-): RealtimeChannel {
+): RoomSubscription {
   const supabase = getSupabaseClient();
-
-  return supabase
+  return subscribeAfterAuthentication(async () => {
+    await ensureGuestIdentity();
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    if (!data.session?.access_token) throw Error('Не удалось подтвердить гостевую сессию.');
+    // Anonymous sign-in updates Realtime asynchronously; join only after its JWT is ready.
+    await supabase.realtime.setAuth(data.session.access_token);
+  }, () => {
+    let active = true;
+    const channel = supabase
     .channel(`room:${roomId}`)
     // Realtime only delivers row changes; rooms.game_state remains the source of truth.
     // Clients replace their room snapshot instead of applying separate local patches.
@@ -54,6 +64,7 @@ export function subscribeToRoom(
         filter: `id=eq.${roomId}`,
       },
       (payload) => {
+        if (!active) return;
         if (import.meta.env.DEV) console.log('[room realtime update raw]', payload);
         if (import.meta.env.DEV) console.log('[room realtime update room]', payload.new);
         const nextRoom = payload.new as Room;
@@ -73,16 +84,26 @@ export function subscribeToRoom(
         filter: `id=eq.${roomId}`,
       },
       (payload) => {
+        if (!active) return;
         if (import.meta.env.DEV) console.log('[room realtime delete raw]', payload);
         // DELETE means every client must leave the online room locally.
         onRoomDelete?.();
       }
     )
     .subscribe((status, error) => {
+      if (!active) return;
       if (import.meta.env.DEV) console.log('[room realtime status]', { roomId, status, error });
       if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
         console.warn('[room realtime status error]', { roomId, status, error });
         onStatusProblem?.();
       }
     });
+    return { unsubscribe: () => {
+      active = false;
+      void supabase.removeChannel(channel);
+    } };
+  }, error => {
+    console.warn('[room realtime authentication failed]', error);
+    onStatusProblem?.();
+  });
 }

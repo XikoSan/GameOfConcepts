@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import { initializeGame, placeCard, upsertPendingSemanticEdge, submitPendingSemanticMove, confirmPendingCard } from '../src/game';
 import { buildMatchStatistics } from '../src/statistics/buildMatchStatistics';
 import { getRelationPresets } from '../src/scoring/semanticRelations';
+import { applyAuthenticatedAction } from '../src/server/secureRoomActions';
 import type { GameState, PlacedCard, SemanticEdge, SemanticEdgeScore, SemanticRelation } from '../src/types';
+import type { Room } from '../src/types/room';
 
 const kind: SemanticRelation = { family: 'kind', fromRole: 'kind', toRole: 'general' };
 const opposite: SemanticRelation = { family: 'opposite', symmetric: true };
@@ -234,4 +236,40 @@ test('statistics: a real accepted move round-trips local and serialized online s
   assert.equal(result.edgeCount, 1);
   assert.equal(result.bestMoves[0].total, game.scores[0]);
   assert.deepEqual(buildMatchStatistics(JSON.parse(JSON.stringify(game))), result);
+});
+
+test('statistics: online finish preserves accepted-move metrics for every reconnected seat', () => {
+  const game = initializeGame(3, undefined, 0);
+  let room: Room = {
+    id: 'statistics-room', code: 'STATS', status: 'playing', version: 0,
+    created_at: '', updated_at: '', host_player_id: 'p0', player_1_id: 'p0', player_2_id: 'p1',
+    player_1_nickname: 'Первый', player_2_nickname: 'Второй', max_players: 3,
+    players: game.players.map((_, seatIndex) => ({ id: `p${seatIndex}`, seatIndex,
+      nickname: ['Первый', 'Второй', 'Третий'][seatIndex], color: 'blue',
+      isHost: seatIndex === 0, connected: true, joinedAt: '' })),
+    turn_order: ['p1', 'p0', 'p2'], current_turn_index: 1, game_state: game,
+  };
+  room = applyAuthenticatedAction(room, 'p0', { type: 'placeCard', cardName: game.players[0].cards[0], coordinates: { x: 8, y: 7 } });
+  const moveId = room.game_state.pendingMove!.cardId;
+  room = applyAuthenticatedAction(room, 'p0', { type: 'upsertSemanticEdge', neighborCardInstanceId: game.startCard.id,
+    relation: getRelationPresets(game.deckSnapshot)[0], direction: 'new-to-neighbor' }, moveId);
+  room = applyAuthenticatedAction(room, 'p0', { type: 'submitSemanticMove' }, moveId);
+  room = applyAuthenticatedAction(room, 'p1', { type: 'confirmCard' }, moveId);
+  room = applyAuthenticatedAction(room, 'p2', { type: 'confirmCard' }, moveId);
+  const accepted = buildMatchStatistics(room.game_state);
+  assert.equal(accepted.moveCount, 1);
+  assert.equal(accepted.historyAvailable, true);
+  const requester = room.turn_order[room.current_turn_index];
+  room = applyAuthenticatedAction(room, requester, { type: 'requestFinish' });
+  const finishId = room.game_state.pendingFinish!.id;
+  for (const player of room.players.filter(player => player.id !== requester)) {
+    room = applyAuthenticatedAction(room, player.id, { type: 'voteFinish', accept: true, finishId });
+  }
+  assert.equal(room.game_state.gameOver, true);
+  assert.equal(room.game_state.endReason, 'agreement');
+  for (const player of room.players) {
+    const reconnected: Room = JSON.parse(JSON.stringify(room));
+    assert.equal(reconnected.players.find(member => member.id === player.id)?.seatIndex, player.seatIndex);
+    assert.deepEqual(buildMatchStatistics(reconnected.game_state), accepted);
+  }
 });

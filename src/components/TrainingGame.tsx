@@ -12,20 +12,22 @@ import { TrainingHint } from './TrainingHint';
 import { TableSidebar } from './TableSidebar';
 import { TableMenu } from './TableMenu';
 import { useCompactTable } from '../hooks/useCompactTable';
+import { useActionDockHeight } from '../hooks/useActionDockHeight';
 
 const noop = () => {};
 interface TrainingGameProps {
   initialState?: TrainingState; onStateChange?: (state: TrainingState) => void;
-  onClose: () => void; controls: ReactNode; onOpenRules: () => void; onOpenSettings: () => void; paused?: boolean; playerName?: string;
+  onClose: () => void; controls: ReactNode; onOpenRules: () => void; onOpenSettings: () => void; onOpenDictionary: (name: string) => void; paused?: boolean; playerName?: string;
 }
 
-export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, paused = false, playerName = 'Вы', initialState, onStateChange }: TrainingGameProps) {
+export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, onOpenDictionary, paused = false, playerName = 'Вы', initialState, onStateChange }: TrainingGameProps) {
   const [state, dispatch] = useReducer(trainingReducer, initialState, saved => saved ?? createTrainingState());
   useEffect(() => { onStateChange?.(state); }, [state, onStateChange]);
   const [camera, setCamera] = useState(0);
   const compact = useCompactTable();
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
-  const [drag, setDrag] = useState<{ cardName: string; initialX: number; initialY: number; playerColor: 'blue' | 'orange' | 'green' | 'purple' } | null>(null);
+  useActionDockHeight(actionDock);
+  const [drag, setDrag] = useState<{ cardName: string; initialX: number; initialY: number; playerColor: 'blue' | 'orange' | 'green' | 'purple'; pointerType?: string } | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const { game, phase, selected } = state;
   const ready = Boolean(game.pendingMove?.semanticEdges?.length);
@@ -99,17 +101,17 @@ export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, p
             selectedCard={phase === 'place' ? (selected ?? null) : null} isActive={phase === 'place'} displayName={playerName}
             onStartCardDrag={(cardName, playerColor, event) => {
               if (phase !== 'place') { event.preventDefault(); return; }
-              dispatch({ type: 'select', name: cardName }); setDrag({ cardName, playerColor, initialX: event.clientX, initialY: event.clientY });
+              dispatch({ type: 'select', name: cardName }); setDrag({ cardName, playerColor, initialX: event.clientX, initialY: event.clientY, pointerType: 'pointerType' in event ? event.pointerType : 'mouse' });
             }}
             onCancelCardDrag={() => setDrag(null)}
-            onOpenDictionary={name => dispatch({ type: 'select', name })} />
-          <div className="hand-actions"><button className="action-button action-button-quiet hand-redraw-button" type="button" disabled aria-label="Пересдать руку" title="Пересдача руки отключена на протяжении обучения">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 7a7 7 0 0 1 11.6-1L20 9M4 15l2.3 3A7 7 0 0 0 17.9 17"/></svg>
-          </button><p className="hand-redraw-caption">Пересдача руки</p></div>
+            onOpenDictionary={onOpenDictionary} />
+          <div className="hand-actions"><button className="action-button action-button-quiet hand-redraw-button hand-redraw-text" type="button" disabled aria-label="Пересдать руку" title="Пересдача руки отключена на протяжении обучения">
+            Пересдача руки
+          </button></div>
         </div>
       </div>
       <TableSidebar controls={controls} log={<section className="sidebar-log" aria-label="Лог партии"><h3>Лог партии</h3>
-          {game.log.length ? <ol className="match-log">{game.log.map((event, index) => <MatchLogEntry key={index} event={event} detail={game.logDetails?.[index]} names={[playerName, 'Учебный соперник']} />)}</ol> : <p>Принятые ходы появятся здесь.</p>}
+          {game.log.length ? <ol className="match-log">{game.log.map((event, index) => <MatchLogEntry key={index} event={event} detail={game.logDetails?.[index]} game={game} logIndex={index} names={[playerName, 'Учебный соперник']} />)}</ol> : <p>Принятые ходы появятся здесь.</p>}
         </section>} reminder={<TableReminder snapshot={game.deckSnapshot} />} />
       </div>
     </section></main>

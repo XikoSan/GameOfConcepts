@@ -27,6 +27,8 @@ import type {
 import { formatSemanticRelation, formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
 import { Cell } from './Cell';
 import { SemanticRelationPopover } from './SemanticRelationPopover';
+import { ScoreHelpButton } from './ScoreDetails';
+import { previewSemanticEdgeScore } from './previewSemanticEdgeScore';
 import {
   calculateBoardOverlayPosition,
   type BoardOverlayId,
@@ -36,6 +38,7 @@ import {
 import './GameBoard.css';
 import { useCompactTable } from '../hooks/useCompactTable';
 import { usePortraitHand } from '../hooks/usePortraitHand';
+import { fitBoardCamera } from './adaptiveBoardCamera';
 
 interface GameBoardProps {
   actionDock?: HTMLElement | null;
@@ -76,6 +79,8 @@ interface CameraState {
 interface ViewportSize {
   width: number;
   height: number;
+  visibleHeight: number;
+  handBusy: boolean;
 }
 
 const GRID_MIN = -40;
@@ -257,19 +262,33 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   incrementCounter('render:GameBoard');
   const compact = useCompactTable();
   const portrait = usePortraitHand();
-  const [camera, setCamera] = useState<CameraState>(() =>
-    getCenteredCamera(gameState.startCard.coordinates)
-  );
-  const [previousResetSignal, setPreviousResetSignal] = useState(resetCameraSignal);
-  if (previousResetSignal !== resetCameraSignal) {
-    setPreviousResetSignal(resetCameraSignal);
-    setCamera(getCenteredCamera(gameState.startCard.coordinates));
+  const [viewport, setViewport] = useState<ViewportSize>({ width: 0, height: 0, visibleHeight: 0, handBusy: false });
+  const [interacting, setInteracting] = useState(false);
+  const boardCards = useMemo(() => Object.values(gameState.board), [gameState.board]);
+  const confirmedCoordinates = useMemo(() => boardCards.filter(card => card.status !== 'pending').map(card => card.coordinates), [boardCards]);
+  const fitViewport = { width: viewport.width, height: viewport.height, visibleHeight: viewport.visibleHeight,
+    originY: getViewportCenterY(viewport.height, portrait), compact };
+  const fittedCamera = fitBoardCamera(confirmedCoordinates, fitViewport);
+  const sceneKey = `${gameState.startCard.id}|${confirmedCoordinates.map(({ x, y }) => `${x},${y}`).sort().join(';')}|${viewport.width}:${viewport.height}:${viewport.visibleHeight}:${compact}|${gameState.pendingMove?.cardId ?? ''}:${gameState.pendingCross?.centerX ?? ''}`;
+  const [cameraControl, setCameraControl] = useState(() => ({ camera: getCenteredCamera(gameState.startCard.coordinates),
+    manual: false, sceneKey: '', matchId: gameState.startCard.id, resetSignal: resetCameraSignal }));
+  const resetRequested = cameraControl.resetSignal !== resetCameraSignal || cameraControl.matchId !== gameState.startCard.id;
+  const busy = Boolean(selectedCard || gameState.pendingMove || gameState.pendingCross || gameState.pendingFinish || interacting || viewport.handBusy);
+  if (viewport.width > 0 && viewport.height > 0 && (resetRequested || cameraControl.sceneKey === '' ||
+      (!cameraControl.manual && !busy && cameraControl.sceneKey !== sceneKey))) {
+    setCameraControl({ camera: resetRequested || cameraControl.sceneKey === ''
+      ? fitBoardCamera(boardCards.map(card => card.coordinates), fitViewport) : fittedCamera,
+    manual: false, sceneKey, matchId: gameState.startCard.id, resetSignal: resetCameraSignal });
   }
-  const [viewport, setViewport] = useState<ViewportSize>({ width: 0, height: 0 });
+  const camera = cameraControl.camera;
+  const setCamera = useCallback((update: (current: CameraState) => CameraState) => {
+    setCameraControl(current => ({ ...current, camera: update(current.camera), manual: true }));
+  }, [setCameraControl]);
   // On phones the minimum scale fits two more columns than the old 0.6 limit.
-  const minZoom = compact && viewport.width > 0
+  const normalMinZoom = compact && viewport.width > 0
     ? viewport.width / (viewport.width / MIN_ZOOM + 2 * CELL_SIZE)
     : MIN_ZOOM;
+  const minZoom = Math.min(normalMinZoom, fittedCamera.zoom);
   const containerRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     isDragging: boolean;
@@ -405,7 +424,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         zoom: nextZoom,
       };
     });
-  }, [minZoom, viewport.height, viewport.width, portrait]);
+  }, [minZoom, viewport.height, viewport.width, portrait, setCamera]);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -415,15 +434,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       incrementCounter('resize-observer:board');
       incrementCounter('dom:getBoundingClientRect:board-viewport');
       const rect = container.getBoundingClientRect();
+      const workspace = container.closest('.table-workspace');
+      const hand = workspace?.querySelector<HTMLElement>('.word-hand');
+      const occluder = workspace?.querySelector<HTMLElement>('.table-hand-tray.has-mobile-actions') ?? hand;
+      const occluderRect = occluder?.getBoundingClientRect();
+      const visibleHeight = portrait && occluderRect && occluderRect.height > 0
+        ? Math.max(96, Math.min(container.clientHeight, occluderRect.top - rect.top - 12))
+        : portrait ? container.clientHeight - Math.min(176, container.clientHeight * .35) : container.clientHeight;
       const nextViewport = {
         width: container.clientWidth,
         height: container.clientHeight,
+        visibleHeight,
+        handBusy: Boolean(hand?.classList.contains('is-hand-arranging')),
       };
       const nextViewportRect = toOverlayRect(rect);
 
       setViewport((currentViewport) =>
         currentViewport.width === nextViewport.width &&
-        currentViewport.height === nextViewport.height
+        currentViewport.height === nextViewport.height &&
+        currentViewport.visibleHeight === nextViewport.visibleHeight &&
+        currentViewport.handBusy === nextViewport.handBusy
           ? currentViewport
           : nextViewport
       );
@@ -437,11 +467,21 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     updateViewportSize();
     const resizeObserver = new ResizeObserver(updateViewportSize);
     resizeObserver.observe(container);
+    const workspace = container.closest('.table-workspace');
+    const hand = workspace?.querySelector('.word-hand');
+    const tray = workspace?.querySelector('.table-hand-tray');
+    if (hand) resizeObserver.observe(hand);
+    if (tray) resizeObserver.observe(tray);
+    const interactionObserver = new MutationObserver(records => {
+      if (records.some(record => record.target instanceof Element && record.target.matches('.word-hand, .table-hand-tray'))) updateViewportSize();
+    });
+    if (workspace) interactionObserver.observe(workspace, { attributes: true, subtree: true, attributeFilter: ['class'] });
 
     return () => {
       resizeObserver.disconnect();
+      interactionObserver.disconnect();
     };
-  }, []);
+  }, [portrait, gameState.startCard.id]);
 
   const touchPoints = useRef(new Map<number, { x: number; y: number }>());
   const pinch = useRef<{ distance: number; x: number; y: number } | null>(null);
@@ -452,6 +492,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
     if (selectedCard || event.button !== 0) return;
+      setInteracting(true);
 
       if (event.pointerType !== 'mouse') {
         touchPoints.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
@@ -504,12 +545,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       offsetX: currentCamera.offsetX + deltaX,
       offsetY: currentCamera.offsetY + deltaY,
     }));
-  }, [minZoom, portrait]);
+  }, [minZoom, portrait, setCamera]);
 
   const handlePointerUp = useCallback((event: React.PointerEvent<HTMLDivElement>) => {
     touchPoints.current.delete(event.pointerId);
     pinch.current = measurePinch();
     const remaining = [...touchPoints.current.values()][0];
+    setInteracting(Boolean(remaining));
     dragRef.current = { isDragging: Boolean(remaining), lastX: remaining?.x ?? 0, lastY: remaining?.y ?? 0 };
     incrementCounter('pan:pointerup');
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
@@ -533,7 +575,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const tooltipScopeKey = gameState.pendingCross
     ? gameState.pendingCross.cardIds.join('|')
     : 'no-pending-cross';
-  const boardCards = useMemo(() => Object.values(gameState.board), [gameState.board]);
   // Keep occupied cells mounted so panning does not dismiss their popovers.
   // Empty cells only need DOM nodes inside the viewport, plus two cells of overscan.
   const visibleCells = useMemo(() => {
@@ -594,6 +635,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const activeRelationScore = activeRelationEdge
     ? pendingSemanticScore?.edges.find((edge) => edge.pendingEdgeId === activeRelationEdge.id)
     : undefined;
+  const getActiveRelationPreviewScore = useCallback((relation: SemanticRelation, direction: PendingSemanticEdge['direction']) =>
+    activeRelationNeighbor ? previewSemanticEdgeScore(gameState, activeRelationNeighbor.id, relation, direction) : undefined,
+  [activeRelationNeighbor, gameState]);
 
   const setBoardOverlayRect = useCallback(
     (id: BoardOverlayId, rect: OverlayRect | null) => {
@@ -878,12 +922,13 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         relationPresets={getRelationPresets(gameState.deckSnapshot)}
         pendingCard={pendingCard} neighborCard={activeRelationNeighbor}
         selectedEdge={activeRelationEdge} selectedScore={activeRelationScore}
+        getPreviewScore={getActiveRelationPreviewScore}
         position={{ left: 0, top: 0 }}
         onClose={() => setActiveRelationEditor(null)}
         onDelete={() => handleRemoveRelation(activeRelationNeighbor.id)}
         onSave={(relation, direction) => handleSaveRelation(activeRelationNeighbor.id, relation, direction)} />
     : <section className="mobile-move-actions" onPointerDown={event => event.stopPropagation()} onClick={event => event.stopPropagation()} aria-label={canEditSemanticMove ? 'Связи хода' : 'Голосование'}>
-        <header><strong>{pendingCard.cardName}</strong><span>{pendingSemanticEdges.length} {pluralizeRelation(pendingSemanticEdges.length)} · +{pendingSemanticScore?.total ?? 0}</span></header>
+        <header><strong>{pendingCard.cardName}</strong><div className="pending-score-summary"><span>{pendingSemanticEdges.length} {pluralizeRelation(pendingSemanticEdges.length)} · +{pendingSemanticScore?.total ?? 0}</span>{Boolean(pendingSemanticScore?.edges.length) && <ScoreHelpButton score={pendingSemanticScore!} />}</div></header>
         {canEditSemanticMove ? <>
           <p>Выберите соседнюю карту, чтобы задать связь.</p>
           <div className="mobile-neighbor-list">{semanticNeighbors.map(neighbor => {
@@ -913,6 +958,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   return (
     <div
       className={`game-board-container ${selectedCard ? '' : 'can-pan'}`}
+      data-camera-mode={cameraControl.manual ? 'manual' : 'automatic'}
+      data-camera-zoom={camera.zoom}
+      data-camera-visible-height={viewport.visibleHeight}
       ref={containerRef}
       onWheel={handleWheel}
       onPointerDown={handlePointerDown}
@@ -1067,10 +1115,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               top: `${pendingActionsRect.top}px`,
             }}
           >
-            <strong>
+            <div className="pending-score-summary"><strong>
               {pendingSemanticEdges.length} {pluralizeRelation(pendingSemanticEdges.length)} · +
               {pendingSemanticScore?.total ?? 0}
-            </strong>
+            </strong>{Boolean(pendingSemanticScore?.edges.length) && <ScoreHelpButton score={pendingSemanticScore!} />}</div>
             <button
               disabled={!canSubmitSemanticMove || Boolean(activeRelationEditor)}
               type="button"
@@ -1097,6 +1145,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             position={relationEditorRect}
             selectedEdge={activeRelationEdge}
             selectedScore={activeRelationScore}
+            getPreviewScore={getActiveRelationPreviewScore}
             onClose={() => {
               setBoardOverlayRect('relation-editor', null);
               setActiveRelationEditor(null);

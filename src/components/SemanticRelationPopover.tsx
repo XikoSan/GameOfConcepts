@@ -13,6 +13,7 @@ import {
   getRelationDirectionQuestion,
   getRelationFamilyLabel,
 } from '../scoring/semanticRelations';
+import { ScoreHelpButton } from './ScoreDetails';
 import './SemanticRelationPopover.css';
 
 interface SemanticRelationPopoverProps {
@@ -22,6 +23,7 @@ interface SemanticRelationPopoverProps {
   neighborCard: PlacedCard;
   selectedEdge?: PendingSemanticEdge;
   selectedScore?: SemanticEdgeScore;
+  getPreviewScore?: (relation: SemanticRelation, direction: PendingSemanticEdge['direction']) => SemanticEdgeScore | undefined;
   position: {
     left: number;
     top: number;
@@ -42,6 +44,7 @@ export function SemanticRelationPopover({
   neighborCard,
   selectedEdge,
   selectedScore,
+  getPreviewScore,
   position,
   onClose,
   onDelete,
@@ -52,6 +55,7 @@ export function SemanticRelationPopover({
   const popoverRef = useRef<HTMLDivElement>(null);
   const onMeasuredRectRef = useRef(onMeasuredRect);
   const [manualPosition, setManualPosition] = useState<{ left: number; top: number } | null>(null);
+  const [scoreHelpOpen, setScoreHelpOpen] = useState(false);
   const dragRef = useRef<{ id: number; x: number; y: number; left: number; top: number } | null>(null);
   const clampPosition = (left: number, top: number) => {
     const rect = popoverRef.current?.getBoundingClientRect();
@@ -83,6 +87,9 @@ export function SemanticRelationPopover({
   const direction =
     sourceCardId === neighborCard.id ? 'neighbor-to-new' : 'new-to-neighbor';
   const isReady = Boolean(selectedRelation && (isOpposite || sourceCardId));
+  const previewScore = useMemo(() => isReady && selectedRelation
+    ? getPreviewScore?.(selectedRelation, isOpposite ? 'new-to-neighbor' : direction) ?? selectedScore
+    : undefined, [direction, getPreviewScore, isOpposite, isReady, selectedRelation, selectedScore]);
   const namesById = useMemo(
     () =>
       new Map([
@@ -109,12 +116,12 @@ export function SemanticRelationPopover({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
+      if (event.key === 'Escape' && !scoreHelpOpen) onClose();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [onClose, scoreHelpOpen]);
 
   useEffect(() => {
     onMeasuredRectRef.current = onMeasuredRect;
@@ -237,14 +244,10 @@ export function SemanticRelationPopover({
 
       <section className="semantic-popover-preview">
         <span>{previewText}</span>
-        {selectedScore && (
-          <small>
-            +1 связь
-            {selectedScore.continuesPath ? ', +1 путь' : ''}
-            {selectedScore.continuesNode ? ', +1 узел' : ''}
-            . Итого +{selectedScore.total}
-          </small>
-        )}
+        {previewScore && <div className="semantic-score-preview-line">
+          <small>+{previewScore.total}: связь +1 · путь +{previewScore.pathBonus} · узел +{previewScore.nodeBonus}</small>
+          <ScoreHelpButton score={previewScore} onOpenChange={setScoreHelpOpen} />
+        </div>}
       </section>
 
       <footer>

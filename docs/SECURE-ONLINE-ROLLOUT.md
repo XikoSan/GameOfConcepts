@@ -2,6 +2,8 @@
 
 Status: server function, guest authentication and SQL migration deployed on 2026-10-09. Three independent guest sessions passed the live command/authorization smoke test.
 
+Update 2026-11-13: deployed `room-command` version 3 from the current bundle. It supports «Человек и общество», unanimous finish proposals, match statistics, and frozen score explanations for accepted semantic edges. A closed `game_diagnostics.events` archive now records online transitions and local clients submit an allowlisted diagnostic queue to the existing Supabase project; records expire after 30 days and exclude names, hands, auth data, voice and IP addresses. Two independent guests verified create/join/start, accepted scoring, a finish proposal, refusal, a second proposal and agreement; Realtime delivery was verified after awaiting both JWT authentication and the PostgreSQL subscription-ready signal. A separate local QA flow verified rejection, redraw, acceptance, finish and archive export. Temporary test rooms were removed.
+
 Players do not register or enter email. Supabase anonymous authentication issues a signed session; a localStorage UUID is no longer authorization. Clearing app data loses access to that guest's rooms. Future account linking is separate work.
 
 ## Deployment order
@@ -11,6 +13,8 @@ Players do not register or enter email. Supabase anonymous authentication issues
 3. During a coordinated client update, apply `supabase/secure-online.sql` after the existing accepted-relations migration. The SQL is transactional and repeatable. It revokes direct client writes and anonymous reads. Old protocol-1 rooms remain stored but become inaccessible; old APKs cannot use online until updated.
 4. Publish the guest-auth web client and rebuild APK. Test two independent guest sessions: create/join/start/place/link/submit/vote/reconnect/delete. Also test outsider reads, forged updates and duplicate votes.
 5. Do not claim rollout complete before these real-service tests pass.
+
+Changes to selectable decks, game actions or finish rules require rebuilding and deploying `room-command` as well as updating the web/APK client. A client-only release does not update the server's bundled rules or deck catalog.
 
 ## Limits and boundaries
 

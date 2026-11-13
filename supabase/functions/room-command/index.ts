@@ -1202,19 +1202,30 @@ const getOtherCardId = (edge, cardId) => {
 	return null;
 };
 const getCardOwner$1 = (board, cardId) => Object.values(board).find((card) => card.id === cardId)?.playerId;
-function continuesSemanticNode(board, edge, graphEdges, activeSeatIndex) {
-	return [edge.fromCardInstanceId, edge.toCardInstanceId].some((centerCardId) => {
+function checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex) {
+	const possibleCenters = [edge.fromCardInstanceId, edge.toCardInstanceId];
+	for (const centerCardId of possibleCenters) {
 		const outerCardId = getOtherCardId(edge, centerCardId);
-		if (!outerCardId || getCardOwner$1(board, outerCardId) !== activeSeatIndex) return false;
+		if (!outerCardId || getCardOwner$1(board, outerCardId) !== activeSeatIndex) continue;
 		const signature = getNodeConnectivitySignature(edge, centerCardId);
-		if (!signature) return false;
-		return graphEdges.some((graphEdge) => {
+		if (!signature) continue;
+		for (const graphEdge of graphEdges) {
 			const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
-			if (!graphOuterCardId || graphOuterCardId === outerCardId) return false;
-			if (getCardOwner$1(board, graphOuterCardId) !== activeSeatIndex) return false;
-			return getNodeConnectivitySignature(graphEdge, centerCardId) === signature;
-		});
-	});
+			if (!graphOuterCardId || graphOuterCardId === outerCardId) continue;
+			if (getCardOwner$1(board, graphOuterCardId) !== activeSeatIndex) continue;
+			if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) return {
+				continuesNode: true,
+				centerCardId,
+				outerCardIds: [graphOuterCardId, outerCardId],
+				matchedEdgeIds: [graphEdge.id]
+			};
+		}
+	}
+	return {
+		continuesNode: false,
+		outerCardIds: [],
+		matchedEdgeIds: []
+	};
 }
 //#endregion
 //#region src/scoring/semanticPaths.ts
@@ -1264,13 +1275,93 @@ function checkSemanticPathContinuation(board, edge, graphEdges, activeSeatIndex)
 		matchedEdgeIds: []
 	};
 }
-function continuesSemanticPath(board, edge, graphEdges, activeSeatIndex) {
-	return checkSemanticPathContinuation(board, edge, graphEdges, activeSeatIndex).continuesPath;
-}
 function isSemanticEdgeGeometryValid(board, edge) {
 	const fromCard = board[getBoardKey$1(edge.fromPosition)];
 	const toCard = board[getBoardKey$1(edge.toPosition)];
 	return fromCard?.id === edge.fromCardInstanceId && toCard?.id === edge.toCardInstanceId;
+}
+//#endregion
+//#region src/scoring/scoreEvidence.ts
+function createScoreExplanation(board, edge, graphEdges, pathCheck, nodeCheck) {
+	const cards = new Map(Object.values(board).map((card) => [card.id, card]));
+	const names = new Map([...cards].map(([id, card]) => [id, card.cardName]));
+	const card = (id) => {
+		const placed = cards.get(id);
+		return placed && {
+			id,
+			name: placed.cardName,
+			ownerSeatIndex: placed.playerId
+		};
+	};
+	const evidence = (source) => {
+		const from = card(source.fromCardInstanceId), to = card(source.toCardInstanceId);
+		return from && to && {
+			id: source.id,
+			from,
+			to,
+			relation: { ...source.relation },
+			label: formatSemanticRelation(source, names)
+		};
+	};
+	const newEdge = evidence(edge);
+	if (!newEdge) return void 0;
+	const explanation = {
+		version: 1,
+		relation: newEdge.label,
+		edge: newEdge
+	};
+	const pathEdge = graphEdges.find((item) => item.id === pathCheck.matchedEdgeIds[0]);
+	const shared = pathCheck.sharedCardInstanceId;
+	if (pathCheck.continuesPath && pathEdge && shared) {
+		const previous = evidence(pathEdge);
+		if (previous) if (isSymmetricRelation(edge.relation)) {
+			const previousOuter = card(pathEdge.fromCardInstanceId === shared ? pathEdge.toCardInstanceId : pathEdge.fromCardInstanceId);
+			const nextOuter = card(edge.fromCardInstanceId === shared ? edge.toCardInstanceId : edge.fromCardInstanceId);
+			const middle = card(shared);
+			if (previousOuter && nextOuter && middle) explanation.path = {
+				cards: [
+					previousOuter,
+					middle,
+					nextOuter
+				],
+				edges: [previous, newEdge],
+				sharedCardId: shared
+			};
+		} else if (edge.toCardInstanceId === pathEdge.fromCardInstanceId) explanation.path = {
+			cards: [
+				newEdge.from,
+				newEdge.to,
+				previous.to
+			],
+			edges: [newEdge, previous],
+			sharedCardId: shared
+		};
+		else explanation.path = {
+			cards: [
+				previous.from,
+				newEdge.from,
+				newEdge.to
+			],
+			edges: [previous, newEdge],
+			sharedCardId: shared
+		};
+	}
+	const nodeEdge = graphEdges.find((item) => item.id === nodeCheck.matchedEdgeIds[0]);
+	if (nodeCheck.continuesNode && nodeCheck.centerCardId && nodeEdge) {
+		const center = card(nodeCheck.centerCardId);
+		const outerCards = nodeCheck.outerCardIds.flatMap((id) => {
+			const value = card(id);
+			return value ? [value] : [];
+		});
+		const previous = evidence(nodeEdge);
+		if (center && previous && outerCards.length === 2) explanation.node = {
+			center,
+			outerCards,
+			direction: isSymmetricRelation(edge.relation) ? "symmetric" : edge.toCardInstanceId === center.id ? "toward-center" : "from-center",
+			edges: [previous, newEdge]
+		};
+	}
+	return explanation;
 }
 //#endregion
 //#region src/scoring/calculateSemanticMoveScore.ts
@@ -1293,11 +1384,22 @@ function calculateSemanticMoveScore({ board, existingEdges, pendingMove, activeS
 			semanticEdges: pendingMove.semanticEdges
 		}, pendingEdge, placedCard);
 		const isValidGeometry = isSemanticEdgeGeometryValid(board, semanticEdge);
-		const continuesPath = isValidGeometry && continuesSemanticPath(board, semanticEdge, graphEdges, activeSeatIndex);
-		const continuesNode = isValidGeometry && continuesSemanticNode(board, semanticEdge, graphEdges, activeSeatIndex);
+		const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex) : {
+			continuesPath: false,
+			reason: "no-compatible-edge",
+			matchedEdgeIds: []
+		};
+		const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex) : {
+			continuesNode: false,
+			outerCardIds: [],
+			matchedEdgeIds: []
+		};
+		const continuesPath = pathCheck.continuesPath;
+		const continuesNode = nodeCheck.continuesNode;
 		const pathBonus = continuesPath ? 1 : 0;
 		const nodeBonus = continuesNode ? 1 : 0;
 		const total = 1 + pathBonus + nodeBonus;
+		const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeCheck) : void 0;
 		if (isValidGeometry) graphEdges.push(semanticEdge);
 		return {
 			pendingEdgeId: pendingEdge.id,
@@ -1306,7 +1408,8 @@ function calculateSemanticMoveScore({ board, existingEdges, pendingMove, activeS
 			nodeBonus,
 			total,
 			continuesPath,
-			continuesNode
+			continuesNode,
+			...explanation ? { explanation } : {}
 		};
 	});
 	return {

@@ -13,6 +13,9 @@ import type {
   SemanticRelation,
 } from '../game';
 import type { GameController } from './gameController';
+import packageInfo from '../../package.json';
+import { localDiagnosticTransition, type LocalDiagnosticState } from '../diagnostics/archive';
+import { enqueueDiagnostics, flushDiagnostics } from '../diagnostics/queue';
 
 type LocalVote = 'accept' | 'reject';
 
@@ -103,7 +106,20 @@ const withLocalPendingVote = (gameState: GameState): GameState => {
 export function useLocalGameState(): GameController & { restoreLocalGame: (state: GameState) => void } {
   const [localPlayerCount, setLocalPlayerCount] = useState(2);
   const [localDeckId, setLocalDeckId] = useState(DEFAULT_DECK.id);
-  const [gameState, setGameState] = useState<GameState>(() => initializeGame(2));
+  const [runId] = useState(() => globalThis.crypto?.randomUUID?.() ?? `local-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const [diagnosticState, setDiagnosticState] = useState<LocalDiagnosticState>(() => ({ game: initializeGame(2), enabled: false, revision: 0, events: [] }));
+  const gameState = diagnosticState.game;
+  const setGameState = useCallback((update: GameState | ((game: GameState) => GameState), explicit?: 'start' | 'resume') => {
+    const metadata = { runId, at: new Date().toISOString(), clientVersion: packageInfo.version };
+    // The updater only creates immutable events; effects own network and storage writes.
+    setDiagnosticState(previous => localDiagnosticTransition(previous, typeof update === 'function' ? update(previous.game) : update, metadata, explicit));
+  }, [runId]);
+  const diagnosticsEnqueued = useRef(new Set<string>());
+  useEffect(() => {
+    const fresh = diagnosticState.events.filter(event => !diagnosticsEnqueued.current.has(event.event_id));
+    if (fresh.length) enqueueDiagnostics(fresh);
+    diagnosticsEnqueued.current = new Set(diagnosticState.events.map(event => event.event_id));
+  }, [diagnosticState.events]);
   const collected = useRef(new Set<string>());
   useEffect(() => {
     const samples = getAcceptedRelationSamples(gameState).filter(sample => {
@@ -115,7 +131,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
     if (samples.length) enqueueAcceptedRelations(samples);
   }, [gameState]);
   useEffect(() => {
-    const retry = () => { void flushAcceptedRelations(); };
+    const retry = () => { void flushAcceptedRelations(); void flushDiagnostics(); };
     retry();
     window.addEventListener('online', retry);
     const timer = window.setInterval(retry, 30000);
@@ -129,7 +145,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
         applyGameAction(prev, { type: 'placeCard', cardName, coordinates })
       );
     },
-    []
+    [setGameState]
   );
 
   const handleUpsertSemanticEdge = useCallback(
@@ -147,32 +163,32 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
         })
       );
     },
-    []
+    [setGameState]
   );
 
   const handleRemoveSemanticEdge = useCallback((neighborCardInstanceId: string) => {
     setGameState((prev) =>
       applyGameAction(prev, { type: 'removeSemanticEdge', neighborCardInstanceId })
     );
-  }, []);
+  }, [setGameState]);
 
   const handleSubmitSemanticMove = useCallback(() => {
     setGameState((prev) =>
       withLocalPendingVote(applyGameAction(prev, { type: 'submitSemanticMove' }))
     );
-  }, []);
+  }, [setGameState]);
 
   const handleCancelPendingMove = useCallback(() => {
     setGameState((prev) => applyGameAction(prev, { type: 'cancelPendingMove' }));
-  }, []);
+  }, [setGameState]);
 
   const resetGame = useCallback((playerCount = localPlayerCount, deckId = localDeckId) => {
     const normalizedPlayerCount = normalizePlayerCount(playerCount);
     const deckDefinition = getDeckDefinitionById(deckId) ?? DEFAULT_DECK;
     setLocalPlayerCount(normalizedPlayerCount);
     setLocalDeckId(deckDefinition.id);
-    setGameState(initializeGame(normalizedPlayerCount, deckDefinition));
-  }, [localDeckId, localPlayerCount]);
+    setGameState(initializeGame(normalizedPlayerCount, deckDefinition), 'start');
+  }, [localDeckId, localPlayerCount, setGameState]);
 
   const voteOnPendingMove = useCallback((vote: LocalVote) => {
     setGameState((prev) => {
@@ -210,7 +226,7 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
         pendingMove,
       };
     });
-  }, []);
+  }, [setGameState]);
 
   const handleConfirmCard = useCallback(() => {
     voteOnPendingMove('accept');
@@ -227,33 +243,33 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
         playerIndex: prev.currentPlayerIndex,
       })
     );
-  }, []);
+  }, [setGameState]);
 
   const handlePassTurn = useCallback(() => {
     setGameState(prev => applyGameAction(prev, { type: 'passTurn' }));
-  }, []);
+  }, [setGameState]);
   const handleRequestFinish = useCallback(() => {
     setGameState(prev => applyGameAction(prev, { type: 'requestFinish' }));
-  }, []);
+  }, [setGameState]);
   const handleVoteFinish = useCallback((accept: boolean) => {
     setGameState(prev => {
       const playerIndex = getNextFinishVoter(prev);
       return playerIndex === null || playerIndex < 0 ? prev
         : applyGameAction(prev, { type: 'voteFinish', playerIndex, accept });
     });
-  }, []);
+  }, [setGameState]);
 
   const handleApproveCross = useCallback(() => {
     setGameState((prev) => applyGameAction(prev, { type: 'approveCross' }));
-  }, []);
+  }, [setGameState]);
 
   const handleRejectCross = useCallback(() => {
     setGameState((prev) => applyGameAction(prev, { type: 'rejectCross' }));
-  }, []);
+  }, [setGameState]);
 
   return {
     restoreLocalGame: (saved) => {
-      setGameState(resolveEmptyHands(saved));
+      setGameState(resolveEmptyHands(saved), 'resume');
       setLocalPlayerCount(saved.players.length);
     },
     gameState,

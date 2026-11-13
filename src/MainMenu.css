@@ -13,7 +13,8 @@
   color: #eeeede;
 }
 .main-menu-updates {
-  position: absolute;
+  position: fixed;
+  z-index: 10;
   left: clamp(12px, 2vw, 32px);
   bottom: clamp(12px, 2vw, 32px);
   width: min(280px, calc(100% - 24px));
@@ -24,6 +25,7 @@
   border: 1px solid rgba(202, 214, 214, 0.14);
   border-radius: 8px;
   background: rgba(13, 20, 22, 0.25);
+  box-shadow: 0 6px 24px #0003;
   color: #c7d0d0;
   text-align: left;
 }
@@ -88,4 +90,11 @@
   .main-menu-updates-toggle { font-size: 12px; }
   .main-menu-updates-list { margin-top: 6px; padding-left: 0; list-style: none; font-size: 11px; line-height: 1.25; }
   .main-menu-updates-list li + li { margin-top: 4px; }
+}
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .main-menu-updates { left: 12px; right: 12px; bottom: 12px; width: auto; max-height: var(--menu-updates-space, min(240px, 30dvh)); padding: 12px 14px; background: #1b2325e6; }
+  .main-menu-updates-toggle { font-size: 16px; }
+  .main-menu-updates-list { margin-top: 10px; font-size: 14px; line-height: 1.5; }
+  .main-menu-updates-list li + li { margin-top: 7px; }
 }

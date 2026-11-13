@@ -34,3 +34,6 @@ __pycache__/
 *.jks
 *.keystore
 key.properties
+
+# Owner-only diagnostic/data exports are not application source.
+private-exports/

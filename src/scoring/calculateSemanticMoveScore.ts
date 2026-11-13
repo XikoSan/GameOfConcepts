@@ -1,8 +1,9 @@
 // Semantic scoring entry point. Accepted edge order matters for incremental node/path bonuses; physical adjacency alone never scores.
 import type { SemanticEdge, SemanticEdgeScore } from '../types';
 import { endMeasure, startMeasure } from '../debug/performanceDiagnostics';
-import { continuesSemanticNode } from './semanticNodes';
-import { continuesSemanticPath, isSemanticEdgeGeometryValid } from './semanticPaths';
+import { checkSemanticNodeContinuation } from './semanticNodes';
+import { checkSemanticPathContinuation, isSemanticEdgeGeometryValid } from './semanticPaths';
+import { createScoreExplanation } from './scoreEvidence';
 import { createSemanticEdgeFromPending } from './semanticRelations';
 import type { CalculateSemanticMoveScoreArgs, SemanticMoveScore } from './types';
 
@@ -38,15 +39,16 @@ export function calculateSemanticMoveScore({
         placedCard
       );
       const isValidGeometry = isSemanticEdgeGeometryValid(board, semanticEdge);
-      const continuesPath =
-        isValidGeometry &&
-        continuesSemanticPath(board, semanticEdge, graphEdges, activeSeatIndex);
-      const continuesNode =
-        isValidGeometry &&
-        continuesSemanticNode(board, semanticEdge, graphEdges, activeSeatIndex);
+      const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
+        : { continuesPath: false, reason: 'no-compatible-edge' as const, matchedEdgeIds: [] };
+      const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
+        : { continuesNode: false, outerCardIds: [], matchedEdgeIds: [] };
+      const continuesPath = pathCheck.continuesPath;
+      const continuesNode = nodeCheck.continuesNode;
       const pathBonus = continuesPath ? 1 : 0;
       const nodeBonus = continuesNode ? 1 : 0;
       const total = (1 + pathBonus + nodeBonus) as 1 | 2 | 3;
+      const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeCheck) : undefined;
 
       if (isValidGeometry) {
         graphEdges.push(semanticEdge);
@@ -60,6 +62,7 @@ export function calculateSemanticMoveScore({
         total,
         continuesPath,
         continuesNode,
+        ...(explanation ? { explanation } : {}),
       };
     });
 

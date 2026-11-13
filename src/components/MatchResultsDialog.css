@@ -331,6 +331,11 @@
   overflow-x: auto;
 }
 
+/* The same metrics become vertical cards on phones, rather than a squeezed table. */
+.match-results-mobile-players {
+  display: none;
+}
+
 .match-results-table {
   width: 100%;
   border-collapse: collapse;
@@ -451,9 +456,180 @@
   margin-top: 0;
 }
 
+.match-results-popup .match-results-back {
+  margin-top: 20px;
+}
+
 @media (max-width: 1100px) {
   .match-results-grid,
   .match-results-player-details {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px), (max-width: 1200px) and (max-height: 600px), (pointer: coarse) and (max-height: 600px) {
+  .app-container .modal-overlay:has(.match-results) {
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .app-container .modal-window:has(.match-results) {
+    min-width: 0;
+    max-width: 100%;
+    max-height: calc(100dvh - max(8px, env(safe-area-inset-top)) - max(8px, env(safe-area-inset-bottom)));
+  }
+
+  .app-container .modal-window:has(.match-results) > .modal-header {
+    padding: 10px 12px;
+  }
+
+  .app-container .modal-window:has(.match-results) .modal-close-button {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .app-container .modal-window:has(.match-results) > .modal-content {
+    min-width: 0;
+    max-height: none;
+    padding: 0;
+  }
+
+  .app-container .modal-window:has(.match-results-popup) > .modal-content {
+    padding: 16px;
+    overflow-x: hidden;
+  }
+
+  .match-results,
+  .match-results p,
+  .match-results li {
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+
+  .match-results .match-results-body {
+    padding: 14px 12px 18px;
+    overflow-x: hidden;
+  }
+
+  .match-results button,
+  .match-results button.match-results-details {
+    min-height: 44px;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 15px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .match-results .match-results-scores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .match-results .match-results-scores li {
+    padding: 8px;
+  }
+
+  .match-results-sections > button {
+    flex: 1;
+  }
+
+  .match-results-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .match-results-panel {
+    padding: 14px;
+  }
+
+  .match-results-chart-row {
+    grid-template-columns: minmax(0, 1.2fr) minmax(60px, 1fr);
+    gap: 8px;
+    font-size: 15px;
+  }
+
+  .match-results-feature,
+  .match-results-concept {
+    font-size: 22px;
+  }
+
+  .match-results-feature > strong:first-child {
+    min-width: 0;
+  }
+
+  .match-results-table-wrap {
+    display: none;
+  }
+
+  .match-results-mobile-players {
+    display: grid;
+    gap: 12px;
+  }
+
+  .match-results-player-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .match-results-player-heading > button {
+    text-align: left;
+    font-weight: 700;
+    padding: 8px 10px;
+  }
+
+  .match-results-player-heading > strong {
+    flex: 0 0 auto;
+  }
+
+  .match-results-player-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .match-results-player-metrics > div {
+    min-width: 0;
+    border-top: 1px solid #454d4d;
+    padding-top: 8px;
+  }
+
+  .match-results-player-metrics dt {
+    color: #b6b9b6;
+    font-size: 14px;
+  }
+
+  .match-results-player-metrics dd {
+    margin-top: 3px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .match-results-player-favorite {
+    grid-column: 1 / -1;
+  }
+
+  .match-results-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .match-results-footer > button,
+  .match-results-footer > div {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .match-results-footer > div {
+    gap: 8px;
+  }
+
+  .match-results-footer > div > button {
+    flex: 1;
+    padding-inline: 8px;
   }
 }

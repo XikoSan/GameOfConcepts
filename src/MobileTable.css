@@ -189,55 +189,118 @@
 
 /* Portrait controls overlay the board so changing a move never resizes the camera. */
 @media (max-width: 900px) and (orientation: portrait) {
-  .app-container { --mobile-dock-height: 176px; }
+  .app-container { --mobile-dock-height: 216px; }
+  .app-container .main-menu {
+    --menu-updates-space: clamp(128px, calc(50dvh - 182px), 240px);
+    justify-content: flex-end;
+    padding: 16px 16px calc(var(--menu-updates-space) + 24px);
+  }
+  .app-container .main-menu > h1,
+  .app-container .main-menu > .main-menu-actions,
+  .app-container .main-menu > .main-menu-footer { flex-shrink: 0; }
+  .app-container .table-hand-tray:has(.player-hand.player-0) { --hand-accent: #386b95; }
+  .app-container .table-hand-tray:has(.player-hand.player-1) { --hand-accent: #98713e; }
+  .app-container .table-hand-tray:has(.player-hand.player-2) { --hand-accent: #49765b; }
+  .app-container .table-hand-tray:has(.player-hand.player-3) { --hand-accent: #75648e; }
+  .app-container .table-hand-tray:not(.has-mobile-actions)::after {
+    content: ''; position: absolute; left: 6px; right: 6px; bottom: 8px; height: 44px;
+    box-sizing: border-box; pointer-events: none; z-index: 0;
+    background: color-mix(in srgb, var(--hand-accent, #386b95) 55%, #303b40);
+    border: 1px solid color-mix(in srgb, var(--hand-accent, #386b95) 70%, #3e4b52);
+    border-top-color: #ffffff35; border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 5px #202a3020;
+  }
   .app-container .table-status-bar { grid-template-columns: minmax(0, 1fr) 58px; gap: 5px; min-height: 42px; }
-  .app-container .table-players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: visible; }
+  .app-container .table-players { display: grid; grid-template-columns: repeat(var(--other-player-count, 1), minmax(0, 1fr)); overflow: visible; }
+  .app-container .table-players .score-row:not(.active-score) { grid-row: 1; }
+  .app-container .table-players .active-score { grid-column: 1 / -1; grid-row: 2; }
   .app-container .table-players .score-row { padding: 5px; min-height: 38px; }
   .app-container .player-score-content .player-score-status { font-size: 7px; }
   .app-container .table-menu { position: relative; display: block; align-self: stretch; z-index: 100; }
   .app-container .table-menu-toggle { display: block; width: 100%; height: 100%; }
   .app-container .table-menu-items { display: none; }
   .app-container .table-menu.is-open .table-menu-items { position: absolute; top: calc(100% + 6px); right: 0; display: grid; grid-template-columns: 1fr; width: 180px; padding: 6px; gap: 6px; border: 1px solid #53595b; border-radius: 8px; background: #292e2f; box-shadow: 0 6px 20px #0005; }
+  .app-container .table-workspace { --mobile-control-extent: var(--mobile-hand-extent, 166px); }
+  .app-container .table-workspace:has(.has-mobile-actions) { --mobile-control-extent: var(--mobile-overlay-height, 166px); }
   .app-container .table-center { position: relative; gap: 0; }
   .app-container .table-hand-tray {
     position: absolute; inset: auto 0 0; z-index: 45; height: var(--mobile-dock-height);
     padding: 0; align-items: stretch; border: 0; border-radius: 0; overflow: visible;
-    background: linear-gradient(0deg, #202425d9, #20242530 55%, transparent); pointer-events: none;
+    background: none; pointer-events: none;
   }
   .app-container .table-hand-tray .player-hand { padding: 0; align-self: stretch; }
   .app-container .table-hand-tray .hand-content,
   .app-container .table-hand-tray .hand-main-group { height: 100%; }
   .app-container .table-hand-tray .cards-container.fan-hand {
-    --fan-card-width: clamp(96px, 29vw, 128px); --fan-step: min(58px, 14vw);
-    position: relative; display: block; height: 100%; width: 100%; padding: 0; overflow: visible;
+    position: absolute; bottom: 52px; left: 6px; display: flex; flex-wrap: wrap;
+    align-content: center; align-items: center; justify-content: space-evenly;
+    height: auto; min-height: 64px; width: calc(100% - 12px); padding: 8px; box-sizing: border-box; gap: 4px 6px; overflow: visible;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--hand-accent, #386b95) 16%, #f1eddf), color-mix(in srgb, var(--hand-accent, #386b95) 28%, #e6e2d7));
+    border: 1px solid color-mix(in srgb, var(--hand-accent, #386b95) 30%, #c9c9bd); border-bottom: 0; border-radius: 12px 12px 0 0;
+    box-shadow: inset 0 1px 0 #fff8, 0 -2px 12px #3d413508;
     touch-action: none; scroll-snap-type: none;
   }
-  .app-container .table-hand-tray .fan-hand .card,
-  .app-container .table-hand-tray .fan-hand .hidden-hand-card {
-    position: absolute; left: calc(50% + var(--fan-offset) * var(--fan-step) - var(--fan-card-width) / 2);
-    bottom: 16px; flex: none; width: var(--fan-card-width); min-width: 0; height: 130px; min-height: 130px;
-    padding: 10px 8px; touch-action: none; pointer-events: auto; z-index: calc(10 + var(--fan-index));
-    transform-origin: 50% 135%; transform: translateY(calc(var(--fan-offset) * var(--fan-offset) * 2px)) rotate(calc(var(--fan-offset) * 3deg));
-    transition: transform .16s ease, filter .16s ease, box-shadow .16s ease;
-    border-radius: 8px; box-shadow: 0 5px 14px #0005, inset 0 1px 0 #ffffff21;
+  .app-container .word-hand-slot {
+    position: relative; display: flex; align-items: center; justify-content: center;
+    flex: 0 0 auto; width: min(var(--word-slot-width, 100%), 100%);
+    min-width: 0; height: 44px; pointer-events: none;
   }
-  .app-container .table-hand-tray .fan-hand .card.is-inspected {
-    --fan-card-width: clamp(150px, 46vw, 184px);
-    left: clamp(8px, calc(50% + var(--fan-offset) * var(--fan-step) - var(--fan-card-width) / 2), calc(100% - var(--fan-card-width) - 8px));
-    z-index: 30; transform: translateY(-30px) rotate(0deg);
-    box-shadow: 0 0 0 1px #ead39a, 0 12px 24px #0007; filter: brightness(1.12);
+  .app-container .word-hand .card.player-blue { --word-accent: #467895; }
+  .app-container .word-hand .card.player-orange { --word-accent: #a67b40; }
+  .app-container .word-hand .card.player-green { --word-accent: #578166; }
+  .app-container .word-hand .card.player-purple { --word-accent: #806b9c; }
+  /* Slots keep touch targets apart; only the text-sized backing is rotated. */
+  .app-container .table-hand-tray .word-hand .card {
+    position: absolute; left: calc(var(--word-x) * 100%); top: 50%; bottom: auto; flex: none;
+    width: max-content; max-width: min(196px, calc(100% - 16px)); min-width: 44px; height: 100%; min-height: 44px;
+    max-height: none; padding: 0; border: 0; border-radius: 0;
+    background: none; box-shadow: none; filter: none; container-type: normal;
+    transform: translate(calc(var(--word-x) * -100%), -50%);
+    display: flex; align-items: center; justify-content: center;
+    touch-action: none; pointer-events: auto; transition: none; z-index: 1;
   }
-  .app-container .table-hand-tray .fan-hand.is-hand-dragging .card:not(.is-inspected) { transform: translateY(16px) rotate(calc(var(--fan-offset) * 3deg)); }
+  .app-container .table-hand-tray .word-hand .card::before,
+  .app-container .table-hand-tray .word-hand .card::after { content: none; }
+  .app-container .table-hand-tray .word-hand .card .card-title {
+    position: static; width: max-content; height: max-content; max-width: none;
+    display: block; padding: 2px 6px; box-sizing: border-box;
+    writing-mode: horizontal-tb;
+    transform: rotate(var(--word-tilt));
+    font-size: 18px; font-weight: 600; line-height: 1; white-space: nowrap;
+    text-overflow: clip; overflow: visible; border: 1px solid color-mix(in srgb, var(--word-accent) 30%, #c7c4b9); border-radius: 4px;
+    color: #303a40; background: color-mix(in srgb, var(--word-accent) 10%, #fffaf0); text-shadow: none;
+    box-shadow: 0 2px 1px color-mix(in srgb, var(--word-accent) 32%, transparent), 0 4px 9px color-mix(in srgb, var(--word-accent) 40%, transparent);
+    transition: background .15s ease, box-shadow .15s ease;
+  }
+  .app-container .table-hand-tray .word-hand .card.is-inspected {
+    z-index: 3;
+  }
+  .app-container .table-hand-tray .word-hand .card.is-inspected .card-title {
+    background: color-mix(in srgb, var(--word-accent) 15%, #fffaf0); border-color: var(--word-accent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--word-accent) 55%, transparent), 0 4px 13px color-mix(in srgb, var(--word-accent) 60%, transparent);
+  }
+  .app-container .table-hand-tray .word-hand .card:focus-visible { outline: none; }
+  .app-container .table-hand-tray .word-hand .card:focus-visible .card-title { outline: 2px solid var(--word-accent); outline-offset: 2px; }
   .app-container .table-hand-tray .fan-hand.is-hand-dragging .card { pointer-events: none; }
-  .app-container .table-hand-tray .deck-stack { left: 12px; top: 0; bottom: auto; height: 34px; gap: 8px; padding: 4px 7px; border-radius: 6px; background: #292e2feb; box-sizing: border-box; z-index: 40; }
-  .app-container .table-hand-tray .deck-card-back { width: 25px; height: 28px; font-size: 13px; }
-  .app-container .hand-actions { top: 0; right: 12px; bottom: auto; height: 34px; flex-direction: row; pointer-events: auto; padding: 0 6px 0 0; border-radius: 6px; background: #292e2feb; z-index: 40; }
-  .app-container .hand-actions > .hand-redraw-button { width: 34px; height: 34px; min-height: 34px; }
-  .app-container .hand-redraw-caption { margin: 0; font-size: 10px; }
-  .app-container .board-tools { bottom: calc(var(--mobile-dock-height) + 10px); }
+  .app-container .table-hand-tray .fan-hand.is-hand-dragging .card.is-inspected { opacity: 0; }
+  .app-container .table-hand-tray .deck-stack { left: 14px; top: auto; bottom: 8px; height: 44px; gap: 6px; padding: 6px 8px; border-radius: 0; background: none; color: #f5f1e7; box-sizing: border-box; z-index: 40; }
+  .app-container .table-hand-tray .deck-card-back { width: 21px; height: 21px; font-size: 13px; min-height: 0; background: #ffffff12; color: #f5f1e7; border-color: #ffffff40; box-shadow: none; border-radius: 4px; }
+  .app-container .table-hand-tray .deck-stack p { font-size: 13px; margin: 0; color: inherit; }
+  .app-container .hand-actions { top: auto; right: 14px; bottom: 8px; height: 44px; flex-direction: row; pointer-events: auto; padding: 0; gap: 5px; border-radius: 0; background: none; border-left: 1px solid #ffffff20; z-index: 40; }
+  .app-container .hand-actions > .hand-redraw-button.hand-redraw-text { min-height: 44px; height: 44px; padding: 8px 10px; color: #f5f1e7; background: none; box-shadow: none; border: 0; }
+  .app-container .hand-actions > .hand-redraw-button { width: 26px; height: 32px; min-height: 32px; min-width: 0; padding: 3px; border: 0; background: none; box-shadow: none; }
+  .app-container .hand-redraw-button svg { width: 19px; height: 19px; }
+  .app-container .hand-redraw-caption { margin: 0; font-size: 13px; }
+  .app-container .board-tools,
+  .app-container .table-center:has(.has-mobile-actions) .board-tools { inset: 8px; }
+  .app-container .board-tools .center-board-button { position: absolute; left: 0; bottom: calc(var(--mobile-control-extent) + 4px); min-width: 32px; min-height: 32px; padding: 5px; }
+  .app-container .board-tools .center-board-button svg { width: 19px; height: 19px; }
+  .app-container .board-tools .match-finish-tools { position: absolute; left: 0; top: 0; max-width: calc(100% - 44px); margin: 0; }
+  .app-container .match-finish-tools > button { min-height: 32px; padding: 6px 8px; font-size: 12px; }
+  .app-container .mobile-sidebar-tabs { top: auto; right: 8px; bottom: calc(var(--mobile-control-extent, var(--mobile-hand-extent, 166px)) + 12px); flex-direction: column; align-items: stretch; gap: 8px; }
+  .app-container .mobile-sidebar-tabs button { min-height: 32px; padding: 5px 9px; font-size: 13px; }
   .app-container .table-hand-tray.has-mobile-actions { height: auto; max-height: 52dvh; padding: 10px; border: 1px solid #535d60; border-radius: 12px 12px 7px 7px; background: #2b3236f5; box-shadow: 0 -6px 24px #0003; pointer-events: auto; overflow: hidden; }
   .app-container .has-mobile-actions .mobile-action-dock { height: auto; max-height: calc(52dvh - 22px); }
-  .app-container .table-center:has(.has-mobile-actions) .board-tools { bottom: auto; top: 56px; }
   .app-container .mobile-sidebar { width: min(320px, calc(100% - 36px)); bottom: 0; }
   .app-container .mobile-sidebar-dismiss { bottom: 0; }
   .mobile-action-dock .semantic-relation-popover { display: flex; flex-direction: column; gap: 7px; min-height: 0; }

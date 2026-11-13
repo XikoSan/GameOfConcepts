@@ -151,6 +151,10 @@
 .hand-redraw-button svg { transition: transform 240ms ease; }
 .hand-redraw-button:not(:disabled):hover svg { transform: rotate(35deg); }
 .hand-redraw-button:not(:disabled):active svg { transform: rotate(90deg); }
+.app-container .hand-actions > .hand-redraw-button.hand-redraw-text {
+  width: auto; height: auto; min-height: 40px; padding: 8px 10px;
+  font-size: 13px; font-weight: 600; white-space: nowrap; border-radius: 6px;
+}
 @media (prefers-reduced-motion: reduce) {
   .app-container .hand-actions > .hand-redraw-button,
   .hand-redraw-button svg { transition: none; }
