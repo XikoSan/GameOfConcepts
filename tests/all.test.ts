@@ -15,3 +15,5 @@ import './score-explanations.test';
 import './export-diagnostics.test.mjs';
 import './score-preview.test';
 import './diagnostics.test';
+import './glossary.test';
+import './score-detail-rows.test';

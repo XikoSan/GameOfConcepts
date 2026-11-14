@@ -1,0 +1,10 @@
+.concept-other-meanings { text-align: left; margin: 12px 0; }
+.concept-other-meanings h4 { margin: 0 0 6px; font-size: 14px; color: #d8c48e; }
+.concept-other-meanings ul { padding-left: 18px; margin: 0; }
+.concept-other-meanings li { margin: 5px 0; line-height: 1.45; }
+.concept-references { display: grid; gap: 8px; width: 100%; }
+.concept-source-links { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.concept-references .concept-report-button { justify-self: start; color: #c6ceca; background: transparent; border: 1px solid #69716c; border-radius: 5px; min-height: 36px; padding: 6px 9px; font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
+.concept-references a { overflow-wrap: anywhere; }
+.modal-overlay:has(.concept-report-dialog) { z-index: 3500; }
+@media(max-width:900px) { .concept-references .concept-report-button, .concept-source-links a { min-height: 44px; display: inline-flex; align-items: center; } }

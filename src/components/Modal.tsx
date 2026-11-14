@@ -78,6 +78,8 @@ export function Modal({
     <div
       ref={overlayRef}
       className="modal-overlay"
+      onPointerDown={(event) => event.stopPropagation()}
+      onClick={(event) => event.stopPropagation()}
       onMouseDown={(event) => {
         event.stopPropagation();
         if (closeOnOverlayClick) onClose();

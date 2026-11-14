@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createTrainingState, trainingReducer, suggestedTrainingMove, TRAINING_HAND, TRAINING_RESERVE, type TrainingState } from '../src/tutorial/trainingGame';
+import { createTrainingState, restoreTrainingState, trainingReducer, suggestedTrainingMove, TRAINING_HAND, TRAINING_RESERVE, TRAINING_NODE_CARD, type TrainingState } from '../src/tutorial/trainingGame';
 import { RELATION_PRESETS } from '../src/scoring/semanticRelations';
 const kind = RELATION_PRESETS.find(r => r.family === 'kind')!;
 const advance = (state: TrainingState) => {
@@ -60,9 +60,8 @@ test('all five openings and four placements lead to a real node and personal pat
       assert.equal(state.phase, 'place');
       const move = suggestedTrainingMove(state);
       assert.ok(move, `No continuation for ${name}: ${state.phase}`);
-      const neighbor = Object.values(state.game.board).find(c => c.cardName === move.neighbor)!;
       state = trainingReducer(state, { type: 'place', name: move.name, position: move.position });
-      state = trainingReducer(state, { type: 'relation', neighbor: neighbor.id, relation: move.relation, direction: 'new-to-neighbor' });
+      for (const connection of move.connections) state = trainingReducer(state, { type: 'relation', neighbor: connection.neighborId, relation: connection.relation, direction: connection.direction });
       state = advance(submit(state));
     }
     assert.equal(state.phase, 'complete', name);
@@ -70,7 +69,55 @@ test('all five openings and four placements lead to a real node and personal pat
     assert.equal(state.sawNode, true);
     assert.ok(state.game.scores[1] > 0);
     assert.ok(state.game.log.length >= 4);
+    const awards = Object.values(state.game.logDetails ?? {}).filter(detail => detail.score.playerId === 0)
+      .flatMap(detail => detail.score.semanticScore?.edges ?? []);
+    const nodes = awards.filter(award => award.nodeBonus);
+    assert.ok(nodes.length);
+    assert.ok(nodes.every(award => award.explanation?.node?.center.name === TRAINING_NODE_CARD));
+    assert.ok(nodes.some(award => award.explanation?.node?.outerCards.some(card => card.ownerSeatIndex === 1)));
+    const centers = Object.values(state.game.board).filter(card => card.cardName === TRAINING_NODE_CARD);
+    assert.equal(centers.length, 1);
+    assert.equal(centers[0].definitionId, 'emotion-state');
+    assert.ok(state.game.deckSnapshot?.cards?.some(card => card.id === centers[0].definitionId));
+    const playerMoves = Object.values(state.game.logDetails ?? {}).filter(detail => detail.score.playerId === 0);
+    assert.ok(playerMoves.findIndex(detail => detail.score.semanticScore?.edges.some(edge => edge.pathBonus)) <
+      playerMoves.findIndex(detail => detail.score.semanticScore?.edges.some(edge => edge.nodeBonus)));
   }
+});
+test('the lesson keeps its prepared center until a real node has at least two compatible links', () => {
+  let state = advance(submit(opening()));
+  while (!state.sawPath) {
+    const move = suggestedTrainingMove(state)!;
+    state = trainingReducer(state, { type: 'place', name: move.name, position: move.position });
+    for (const connection of move.connections) state = trainingReducer(state, { type: 'relation', neighbor: connection.neighborId, relation: connection.relation, direction: connection.direction });
+    state = advance(submit(state));
+  }
+  const move = suggestedTrainingMove(state)!;
+  assert.equal(move.name, TRAINING_NODE_CARD);
+  assert.ok(move.connections.length >= 2);
+  state = trainingReducer(state, { type: 'place', name: move.name, position: move.position });
+  const first = move.connections[0];
+  state = trainingReducer(state, { type: 'relation', neighbor: first.neighborId, relation: first.relation, direction: first.direction });
+  const score = state.game.scores[0];
+  state = trainingReducer(state, { type: 'submit' });
+  assert.equal(state.phase, 'relation');
+  assert.match(state.feedback, /как минимум две/);
+  assert.equal(state.game.scores[0], score);
+  assert.equal(state.sawNode, false);
+  state = trainingReducer(state, { type: 'cancel' });
+  assert.ok(state.game.players[0].cards.includes(TRAINING_NODE_CARD));
+});
+test('new lesson saves resume unchanged; incompatible neutral-center lessons restart with an explanation', () => {
+  const current = advance(submit(opening()));
+  const saved = JSON.parse(JSON.stringify(current)) as TrainingState;
+  assert.equal(restoreTrainingState(saved), saved);
+  delete saved.scenarioVersion;
+  const restored = restoreTrainingState(saved);
+  assert.equal(restored.phase, 'intro');
+  assert.equal(restored.moves, 0);
+  assert.equal(restored.scenarioVersion, 2);
+  assert.match(restored.feedback, /Правило узла изменилось/);
+  assert.deepEqual(restored.game.players[0].cards, TRAINING_HAND);
 });
 test('cancel and restart preserve isolation; late acceptance cannot affect restarted lesson', () => {
   let state = trainingReducer(opening(), { type: 'cancel' });

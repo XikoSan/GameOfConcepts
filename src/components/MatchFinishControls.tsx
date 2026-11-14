@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { getPassAvailability, isDrawPileExhausted, type GameState } from '../game';
+import { getFinalTurnPlayerIndex, getPassAvailability, isDrawPileExhausted, type GameState } from '../game';
 import { Modal } from './Modal';
 import { MatchResultsDialog } from './MatchResultsDialog';
 import './MatchFinishControls.css';
@@ -47,7 +47,8 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
   const voter = online ? localPlayerIndex : nextVoter;
   const canVote = Boolean(pending && voter !== null && voter >= 0 && !Object.hasOwn(pending.votes, String(voter)));
   const passLimit = game.players.length - 1;
-  const passWillFinish = (game.consecutivePasses ?? 0) + 1 >= passLimit;
+  const finalSeat = getFinalTurnPlayerIndex(game);
+  const passWillFinish = finalSeat !== null || (game.consecutivePasses ?? 0) + 1 >= passLimit;
   const visibleError = actionError || (attemptedAction ? error : null);
 
   const runAction = async (action: () => void | Promise<void>) => {
@@ -73,6 +74,7 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
 
   return <>
     <div className="match-finish-tools">
+      {finalSeat !== null && <span className="match-final-turn" role="status">Завершающий ход: {playerName(finalSeat)}</span>}
       {game.gameOver ? <button ref={resultsButtonRef} type="button" onClick={() => setResultHidden(false)}>Итоги партии</button>
         : pending ? <button type="button" onClick={() => setHiddenVoteId(null)}>Голосование о завершении</button>
           : exhausted ? <button type="button" disabled={!enabled || !availability.canPass || busy} title={availability.reason || 'Пропустить ход'} onClick={() => openConfirmation('pass')}>Пас</button>
@@ -83,8 +85,8 @@ export function MatchFinishControls({ game, players, localPlayerIndex, online, a
     {active && confirmation && !pending && !game.gameOver && <Modal title={confirmation === 'pass' ? 'Спасовать?' : 'Завершить по согласию?'} onClose={() => { if (!busy) setConfirmation(null); }}>
       <div className="match-finish-dialog">
         {confirmation === 'pass' ? <>
-          <p>Колода закончилась. Пас передаёт ход без розыгрыша карты.</p>
-          <p>{game.players.length === 2 ? 'Вдвоём один пас сразу завершает партию.' : `${passLimit} паса подряд завершают партию: оставшийся игрок не получает одиночного хода. Принятый ход сбрасывает серию пасов.`}</p>
+          <p>{finalSeat !== null ? 'Колода закончилась. Можно пропустить завершающий ход без розыгрыша карты.' : 'Колода закончилась. Пас передаёт ход без розыгрыша карты.'}</p>
+          <p>{finalSeat !== null ? 'Карты остались только у вас. Это завершающий ход: можно сыграть одну карту или спасовать. После принятия карты или паса партия закончится.' : game.players.length === 2 ? 'Вдвоём один пас сразу завершает партию.' : `${passLimit} паса подряд завершают партию. Принятый ход сбрасывает серию пасов.`}</p>
           <p><strong>{passWillFinish ? 'Этот пас завершит партию. Победитель определяется по текущим очкам.' : `Пасов подряд сейчас: ${game.consecutivePasses ?? 0} из ${passLimit}.`}</strong></p>
         </> : <p>Предложить закончить партию сейчас и сравнить набранные очки? Нужно согласие всех игроков. Если кто-то откажется, партия продолжится с текущего хода.</p>}
         {errorMessage}

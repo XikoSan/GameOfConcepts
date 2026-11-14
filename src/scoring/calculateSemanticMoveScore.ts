@@ -41,7 +41,7 @@ export function calculateSemanticMoveScore({
       const isValidGeometry = isSemanticEdgeGeometryValid(board, semanticEdge);
       const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
         : { continuesPath: false, reason: 'no-compatible-edge' as const, matchedEdgeIds: [] };
-      const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
+      const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex, pendingMove.cardId)
         : { continuesNode: false, outerCardIds: [], matchedEdgeIds: [] };
       const continuesPath = pathCheck.continuesPath;
       const continuesNode = nodeCheck.continuesNode;

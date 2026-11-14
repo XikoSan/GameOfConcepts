@@ -1,39 +1,39 @@
-.score-details { min-width: 0; color: #e4e4da; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; text-align: left; }
-.score-details p, .score-details h4 { margin: 0; }
-.score-details .score-details-relation { color: #eee7d7; font-weight: 700; font-size: 14px; }
-.score-details-formula { display: flex; align-items: center; gap: 10px; margin-top: 8px; padding: 8px 10px; border: 1px solid #62634f; border-radius: 6px; background: #b59a5712; }
-.score-details-formula > strong { color: #e4c885; font-size: 20px; white-space: nowrap; }
-.score-details-formula > span { color: #d4d8cf; font-size: 13px; }
-.score-details > section { margin-top: 12px; }
-.score-details > section > h4 { margin-bottom: 4px; color: #e3cd96; font-size: 14px; line-height: 1.35; }
-.score-details > section > p { margin: 4px 0 0; font-size: 13px; color: #c4cbc4; line-height: 1.45; }
-.score-details > section > .score-details-chain { color: #f0e7d4; font-weight: 650; }
-.score-details ul { margin: 6px 0; padding-left: 18px; }
-.score-details li { margin: 4px 0; font-size: 13px; }
-.score-details .score-details-preview-note { color: #afb9b1; }
-.move-score-details > .score-details + .score-details { margin-top: 18px; padding-top: 18px; border-top: 1px solid #535b55; }
-.move-score-total { display: flex; justify-content: space-between; gap: 12px; margin: 16px 0 0; padding-top: 12px; border-top: 1px solid #535b55; }
-.move-score-total strong { color: #e4c885; }
+.score-details { min-width: 0; color: #e4e4da; font-size: 13px; line-height: 1.45; text-align: left; }
+.score-details .score-detail-rows { list-style: none; margin: 0; padding: 0; }
+.score-details .score-detail-row { display: grid; grid-template-columns: 24px 42px minmax(0, 1fr); align-items: baseline; gap: 7px; padding: 6px 0; margin: 0; }
+.score-detail-points { color: #e4c885; font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.score-detail-kind { color: #aebbb5; font-size: 12px; }
+.score-detail-content { min-width: 0; }
+.score-detail-chain { color: #eee7d7; }
+.score-detail-chain-part { display: inline-block; max-width: 100%; overflow-wrap: anywhere; vertical-align: top; }
+.score-detail-chain-part + .score-detail-chain-part { margin-left: 0.3em; }
+.score-detail-arrow { color: #c8b681; white-space: nowrap; }
+.score-detail-missing { color: #b6beb8; overflow-wrap: anywhere; }
+.score-detail-family { display: inline-block; margin: 0 6px 2px 0; padding: 0 4px; border: 1px solid #64756b88; border-radius: 3px; background: #72817718; color: #c7d1c5; font-size: 10px; line-height: 1.5; white-space: nowrap; text-decoration: none; vertical-align: baseline; }
+.score-detail-family-cause { border-color: #a68a5266; color: #ddc998; }
+.score-detail-family-kind { border-color: #7498ac66; color: #b6d2df; }
+.score-detail-family-part { border-color: #7b9e7666; color: #bed6b6; }
+.score-detail-family-property { border-color: #aa84ac66; color: #d8bfdb; }
+.score-detail-family-opposite { border-color: #b38a7866; color: #dfc2b4; }
+.score-details .score-detail-group-start { border-top: 1px solid #626b5c55; margin-top: 3px; padding-top: 9px; }
 .semantic-relation-popover .score-help-button, .score-help-button { flex: 0 0 44px; width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 4px; border: 1px solid #8b805f; border-radius: 50%; color: #e6d49b; background: #3a413c; font: inherit; font-weight: 800; font-size: 18px; cursor: pointer; }
 .score-help-button:focus-visible { outline: 2px solid #e4ca8a; outline-offset: 2px; }
 .score-explanation-dialog { color: #e4e4da; }
-.score-explanation-dialog .score-details-preview-note { color: #b8c0b7; font-size: 13px; margin: 16px 0; }
-.score-details-back { min-height: 44px; padding: 8px 12px; border: 1px solid #77806f; border-radius: 6px; color: #f1eddf; background: #3e5949; font: inherit; cursor: pointer; }
+.score-details-back { min-height: 44px; margin-top: 12px; padding: 8px 12px; border: 1px solid #77806f; border-radius: 6px; color: #f1eddf; background: #3e5949; font: inherit; cursor: pointer; }
 .modal-overlay:has(.score-explanation-dialog) { z-index: 3400; background: #05090988; }
-.modal-window:has(.score-explanation-dialog) { width: min(560px, 100%); background: #292e2f; border-color: #62675f; }
+.modal-window:has(.score-explanation-dialog) { width: min(500px, 100%); background: #292e2f; border-color: #62675f; }
 .modal-window:has(.score-explanation-dialog) .modal-close-button { width: 44px; height: 44px; min-width: 44px; flex-shrink: 0; }
 .semantic-score-preview-line { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .semantic-score-preview-line > small { min-width: 0; line-height: 1.4; }
 .semantic-score-preview-line .score-help-button { flex-shrink: 0; }
 .pending-score-summary { display: flex; align-items: center; gap: 6px; }
-.log-detail-popover:has(.score-details) { width: min(430px, calc(100vw - 24px)); max-height: min(620px, calc(100dvh - 24px)); overscroll-behavior: contain; touch-action: pan-y; }
-.log-detail-popover:has(.score-details) > header { position: sticky; top: -14px; margin: -14px -14px 0; padding: 10px 14px; background: #292e2f; z-index: 1; border-bottom: 1px solid #4b544b; }
+.log-detail-popover:has(.score-details) { width: min(460px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overscroll-behavior: contain; touch-action: pan-y; padding: 10px 12px; }
+.log-detail-popover:has(.score-details) > header { position: sticky; top: -10px; align-items: center; margin: -10px -12px 6px; padding: 4px 6px 4px 12px; background: #292e2f; z-index: 1; border-bottom: 1px solid #4b544b; }
+.log-detail-popover .log-detail-total { color: #e4c885; font-weight: 700; font-size: 15px; margin-left: auto; white-space: nowrap; }
 .log-detail-popover:has(.score-details) > header button { min-width: 44px; min-height: 44px; flex-shrink: 0; }
-.log-edge-detail + .log-edge-detail { margin-top: 18px; padding-top: 16px; border-top: 1px solid #4b544b; }
 @media (max-width: 900px) {
-  .log-detail-popover:has(.score-details) { font-size: 14px; }
-  .score-details, .score-details .score-details-relation { font-size: 15px; }
-  .score-details > section > p, .score-details li { font-size: 14px; }
+  .score-details { font-size: 14px; }
+  .score-details .score-detail-row { grid-template-columns: 24px 40px minmax(0, 1fr); gap: 5px; }
   .modal-overlay:has(.score-explanation-dialog) { padding: 8px; }
   .modal-window:has(.score-explanation-dialog) { max-height: calc(100dvh - 16px); }
   .modal-window:has(.score-explanation-dialog) > .modal-content { max-height: calc(100dvh - 94px); padding: 14px; overscroll-behavior: contain; }

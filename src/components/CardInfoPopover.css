@@ -33,7 +33,9 @@
   width: min(340px, calc(100vw - 24px));
   max-height: min(70vh, 460px);
   padding: 14px;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .card-info-popover-pinned.expanded {
@@ -111,12 +113,13 @@
 }
 
 .card-info-popover-pinned p {
-  max-height: min(34vh, 260px);
+  max-height: none;
+  overflow: visible;
   padding-right: 3px;
 }
 
 .card-info-popover-pinned.expanded p {
-  max-height: min(48vh, 430px);
+  max-height: none;
 }
 
 .card-info-relations {

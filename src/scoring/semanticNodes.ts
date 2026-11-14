@@ -22,37 +22,36 @@ export function checkSemanticNodeContinuation(
   board: BoardState,
   edge: SemanticEdge,
   graphEdges: readonly SemanticEdge[],
-  activeSeatIndex: number
+  activeSeatIndex: number,
+  newCardId: string,
 ): NodeContinuationCheck {
-  const possibleCenters = [edge.fromCardInstanceId, edge.toCardInstanceId];
+  const none: NodeContinuationCheck = { continuesNode: false, outerCardIds: [], matchedEdgeIds: [] };
+  // Only the played card can earn a node bonus; an old endpoint never becomes this move's center.
+  const centerCardId = newCardId;
+  if (getCardOwner(board, centerCardId) !== activeSeatIndex) return none;
+  const outerCardId = getOtherCardId(edge, centerCardId);
+  if (!outerCardId || getCardOwner(board, outerCardId) === undefined) return none;
+  const signature = getNodeConnectivitySignature(edge, centerCardId);
+  if (!signature) return none;
 
-  for (const centerCardId of possibleCenters) {
-    const outerCardId = getOtherCardId(edge, centerCardId);
-    if (!outerCardId || getCardOwner(board, outerCardId) !== activeSeatIndex) {
-      continue;
-    }
-
-    const signature = getNodeConnectivitySignature(edge, centerCardId);
-    if (!signature) continue;
-
-    for (const graphEdge of graphEdges) {
-      const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
-      if (!graphOuterCardId || graphOuterCardId === outerCardId) continue;
-      if (getCardOwner(board, graphOuterCardId) !== activeSeatIndex) continue;
-
-      if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) {
-        return { continuesNode: true, centerCardId, outerCardIds: [graphOuterCardId, outerCardId], matchedEdgeIds: [graphEdge.id] };
-      }
+  for (const graphEdge of graphEdges) {
+    // Count only earlier spokes of this move, regardless of their outer cards' owners.
+    if (graphEdge.createdAtMoveId !== edge.createdAtMoveId) continue;
+    const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
+    if (!graphOuterCardId || graphOuterCardId === outerCardId || getCardOwner(board, graphOuterCardId) === undefined) continue;
+    if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) {
+      return { continuesNode: true, centerCardId, outerCardIds: [graphOuterCardId, outerCardId], matchedEdgeIds: [graphEdge.id] };
     }
   }
-  return { continuesNode: false, outerCardIds: [], matchedEdgeIds: [] };
+  return none;
 }
 
 export function continuesSemanticNode(
   board: BoardState,
   edge: SemanticEdge,
   graphEdges: readonly SemanticEdge[],
-  activeSeatIndex: number
+  activeSeatIndex: number,
+  newCardId: string,
 ): boolean {
-  return checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex).continuesNode;
+  return checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex, newCardId).continuesNode;
 }

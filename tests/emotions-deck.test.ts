@@ -81,7 +81,7 @@ test('retired relations and malformed roles are rejected', () => {
   const presets = getRelationPresets(state.deckSnapshot);
   assert.equal(presets.length, 5);
   const cause = presets.find(r => r.family === 'cause')!;
-  const malformed = { ...cause, fromRole: 'property', toRole: 'property-bearer' } as SemanticRelation;
+  const malformed = { ...cause, fromRole: 'property', toRole: 'property-bearer' } as unknown as SemanticRelation;
   assert.equal(upsertPendingSemanticEdge(state, state.startCard.id, malformed, 'new-to-neighbor'), state);
   const good = upsertPendingSemanticEdge(state, state.startCard.id, cause, 'new-to-neighbor');
   const bad = structuredClone(good);
@@ -130,15 +130,15 @@ function score(relation: SemanticRelation, neutralCenter = false) {
         direction: 'neighbor-to-new', createdOrder: 0 }] } });
 }
 
-test('classic families keep path and node direction semantics and the +3 cap', () => {
+test('classic families keep path ownership and never reward adding a spoke to an old center', () => {
   for (const relation of getRelationPresets(initializeGame(2, EMOTIONS_DECK).deckSnapshot)) {
     const result = score(relation);
-    assert.equal(result.total, 3, relation.family);
+    assert.equal(result.total, 2, relation.family);
     assert.equal(result.edges[0].pathBonus, 1);
-    assert.equal(result.edges[0].nodeBonus, 1);
+    assert.equal(result.edges[0].nodeBonus, 0);
     const withNeutral = score(relation, true);
     assert.equal(withNeutral.edges[0].pathBonus, 0);
-    assert.equal(withNeutral.edges[0].nodeBonus, 1);
+    assert.equal(withNeutral.edges[0].nodeBonus, 0);
   }
   const opposite = getRelationPresets().find(r => r.family === 'opposite')!;
   assert.ok(isSymmetricRelation(opposite));

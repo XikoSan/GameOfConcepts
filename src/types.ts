@@ -264,7 +264,7 @@ export interface GameState {
   logDetails?: Record<number, { score: TurnScoreResult; relations: string[] }>;
   gameOver: boolean;
   consecutivePasses?: number;
-  endReason?: 'consecutive-passes' | 'empty-hands' | 'agreement';
+  endReason?: 'consecutive-passes' | 'empty-hands' | 'agreement' | 'final-turn';
   /** Finish votes use stable seat keys in both local and online games. */
   pendingFinish?: { id: string; requestedBy: number; votes: Record<string, boolean> } | null;
 }

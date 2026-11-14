@@ -6,6 +6,7 @@ import {
   type CardRelationLabel,
 } from '../scoring/semanticRelations';
 import type { ConceptSummary } from '../services/conceptDescriptionService';
+import { ConceptMeanings, ConceptReferences } from './ConceptReferences';
 import './CardInfoPopover.css';
 
 export type CardInfoPopoverMode = 'tooltip' | 'pinned';
@@ -51,7 +52,7 @@ function getCompactText(value: string): string {
 
 function getBodyText(status: CardInfoStatus, summary: ConceptSummary | null): string {
   if (status === 'loading') return 'Загрузка описания...';
-  if (status === 'error' || status === 'empty' || !summary) return 'Описание не найдено.';
+  if (status === 'error' || status === 'empty' || !summary) return 'Этого понятия пока нет в словаре игры.';
   return summary.extract;
 }
 
@@ -80,7 +81,7 @@ export function CardInfoPopover({
   const onMeasuredRectRef = useRef(onMeasuredRect);
   const countedHiddenMountRef = useRef(false);
   const fullText = getBodyText(status, summary);
-  const isLongDescription = status === 'ready' && fullText.length > COMPACT_TEXT_LENGTH;
+  const isLongDescription = status === 'ready' && (fullText.length > COMPACT_TEXT_LENGTH || Boolean(summary?.additionalMeanings.length));
   const visibleText =
     mode === 'tooltip' || !isExpanded ? getCompactText(fullText) : fullText;
   const style = {
@@ -168,6 +169,7 @@ export function CardInfoPopover({
       </div>
 
       <p>{visibleText}</p>
+      {mode === 'pinned' && isExpanded && summary && <ConceptMeanings summary={summary} />}
 
       {relationsExpanded && semanticRelations.length > 0 && (
         <section className="card-info-relations" aria-label="Смысловые связи карты">
@@ -202,9 +204,8 @@ export function CardInfoPopover({
               {isExpanded ? 'Свернуть' : 'Развернуть'}
             </button>
           )}
-          <a href={wiktionaryUrl} rel="noreferrer" target="_blank">
-            Викисловарь
-          </a>
+          <ConceptReferences term={cardName} summary={summary} />
+          {!summary && <a href={wiktionaryUrl} rel="noreferrer" target="_blank">Найти в Викисловаре</a>}
         </div>
       )}
     </div>

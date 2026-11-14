@@ -1202,30 +1202,30 @@ const getOtherCardId = (edge, cardId) => {
 	return null;
 };
 const getCardOwner$1 = (board, cardId) => Object.values(board).find((card) => card.id === cardId)?.playerId;
-function checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex) {
-	const possibleCenters = [edge.fromCardInstanceId, edge.toCardInstanceId];
-	for (const centerCardId of possibleCenters) {
-		const outerCardId = getOtherCardId(edge, centerCardId);
-		if (!outerCardId || getCardOwner$1(board, outerCardId) !== activeSeatIndex) continue;
-		const signature = getNodeConnectivitySignature(edge, centerCardId);
-		if (!signature) continue;
-		for (const graphEdge of graphEdges) {
-			const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
-			if (!graphOuterCardId || graphOuterCardId === outerCardId) continue;
-			if (getCardOwner$1(board, graphOuterCardId) !== activeSeatIndex) continue;
-			if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) return {
-				continuesNode: true,
-				centerCardId,
-				outerCardIds: [graphOuterCardId, outerCardId],
-				matchedEdgeIds: [graphEdge.id]
-			};
-		}
-	}
-	return {
+function checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex, newCardId) {
+	const none = {
 		continuesNode: false,
 		outerCardIds: [],
 		matchedEdgeIds: []
 	};
+	const centerCardId = newCardId;
+	if (getCardOwner$1(board, centerCardId) !== activeSeatIndex) return none;
+	const outerCardId = getOtherCardId(edge, centerCardId);
+	if (!outerCardId || getCardOwner$1(board, outerCardId) === void 0) return none;
+	const signature = getNodeConnectivitySignature(edge, centerCardId);
+	if (!signature) return none;
+	for (const graphEdge of graphEdges) {
+		if (graphEdge.createdAtMoveId !== edge.createdAtMoveId) continue;
+		const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
+		if (!graphOuterCardId || graphOuterCardId === outerCardId || getCardOwner$1(board, graphOuterCardId) === void 0) continue;
+		if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) return {
+			continuesNode: true,
+			centerCardId,
+			outerCardIds: [graphOuterCardId, outerCardId],
+			matchedEdgeIds: [graphEdge.id]
+		};
+	}
+	return none;
 }
 //#endregion
 //#region src/scoring/semanticPaths.ts
@@ -1389,7 +1389,7 @@ function calculateSemanticMoveScore({ board, existingEdges, pendingMove, activeS
 			reason: "no-compatible-edge",
 			matchedEdgeIds: []
 		};
-		const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex) : {
+		const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex, pendingMove.cardId) : {
 			continuesNode: false,
 			outerCardIds: [],
 			matchedEdgeIds: []
@@ -1440,6 +1440,13 @@ function finishGame(game, endReason) {
 function nextSeat(game, turnOrder) {
 	return turnOrder[(turnOrder.indexOf(game.currentPlayerIndex) + 1) % turnOrder.length];
 }
+/** The pending card still belongs to its author until voting finishes, even off-hand. */
+function getFinalTurnPlayerIndex(game) {
+	if (game.gameOver || !isDrawPileExhausted(game)) return null;
+	const pendingAuthor = game.pendingMove ? getPendingMovePlayerIndex(game.pendingMove) : null;
+	const remaining = game.players.flatMap((player, seat) => player.cards.length > 0 || seat === pendingAuthor ? [seat] : []);
+	return remaining.length === 1 ? remaining[0] : null;
+}
 function getPassAvailability(game, playerIndex) {
 	if (game.gameOver) return {
 		canPass: false,
@@ -1483,14 +1490,23 @@ function recordPass(game, turnOrder, automatic = false) {
 function resolveEmptyHands(game, turnOrder = game.players.map((_, index) => index)) {
 	if (game.gameOver || game.pendingMove || game.pendingCross || game.pendingFinish || !isDrawPileExhausted(game)) return game;
 	if (turnOrder.every((seat) => game.players[seat].cards.length === 0)) return finishGame(game, "empty-hands");
+	const finalSeat = getFinalTurnPlayerIndex(game);
+	if (finalSeat !== null) return {
+		...game,
+		currentPlayerIndex: finalSeat,
+		consecutivePasses: 0
+	};
 	let next = game;
 	while (!next.gameOver && next.players[next.currentPlayerIndex].cards.length === 0) next = recordPass(next, turnOrder, true);
-	if (!next.gameOver && turnOrder.filter((seat) => next.players[seat].cards.length > 0).length === 1) return finishGame(next, "consecutive-passes");
 	return next;
 }
 function passTurn(game, playerIndex = game.currentPlayerIndex, turnOrder = game.players.map((_, index) => index)) {
 	if (!getPassAvailability(game, playerIndex).canPass) return game;
 	if (turnOrder.every((seat) => game.players[seat].cards.length === 0)) return finishGame(game, "empty-hands");
+	if (getFinalTurnPlayerIndex(game) === playerIndex) return finishGame({
+		...game,
+		log: [...game.log, `${getPlayerLabel(playerIndex)}: пас.`]
+	}, "final-turn");
 	return resolveEmptyHands(recordPass(game, turnOrder), turnOrder);
 }
 function requestFinish(game, playerIndex = game.currentPlayerIndex) {
@@ -1924,7 +1940,7 @@ function confirmPendingCard(gameState, turnOrder = gameState.players.map((_, ind
 	const nextScores = ensureScoreCapacity(gameState.scores, gameState.players.length);
 	nextScores[playerIndex] = (nextScores[playerIndex] ?? 0) + scorePreview.total;
 	const turnScore = createTurnScoreResult(playerIndex, cardName, scorePreview, nextScores[playerIndex]);
-	return resolveEmptyHands({
+	const accepted = {
 		...gameState,
 		board: newBoard,
 		players: newPlayers,
@@ -1948,7 +1964,9 @@ function confirmPendingCard(gameState, turnOrder = gameState.players.map((_, ind
 				relations: acceptedSemanticEdges.map((edge) => formatSemanticRelation(edge, new Map(Object.values(newBoard).map((card) => [card.id, card.cardName]))))
 			}
 		}
-	}, turnOrder);
+	};
+	if (getFinalTurnPlayerIndex(gameState) === playerIndex) return finishGame(accepted, newPlayers.every((player) => player.cards.length === 0) ? "empty-hands" : "final-turn");
+	return resolveEmptyHands(accepted, turnOrder);
 }
 function returnPendingCard(gameState) {
 	if (gameState.gameOver || gameState.pendingFinish) return gameState;

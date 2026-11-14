@@ -65,8 +65,8 @@
 .dictionary-result-grid {
   display: grid;
   gap: 10px;
-  max-height: min(500px, 52vh);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   padding-right: 2px;
 }
 
@@ -100,8 +100,8 @@
 }
 
 .dictionary-extract {
-  max-height: min(220px, 30vh);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
   padding: 10px;
   border: 1px solid rgba(214, 174, 118, 0.16);
   border-radius: 10px;
@@ -135,4 +135,13 @@
 
 .dictionary-entry a:hover {
   text-decoration: underline;
+}
+
+.modal-window:has(.dictionary-modal) { display: flex; flex-direction: column; max-height: calc(100dvh - 24px); }
+.modal-window:has(.dictionary-modal) .modal-close-button { width: 44px; height: 44px; flex-shrink: 0; }
+.modal-window:has(.dictionary-modal) > .modal-content { min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; }
+@media (max-width: 900px) {
+  .dictionary-extract p, .dictionary-extract .concept-other-meanings li { font-size: 14px; }
+  .dictionary-note { font-size: 13px; }
+  .dictionary-search input, .dictionary-search button { min-height: 44px; }
 }

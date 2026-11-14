@@ -8,6 +8,8 @@ Players do not register or enter email. Supabase anonymous authentication issues
 
 ## Deployment order
 
+Update 2026-11-13 (final turn): deployed `room-command` version 4 with the approved one-final-move exception for the sole remaining hand. Pure server tests cover pending-card ownership, shuffled turn order, rejection/retry, final acceptance and pass; the two-guest live smoke passed after deployment. No SQL or access-policy changes were required. See `docs/decisions/2026-11-13-final-turn.md`.
+
 1. Enable anonymous sign-ins in Supabase Authentication. Keep signup IP rate limiting enabled; per-user quotas alone cannot stop mass guest creation.
 2. Run `npm run build:server`. Deploy `supabase/functions/room-command/index.ts` as `room-command` to the existing project. It requires standard SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY server secrets. Never put the service key in VITE variables. The handler verifies bearer tokens using Auth getUser.
 3. During a coordinated client update, apply `supabase/secure-online.sql` after the existing accepted-relations migration. The SQL is transactional and repeatable. It revokes direct client writes and anonymous reads. Old protocol-1 rooms remain stored but become inaccessible; old APKs cannot use online until updated.
@@ -17,6 +19,8 @@ Players do not register or enter email. Supabase anonymous authentication issues
 Changes to selectable decks, game actions or finish rules require rebuilding and deploying `room-command` as well as updating the web/APK client. A client-only release does not update the server's bundled rules or deck catalog.
 
 ## Limits and boundaries
+
+Update 2026-11-14: `room-command` version 5 is ACTIVE (bundle hash `d33819d4d4fe2e784948f7f587c1ce4c9d4cdc45e5c2c02e409c53a8cf09b03a`). Node bonuses now require the newly played, own center; neighboring owners are unrestricted. Existing recorded awards remain unchanged. A live two-guest test accepted three moves in its own room: a new center between own and foreign neighbors earned one path bonus and one node bonus (+4), and both clients read equal scores. Only that QA room was removed afterward. No SQL or access-policy changes. See `docs/decisions/2026-11-14-node-center.md`.
 
 - Five room creations per guest per hour; 120 other commands per minute.
 - Thirty local collection batches per guest per minute, max 50 samples / 100 KB per batch.

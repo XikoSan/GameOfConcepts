@@ -1,0 +1,12 @@
+.pending-relation-review { color: #e6e4d9; font-size: 16px; line-height: 1.5; overflow-wrap: anywhere; }
+.pending-relation-review dl { margin: 0; }
+.pending-relation-review dt { margin-top: 14px; color: #cdb77c; font-size: 13px; }
+.pending-relation-review dd { margin: 4px 0 0; font-weight: 650; }
+.pending-relation-direction { padding: 10px; border: 1px solid #697066; border-radius: 6px; background: #b39b5c12; }
+.pending-relation-note { color: #b7c0b8; font-size: 13px; }
+.modal-overlay:has(.pending-relation-review) { z-index: 3400; }
+.modal-window:has(.pending-relation-review) { width: min(460px, 100%); }
+.modal-window:has(.pending-relation-review) .modal-close-button { width: 44px; height: 44px; flex-shrink: 0; }
+.mobile-vote-relations .pending-relation-label { display: block; width: 100%; min-height: 44px; padding: 6px 8px; border: 1px solid #667066; border-radius: 5px; background: #ffffff08; color: inherit; font: inherit; line-height: 1.4; text-align: left; }
+.semantic-board-link.reviewable { cursor: pointer; }
+.semantic-board-link.reviewable:focus-visible { outline: 2px solid #e4ca8a; outline-offset: 3px; }

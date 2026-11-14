@@ -1,139 +1,46 @@
-const WIKIPEDIA_SUMMARY_URL = 'https://ru.wikipedia.org/api/rest_v1/page/summary/';
-const WIKIPEDIA_API_URL = 'https://ru.wikipedia.org/w/api.php';
-const WIKIPEDIA_SEARCH_URL = 'https://ru.wikipedia.org/w/index.php';
+import { EMOTIONS_GLOSSARY } from '../data/glossaryEmotions';
+import { DISCUSSION_GLOSSARY } from '../data/glossaryDiscussion';
+import type { GlossaryEntry } from '../data/glossaryTypes';
 
 export interface ConceptSummary {
   title: string;
   extract: string;
-  url: string;
-  source: 'wikipedia';
+  additionalMeanings: readonly string[];
+  sources: GlossaryEntry['sources'];
+  source: 'glossary';
 }
 
-const summaryCache = new Map<string, ConceptSummary | null>();
-const shortDescriptionCache = new Map<string, string | null>();
+export const CONCEPT_GLOSSARY: readonly GlossaryEntry[] = [...EMOTIONS_GLOSSARY, ...DISCUSSION_GLOSSARY];
+export const normalizeConceptKey = (value: string) => value.normalize('NFC').trim().toLocaleLowerCase('ru-RU').replaceAll('ё', 'е').replace(/\s+/g, ' ');
+const byId = new Map(CONCEPT_GLOSSARY.map(entry => [entry.definitionId, entry]));
+const byName = new Map(CONCEPT_GLOSSARY.flatMap(entry =>
+  [entry.term, ...(entry.aliases ?? [])].map(name => [normalizeConceptKey(name), entry] as const)));
 
-const normalizeConceptKey = (value: string) => value.trim().toLocaleLowerCase('ru-RU');
-
-const compactText = (value: string) => value.replace(/\s+/g, ' ').trim();
-
-export const getWikipediaSearchUrl = (term: string) => {
-  const url = new URL(WIKIPEDIA_SEARCH_URL);
+export function getWikipediaSearchUrl(term: string) {
+  const url = new URL('https://ru.wikipedia.org/w/index.php');
   url.searchParams.set('search', term.trim());
   return url.toString();
-};
-
-function truncateDescription(value: string, maxLength = 210): string {
-  const text = compactText(value);
-  if (text.length <= maxLength) return text;
-
-  const sentenceMatch = text.slice(0, maxLength).match(/^(.{80,}?[.!?])(\s|$)/);
-  if (sentenceMatch) return sentenceMatch[1];
-
-  return `${text.slice(0, maxLength).trim()}...`;
 }
 
-async function fetchWikipediaSummary(title: string): Promise<ConceptSummary | null> {
-  const response = await fetch(`${WIKIPEDIA_SUMMARY_URL}${encodeURIComponent(title)}`);
-  if (response.status === 404) return null;
-  if (!response.ok) {
-    throw new Error(`Wikipedia ответила с ошибкой ${response.status}.`);
-  }
-
-  const data = (await response.json()) as {
-    title?: string;
-    extract?: string;
-    content_urls?: {
-      desktop?: {
-        page?: string;
-      };
-    };
-  };
-
-  if (!data.title || !data.extract?.trim()) return null;
-
-  return {
-    title: data.title,
-    extract: compactText(data.extract),
-    url:
-      data.content_urls?.desktop?.page ??
-      `https://ru.wikipedia.org/wiki/${encodeURIComponent(data.title.replaceAll(' ', '_'))}`,
-    source: 'wikipedia',
-  };
+export function getLocalConceptSummary(term: string, definitionId?: string): ConceptSummary | null {
+  // Saved cards use stable ids; names also support free lookup and older snapshots.
+  const entry = (definitionId ? byId.get(definitionId) : undefined) ?? byName.get(normalizeConceptKey(term));
+  return entry ? {
+    title: entry.term, extract: entry.definition, additionalMeanings: entry.meanings ?? [],
+    sources: entry.sources, source: 'glossary',
+  } : null;
 }
 
-async function searchWikipedia(term: string): Promise<string | null> {
-  const url = new URL(WIKIPEDIA_API_URL);
-  Object.entries({
-    action: 'opensearch',
-    format: 'json',
-    origin: '*',
-    namespace: '0',
-    limit: '5',
-    search: term,
-  }).forEach(([key, value]) => url.searchParams.set(key, value));
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Wikipedia search ответил с ошибкой ${response.status}.`);
-  }
-
-  const [, titles] = (await response.json()) as [string, string[], string[], string[]];
-  return titles[0] ?? null;
-}
-
-export async function getConceptSummary(term: string): Promise<ConceptSummary | null> {
-  const normalizedTerm = term.trim();
-  if (!normalizedTerm) return null;
-
-  if (import.meta.env.DEV) console.log('[concept summary start]', normalizedTerm);
-  const cacheKey = normalizeConceptKey(normalizedTerm);
-  if (summaryCache.has(cacheKey)) {
-    return summaryCache.get(cacheKey) ?? null;
-  }
-
-  const exactSummary = await fetchWikipediaSummary(normalizedTerm);
-  if (exactSummary) {
-    if (import.meta.env.DEV) console.log('[concept summary result]', {
-      title: exactSummary.title,
-      hasExtract: true,
-      source: exactSummary.source,
-    });
-    summaryCache.set(cacheKey, exactSummary);
-    return exactSummary;
-  }
-
-  const fallbackTitle = await searchWikipedia(normalizedTerm);
-  const fallbackSummary = fallbackTitle
-    ? await fetchWikipediaSummary(fallbackTitle)
-    : null;
-
-  if (import.meta.env.DEV) console.log(
-    '[concept summary result]',
-    fallbackSummary
-      ? {
-          title: fallbackSummary.title,
-          hasExtract: true,
-          source: fallbackSummary.source,
-        }
-      : null
-  );
-  summaryCache.set(cacheKey, fallbackSummary);
-
-  return fallbackSummary;
+// Keep the async API for callers with cancellation guards. No network request is needed.
+export async function getConceptSummary(term: string, definitionId?: string): Promise<ConceptSummary | null> {
+  return getLocalConceptSummary(term, definitionId);
 }
 
 export async function getShortConceptDescription(term: string): Promise<string | null> {
-  const normalizedTerm = term.trim();
-  if (!normalizedTerm) return null;
-
-  const cacheKey = normalizeConceptKey(normalizedTerm);
-  if (shortDescriptionCache.has(cacheKey)) {
-    return shortDescriptionCache.get(cacheKey) ?? null;
-  }
-
-  const summary = await getConceptSummary(normalizedTerm);
-  const description = summary ? truncateDescription(summary.extract) : null;
-  shortDescriptionCache.set(cacheKey, description);
-
-  return description;
+  const summary = getLocalConceptSummary(term);
+  if (!summary) return null;
+  const text = summary.extract.replace(/\s+/g, ' ').trim();
+  if (text.length <= 210) return text;
+  const sentence = text.slice(0, 210).match(/^(.{40,}?[.!?])(?:\s|$)/);
+  return sentence?.[1] ?? `${text.slice(0, 210).trim()}…`;
 }

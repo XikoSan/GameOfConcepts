@@ -28,18 +28,16 @@ function sympathy(reverse = false) {
         neighborCardInstanceId: neighbor.id, relation: cause, direction: 'new-to-neighbor' as const, createdOrder })) } };
 }
 
-test('score explanations freeze the two actual paths and distinct node centers for Sympathy +6', () => {
+test('score explanations freeze two actual paths and only Sympathy as the node center for +5', () => {
   const input = sympathy();
   const original = structuredClone(input);
   const score = calculateSemanticMoveScore(input);
-  assert.equal(score.total, 6);
+  assert.equal(score.total, 5);
   const [first, second] = score.edges.map(edge => edge.explanation!);
   assert.equal(first.relation, 'Симпатия — причина Улыбка');
   assert.deepEqual(first.path!.cards.map(c => c.name), ['Симпатия', 'Улыбка', 'Веселье']);
   assert.equal(first.path!.sharedCardId, 'smile');
-  assert.equal(first.node!.center.name, 'Улыбка');
-  assert.equal(first.node!.direction, 'toward-center');
-  assert.deepEqual(first.node!.outerCards.map(c => c.name), ['Настроение', 'Симпатия']);
+  assert.equal(first.node, undefined);
   assert.deepEqual(second.path!.cards.map(c => c.name), ['Симпатия', 'Воодушевление', 'Веселье']);
   assert.equal(second.node!.center.name, 'Симпатия');
   assert.equal(second.node!.direction, 'from-center');
@@ -59,27 +57,26 @@ test('score explanations follow creation order and do not promise a node before 
   assert.equal(score.edges[1].explanation!.node!.center.id, 'sympathy');
 });
 
-test('symmetric witnesses show a three-card path and a symmetric common center', () => {
+test('symmetric witnesses show a three-card path but do not reward its old middle as a node', () => {
   const a = card('a', 'A', 0, 0), b = card('b', 'B', 1, 0), n = card('n', 'N', 1, 1);
   const board = Object.fromEntries([a, b, n].map(c => [`${c.coordinates.x},${c.coordinates.y}`, c]));
   const result = calculateSemanticMoveScore({ board, existingEdges: [accepted(a, b, opposite)], activeSeatIndex: 0,
     pendingMove: { moveId: 'new', cardId: n.id, position: n.coordinates, placedBySeatIndex: 0,
       semanticEdges: [{ id: 'new-nb', neighborCardInstanceId: b.id, neighborPosition: b.coordinates,
         relation: opposite, direction: 'new-to-neighbor', createdOrder: 0 }] } });
-  assert.equal(result.total, 3);
+  assert.equal(result.total, 2);
   assert.deepEqual(result.edges[0].explanation!.path!.cards.map(c => c.name), ['A', 'B', 'N']);
-  assert.equal(result.edges[0].explanation!.node!.direction, 'symmetric');
-  assert.equal(result.edges[0].explanation!.node!.center.name, 'B');
+  assert.equal(result.edges[0].explanation!.node, undefined);
 });
 
-test('a foreign internal card never receives a path witness even when a node is valid', () => {
+test('a foreign internal card supplies neither a path witness nor an old-center node', () => {
   const input = sympathy();
   input.board['0,1'].playerId = 1;
   input.pendingMove.semanticEdges = input.pendingMove.semanticEdges.slice(0, 1);
   const result = calculateSemanticMoveScore(input);
-  assert.equal(result.total, 2);
+  assert.equal(result.total, 1);
   assert.equal(result.edges[0].explanation!.path, undefined);
-  assert.equal(result.edges[0].explanation!.node!.center.ownerSeatIndex, 1);
+  assert.equal(result.edges[0].explanation!.node, undefined);
 });
 
 function historical() {
@@ -102,7 +99,7 @@ function historical() {
       totalGained: 1, newTotalScore: index + 1, semanticScore: { total: 1, edges: [award] } } };
   });
   game.logDetails[3] = { relations: score.edges.map(edge => edge.explanation!.relation), score: {
-    playerId: 0, cardName: 'Симпатия', totalGained: 6, newTotalScore: 9,
+    playerId: 0, cardName: 'Симпатия', totalGained: 5, newTotalScore: 8,
     semanticScore: { ...score, edges: score.edges.map(({ explanation: _explanation, ...award }) => { void _explanation; return award; }) },
   } };
   return { game, score };
@@ -140,4 +137,19 @@ test('persisted explanations are used unchanged when later cards or labels chang
   assert.equal(getHistoricalMoveScore(game, 3), score);
   assert.equal(score.edges[0].explanation!.path!.cards[2].name, 'Веселье');
   assert.equal(getHistoricalMoveScore(game, 99), undefined);
+});
+
+test('historical six-point awards are not rewritten by the new-center rule', () => {
+  const { game } = historical();
+  const detail = game.logDetails![3];
+  const oldScore = detail.score.semanticScore!;
+  oldScore.edges[0] = { ...oldScore.edges[0], nodeBonus: 1, continuesNode: true, total: 3 };
+  oldScore.total = 6;
+  detail.score.totalGained = 6;
+  detail.score.newTotalScore = 9;
+  const original = structuredClone(game);
+  assert.equal(getHistoricalMoveScore(game, 3), oldScore);
+  assert.equal(oldScore.total, 6);
+  assert.ok(oldScore.edges.every(edge => !edge.explanation));
+  assert.deepEqual(game, original);
 });

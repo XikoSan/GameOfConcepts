@@ -5,8 +5,8 @@ import './FeedbackForm.css';
 const recipient = 'xikomiqaelyan@gmail.com';
 
 // mailto opens a draft in the player's mail app; only that app can confirm delivery.
-export function FeedbackForm() {
-  const [description, setDescription] = useState('');
+export function FeedbackForm({ initialDescription = '' }: { initialDescription?: string } = {}) {
+  const [description, setDescription] = useState(initialDescription);
   const [reply, setReply] = useState('');
   const [message, setMessage] = useState('');
   const report = () => `Игра понятий ${packageInfo.version}\n\n${description.trim()}\n\nПочта для ответа: ${reply.trim() || 'не указана'}\nЭкран: ${window.innerWidth} × ${window.innerHeight}\nСистема: ${navigator.userAgent}\nПолучатель: ${recipient}`;

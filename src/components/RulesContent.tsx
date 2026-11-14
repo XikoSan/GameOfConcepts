@@ -44,7 +44,7 @@ function RulesExampleBlock({ id }: { id: RulesExampleId }) {
             <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 2 очка">+2</span>
           </div>
           <div className="rules-node-annotations">
-            <p>Безопасность — причина.<br />Окружающие понятия — следствия.<br />Карта в центре может быть вашей, чужой или нейтральной.</p>
+            <p>Новая карта «Безопасность» — ваш центр узла.<br />Окружающие понятия — следствия; их карты могут принадлежать любому игроку.<br />Первая причинная связь даёт +1, каждая следующая от нового центра — +2 с бонусом узла.</p>
           </div>
         </div>
       ) : example.imageSrc ? (

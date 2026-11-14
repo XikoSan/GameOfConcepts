@@ -6,6 +6,7 @@ import {
 import type { ConceptSummary } from '../services/conceptDescriptionService';
 import { getWiktionarySearchUrl } from '../services/dictionaryService';
 import { Modal } from './Modal';
+import { ConceptMeanings, ConceptReferences } from './ConceptReferences';
 import './DictionaryModal.css';
 
 interface DictionaryModalProps {
@@ -22,6 +23,7 @@ const getVisibleExtract = (extract: string) =>
 
 export function DictionaryModal({ initialTerm, onClose }: DictionaryModalProps) {
   const [query, setQuery] = useState(initialTerm);
+  const [searchedTerm, setSearchedTerm] = useState(initialTerm.trim());
   const [conceptSummary, setConceptSummary] = useState<ConceptSummary | null>(null);
   const [isLoading, setIsLoading] = useState(Boolean(initialTerm.trim()));
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +39,7 @@ export function DictionaryModal({ initialTerm, onClose }: DictionaryModalProps) 
     }
 
     setIsLoading(true);
+    setSearchedTerm(normalizedTerm);
     setError(null);
     setHasSearched(true);
 
@@ -94,7 +97,7 @@ export function DictionaryModal({ initialTerm, onClose }: DictionaryModalProps) 
   const isConceptExtractTrimmed = Boolean(
     conceptSummary && conceptSummary.extract.length > MAX_EXTRACT_LENGTH
   );
-  const currentTerm = query.trim() || initialTerm.trim();
+  const currentTerm = conceptSummary?.title ?? searchedTerm;
   const wikipediaSearchUrl = getWikipediaSearchUrl(currentTerm);
   const wiktionarySearchUrl = getWiktionarySearchUrl(currentTerm);
 
@@ -126,37 +129,35 @@ export function DictionaryModal({ initialTerm, onClose }: DictionaryModalProps) 
         {!isLoading && !error && hasSearched && (
           <div className="dictionary-result-grid">
             <article className="dictionary-entry dictionary-source-card">
-              <span className="dictionary-source-label">Описание понятия</span>
+              <span className="dictionary-source-label">Словарь игры · доступен без интернета</span>
               {conceptSummary ? (
                 <>
                   <h3>{conceptSummary.title}</h3>
                   <div className="dictionary-extract">
                     <p>{visibleConceptExtract}</p>
+                    <ConceptMeanings summary={conceptSummary} />
                   </div>
-                  <a href={conceptSummary.url} rel="noreferrer" target="_blank">
-                    {isConceptExtractTrimmed
-                      ? 'Открыть полную статью в Wikipedia'
-                      : 'Открыть в Wikipedia'}
-                  </a>
+                  {isConceptExtractTrimmed && <p>Показано сокращённое описание.</p>}
+                  <ConceptReferences term={conceptSummary.title} summary={conceptSummary} />
                 </>
               ) : (
                 <>
-                  <p className="dictionary-state compact">Описание понятия не найдено.</p>
+                  <p className="dictionary-state compact">Этого понятия пока нет в словаре игры. Можно самостоятельно поискать его во внешних источниках.</p>
+                  <ConceptReferences term={currentTerm} summary={null} />
                   <a href={wikipediaSearchUrl} rel="noreferrer" target="_blank">
-                    Найти в Wikipedia
+                    Найти в Википедии
                   </a>
                 </>
               )}
             </article>
 
             <article className="dictionary-entry dictionary-source-card">
-              <span className="dictionary-source-label">Викисловарь</span>
+              <span className="dictionary-source-label">{conceptSummary ? 'О значениях' : 'Викисловарь'}</span>
               <p className="dictionary-note">
-                Словарная статья может содержать значения, формы слова и этимологию.
+                {conceptSummary ? 'Справка помогает разобраться в понятии. Она не ограничивает обсуждение одним толкованием: выбранную связь оценивают участники партии.' : 'Словарная статья может содержать значения, формы слова и этимологию.'}
               </p>
-              <a href={wiktionarySearchUrl} rel="noreferrer" target="_blank">
-                Открыть в Викисловаре
-              </a>
+              {!conceptSummary && <a href={wiktionarySearchUrl} rel="noreferrer" target="_blank">Найти в Викисловаре</a>}
+              {conceptSummary && <p className="dictionary-note">Ссылки на источники находятся рядом с определением. Они откроются во внешнем браузере и требуют интернета.</p>}
             </article>
           </div>
         )}

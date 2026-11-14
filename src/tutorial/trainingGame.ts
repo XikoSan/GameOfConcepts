@@ -6,6 +6,7 @@ import type { Coordinates, GameState, PendingSemanticEdge, SemanticRelation, Rel
 
 export type TrainingPhase = 'intro' | 'hand' | 'deck' | 'redraw' | 'place' | 'relation' | 'explain' | 'voting' | 'result' | 'score' | 'reminder' | 'log' | 'opponent' | 'opponent-result' | 'complete';
 export interface TrainingState {
+  scenarioVersion?: 2;
   game: GameState; phase: TrainingPhase; feedback: string; moves: number; selected: string | null;
   sawPath: boolean; sawNode: boolean; lastGain: number; lastExplanation: string; opponentAttempt: number; explainedReminder: boolean; opponentResultShown: boolean;
 }
@@ -19,6 +20,7 @@ export type TrainingAction =
 
 export const TRAINING_HAND = ['Радость', 'Грусть', 'Страх', 'Гнев', 'Интерес'];
 export const TRAINING_RESERVE = ['Веселье', 'Уныние', 'Ужас', 'Раздражение', 'Увлечённость'];
+export const TRAINING_NODE_CARD = 'Состояние';
 const subtypes = Object.fromEntries(TRAINING_RESERVE.map((name, i) => [name, TRAINING_HAND[i]]));
 const opposites: Record<string, string[]> = { Радость: ['Грусть', 'Уныние', 'Горе'], Грусть: ['Радость', 'Веселье', 'Приподнятость'], Страх: ['Спокойствие', 'Облегчение'], Гнев: ['Спокойствие', 'Нежность'], Интерес: ['Безразличие', 'Скука'] };
 const opponentCards = [...new Set(Object.values(opposites).flat())];
@@ -31,7 +33,8 @@ const offsets = [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 0, y: -1 
 
 // A finite lesson vocabulary, not a semantic validator for ordinary matches.
 export function isTrainingRelation(from: string, to: string, family: RelationFamily): boolean {
-  if (family === 'kind') return (to === 'Эмоция' && TRAINING_HAND.includes(from)) || subtypes[from] === to;
+  if (family === 'kind') return (to === 'Эмоция' && TRAINING_HAND.includes(from)) || subtypes[from] === to ||
+    (to === TRAINING_NODE_CARD && [...TRAINING_HAND, ...TRAINING_RESERVE, ...opponentCards].includes(from));
   if (family === 'opposite') return Boolean(opposites[from]?.includes(to) || opposites[to]?.includes(from));
   return false;
 }
@@ -39,29 +42,58 @@ export function isTrainingRelation(from: string, to: string, family: RelationFam
 export function createTrainingState(): TrainingState {
   const neutral = EMOTIONS_DECK.neutralCards!.find(c => c.name === 'Эмоция')!;
   const game = initializeGame(2, { ...EMOTIONS_DECK, neutralCards: [neutral] }, 0);
+  // This lesson deals a normally neutral concept as a player-owned center; ordinary decks stay unchanged.
+  const nodeDefinition = EMOTIONS_DECK.neutralCards!.find(c => c.name === TRAINING_NODE_CARD)!;
+  game.deckSnapshot = { ...game.deckSnapshot!, cards: [...game.deckSnapshot!.cards!, { ...nodeDefinition }],
+    cardDefinitionIds: [...game.deckSnapshot!.cardDefinitionIds, nodeDefinition.id] };
   delete game.sharedDeck;
   game.players[0].cards = [...TRAINING_HAND];
   game.deck[0] = [...TRAINING_RESERVE].reverse();
   game.players[1].cards = opponentCards.slice(0, 5);
   game.deck[1] = opponentCards.slice(5);
-  return { game, phase: 'intro', feedback: '', moves: 0, selected: null, sawPath: false, sawNode: false, lastGain: 0, lastExplanation: '', opponentAttempt: 0, explainedReminder: false, opponentResultShown: false };
+  return { scenarioVersion: 2, game, phase: 'intro', feedback: '', moves: 0, selected: null, sawPath: false, sawNode: false, lastGain: 0, lastExplanation: '', opponentAttempt: 0, explainedReminder: false, opponentResultShown: false };
+}
+
+export function restoreTrainingState(saved?: TrainingState): TrainingState {
+  if (!saved) return createTrainingState();
+  if (saved.scenarioVersion === 2) return saved;
+  // Old lessons taught a neutral-center node and cannot safely resume under the new scoring rule.
+  return { ...createTrainingState(), feedback: 'Правило узла изменилось, поэтому сохранённое обучение начато заново. Теперь узел строится вокруг вашей новой карты.' };
 }
 
 export function suggestedTrainingMove(state: TrainingState) {
   const candidates = [];
-  for (const name of state.game.players[0].cards) for (const neighbor of Object.values(state.game.board)) {
-    for (const relation of RELATION_PRESETS) {
-      if (relation.family !== 'kind' || !isTrainingRelation(name, neighbor.cardName, relation.family)) continue;
-      for (const offset of offsets) {
-        const position = { x: neighbor.coordinates.x + offset.x, y: neighbor.coordinates.y + offset.y };
+  const cards = Object.values(state.game.board);
+  const positions = new Map(cards.flatMap(card => offsets.map(offset => {
+    const position = { x: card.coordinates.x + offset.x, y: card.coordinates.y + offset.y };
+    return [`${position.x},${position.y}`, position] as const;
+  })));
+  for (const name of state.game.players[0].cards) {
+      for (const position of positions.values()) {
         const placed = placeCard(state.game, name, position);
         if (placed === state.game) continue;
-        const linked = upsertPendingSemanticEdge(placed, neighbor.id, relation, 'new-to-neighbor');
+        let linked = placed;
+        const connections: { neighbor: string; neighborId: string; relation: SemanticRelation; direction: PendingSemanticEdge['direction'] }[] = [];
+        for (const neighbor of cards) {
+          if (Math.abs(neighbor.coordinates.x - position.x) + Math.abs(neighbor.coordinates.y - position.y) !== 1) continue;
+          for (const relation of RELATION_PRESETS) {
+            if (relation.family !== 'kind') continue;
+            const direction = isTrainingRelation(name, neighbor.cardName, relation.family) ? 'new-to-neighbor'
+              : isTrainingRelation(neighbor.cardName, name, relation.family) ? 'neighbor-to-new' : null;
+            if (!direction) continue;
+            linked = upsertPendingSemanticEdge(linked, neighbor.id, relation, direction);
+            connections.push({ neighbor: neighbor.cardName, neighborId: neighbor.id, relation, direction });
+          }
+        }
+        if (!connections.length) continue;
         const score = linked.pendingMove?.scorePreview;
-        const priority = (!state.sawPath && score?.edges.some(e => e.pathBonus) ? 10 : 0) + (!state.sawNode && score?.edges.some(e => e.nodeBonus) ? 20 : 0);
-        candidates.push({ name, neighbor: neighbor.cardName, position, relation, priority });
+        const path = Boolean(score?.edges.some(e => e.pathBonus));
+        const node = Boolean(score?.edges.some(e => e.nodeBonus));
+        // Keep the single prepared center until a genuine multi-link node is available.
+        if (name === TRAINING_NODE_CARD && (!state.sawPath || !node)) continue;
+        const priority = (!state.sawPath && path ? 30 : 0) + (!state.sawNode && node ? 20 : 0);
+        candidates.push({ name, neighbor: connections[0].neighbor, position, relation: connections[0].relation, connections, path, node, priority });
       }
-    }
   }
   return candidates.sort((a, b) => b.priority - a.priority)[0];
 }
@@ -85,7 +117,7 @@ function opponentTurn(state: TrainingState): TrainingState {
     const prepared = { ...game, players: game.players.map((player, i) => i === 1 ? { ...player, cards: hand } : player), deck: game.deck.map((cards, i) => i === 1 ? deck : cards) };
     for (const offset of offsets) {
       const position = { x: neighbor.coordinates.x + offset.x, y: neighbor.coordinates.y + offset.y };
-      // Keep the neutral card's remaining sides available for the player's node.
+      // Leave opening cells around the neutral card available for independent player moves.
       const center = game.startCard.coordinates;
       if (Math.abs(position.x - center.x) + Math.abs(position.y - center.y) <= 1) continue;
       const placed = placeCard(prepared, name, position);
@@ -127,6 +159,9 @@ export function trainingReducer(state: TrainingState, action: TrainingAction): T
     case 'submit': {
       if (phase !== 'relation') return state;
       if (!game.pendingMove?.semanticEdges?.length) return { ...state, feedback: 'Выберите хотя бы одну связь перед голосованием.' };
+      if (game.pendingMove.cardName === TRAINING_NODE_CARD && !game.pendingMove.scorePreview?.edges.some(edge => edge.nodeBonus)) {
+        return { ...state, feedback: 'Для учебного узла сделайте «Состояние» общим центром: свяжите с ним как минимум две соседние карты типом «Вид», направляя обе связи к «Состоянию». Можно отменить размещение и выбрать другую клетку.' };
+      }
       return state.moves === 0 ? { ...state, phase: 'explain', feedback: '' } : { ...state, game: submitPendingSemanticMove(game), phase: 'voting', feedback: '' };
     }
     case 'explain': {
@@ -146,7 +181,15 @@ export function trainingReducer(state: TrainingState, action: TrainingAction): T
       if (!accepted) return { ...state, game: returnPendingCard(game), phase: 'place', feedback: 'Соперник отклонил ход: не все связи входят в подготовленные примеры. Карта вернулась в руку, очки не изменились. В обычной партии допустимость решают игроки по вашему обоснованию.' };
       // Draw a prepared subtype of the first played emotion, so every opening has a path continuation.
       const subtype = TRAINING_RESERVE.find(name => subtypes[name] === pending.cardName && game.deck[0].includes(name));
-      const ready = subtype ? { ...game, deck: game.deck.map((cards, index) => index === 0 ? [...cards.filter(c => c !== subtype), subtype] : cards) } : game;
+      let ready = subtype ? { ...game, deck: game.deck.map((cards, index) => index === 0 ? [...cards.filter(c => c !== subtype), subtype] : cards) } : game;
+      // The opening chooses a prepared five-card reserve branch: its subtype plus a new node center.
+      if (state.moves === 0 && subtype && ready.deck[0].length > 1) {
+        ready = { ...ready, deck: ready.deck.map((cards, index) => index === 0 ? [TRAINING_NODE_CARD, ...cards.slice(1)] : cards) };
+      }
+      const previewPath = Boolean(ready.pendingMove?.scorePreview?.edges.some(edge => edge.pathBonus));
+      if (previewPath && ready.deck[0].includes(TRAINING_NODE_CARD)) {
+        ready = { ...ready, deck: ready.deck.map((cards, index) => index === 0 ? [...cards.filter(name => name !== TRAINING_NODE_CARD), TRAINING_NODE_CARD] : cards) };
+      }
       const confirmed = confirmPendingCard(ready);
       const score = confirmed.logDetails?.[confirmed.log.length - 1]?.score.semanticScore;
       const path = Boolean(score?.edges.some(e => e.pathBonus));

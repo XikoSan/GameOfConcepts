@@ -1,35 +1,40 @@
 import { useId, useState } from 'react';
 import { createPortal } from 'react-dom';
-import type { SemanticEdgeScore, SemanticMoveScore } from '../types';
-import { isSymmetricRelation } from '../scoring/semanticRelations';
+import type { RelationFamily, SemanticEdgeScore, SemanticMoveScore } from '../types';
+import { getRelationFamilyLabel } from '../scoring/semanticRelations';
+import { getScoreDetailRows } from './scoreDetailRows';
 import { Modal } from './Modal';
 import './ScoreDetails.css';
 
+const familyBadges: Partial<Record<RelationFamily, string>> = {
+  kind: 'Вид', part: 'Часть', cause: 'Прич.', property: 'Свойст.', opposite: 'Против.',
+};
+
 export function ScoreDetails({ score, relation }: { score: SemanticEdgeScore; relation?: string }) {
-  const evidence = score.explanation;
-  const path = evidence?.path;
-  const node = evidence?.node;
-  return <div className="score-details">
-    {(evidence?.relation || relation) && <p className="score-details-relation">{evidence?.relation ?? relation}</p>}
-    <div className="score-details-formula"><strong>+{score.total}</strong><span>Связь +{score.baseScore} · Путь +{score.pathBonus} · Узел +{score.nodeBonus}</span></div>
-    <section><h4>Связь +{score.baseScore}</h4><p>За выбранную смысловую связь.</p></section>
-    <section>
-      <h4>Путь +{score.pathBonus}</h4>
-      {path ? <><p className="score-details-chain">{path.cards.map(card => card.name).join(path.edges[0] && isSymmetricRelation(path.edges[0].relation) ? ' ↔ ' : ' → ')}</p><p>Продолжение проходит через вашу карту «{path.cards.find(card => card.id === path.sharedCardId)?.name}».</p></>
-        : <p>{score.pathBonus ? 'Подробности пути для этого хода не сохранились.' : 'Эта связь не продолжает ваш путь того же типа и направления.'}</p>}
-    </section>
-    <section>
-      <h4>Узел +{score.nodeBonus}</h4>
-      {node ? <><p>Центр — «{node.center.name}».</p><ul>{node.edges.map(edge => <li key={edge.id}>{edge.label}</li>)}</ul><p>{node.direction === 'symmetric' ? 'Ваши внешние карты связаны с общим центром одним типом.' : node.direction === 'toward-center' ? 'Связи от ваших внешних карт направлены к общему центру.' : 'Связи от общего центра направлены к вашим внешним картам.'}</p></>
-        : <p>{score.nodeBonus ? 'Подробности узла для этого хода не сохранились.' : 'Эта связь не продолжает узел с вашими внешними картами.'}</p>}
-    </section>
-  </div>;
+  return <MoveScoreDetails score={{ edges: [score], total: score.total }} relations={[relation]} />;
 }
 
-export function MoveScoreDetails({ score }: { score: SemanticMoveScore }) {
-  return <div className="move-score-details">
-    {score.edges.map(edge => <ScoreDetails key={edge.pendingEdgeId} score={edge} />)}
-    <p className="move-score-total">Всего за ход <strong>+{score.total}</strong></p>
+export function MoveScoreDetails({ score, relations }: {
+  score: SemanticMoveScore;
+  relations?: readonly (string | undefined)[];
+}) {
+  const rows = getScoreDetailRows(score.edges, relations);
+  return <div className="score-details move-score-details">
+    <ul className="score-detail-rows" aria-label="Начисления очков">
+      {rows.map((row, index) => <li key={row.id} className={`score-detail-row${index > 0 && rows[index - 1].kind !== row.kind ? ' score-detail-group-start' : ''}`}>
+        <strong className="score-detail-points">+{row.points}</strong>
+        <span className="score-detail-kind">{row.kind}</span>
+        <span className="score-detail-content">
+          {row.family && <abbr className={`score-detail-family score-detail-family-${row.family}`}
+            title={getRelationFamilyLabel(row.family)} aria-label={`Тип связи: ${getRelationFamilyLabel(row.family)}`}>
+            {familyBadges[row.family] ?? getRelationFamilyLabel(row.family)}
+          </abbr>}
+          {row.cards ? <span className="score-detail-chain">{row.cards.map((card, cardIndex) => <span className="score-detail-chain-part" key={`${card.id}-${cardIndex}`}>
+            {cardIndex > 0 && <span className="score-detail-arrow">{row.arrows?.[cardIndex - 1]} </span>}{card.name}
+          </span>)}</span> : <span className="score-detail-missing">{row.fallback}</span>}
+        </span>
+      </li>)}
+    </ul>
   </div>;
 }
 
@@ -40,10 +45,9 @@ export function ScoreHelpButton({ score, onOpenChange }: { score: SemanticEdgeSc
   return <>
     <button type="button" className="score-help-button" aria-label="Показать расчёт очков" aria-haspopup="dialog" aria-expanded={Boolean(portalRoot)} aria-controls={portalRoot ? id : undefined}
       onClick={event => { event.stopPropagation(); setPortalRoot(event.currentTarget.closest<HTMLElement>('.app-container') ?? document.body); onOpenChange?.(true); }}>?</button>
-    {portalRoot && createPortal(<Modal title="Расчёт очков" onClose={close} trapFocus>
+    {portalRoot && createPortal(<Modal title={`Расчёт очков · +${score.total}`} onClose={close} trapFocus>
       <div id={id} className="score-explanation-dialog">
         {'edges' in score ? <MoveScoreDetails score={score} /> : <ScoreDetails score={score} />}
-        <p className="score-details-preview-note">Это предварительный расчёт. Очки начислятся после принятия хода. Связи учитываются в порядке добавления.</p>
         <button type="button" className="score-details-back" onClick={close}>Вернуться к связям</button>
       </div>
     </Modal>, portalRoot)}

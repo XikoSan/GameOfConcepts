@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initializeGame, getPassAvailability, resolveEmptyHands, canPlaceCard, placeCard, redrawPlayerHand,
+import { initializeGame, getPassAvailability, getFinalTurnPlayerIndex, resolveEmptyHands, canPlaceCard, placeCard, redrawPlayerHand,
   confirmPendingCard, returnPendingCard, upsertPendingSemanticEdge, submitPendingSemanticMove } from '../src/game';
 import { applyGameAction as act, type GameAction } from '../src/gameActions';
 import { applyAuthenticatedAction as serverAct } from '../src/server/secureRoomActions';
@@ -12,7 +12,11 @@ function exhausted(count = 2): GameState {
   return { ...initializeGame(count, undefined, 0), sharedDeck: [] };
 }
 function proposal(game: GameState): GameState {
-  const placed = placeCard(game, game.players[game.currentPlayerIndex].cards[0], { x: 8, y: 7 });
+  const { x, y } = game.startCard.coordinates;
+  const coordinates = [{ x: x + 1, y }, { x: x - 1, y }, { x, y: y + 1 }, { x, y: y - 1 }]
+    .find(cell => canPlaceCard(game, cell));
+  assert.ok(coordinates, 'proposal fixture needs a free neighbor of the neutral card');
+  const placed = placeCard(game, game.players[game.currentPlayerIndex].cards[0], coordinates);
   const linked = upsertPendingSemanticEdge(placed, placed.startCard.id,
     getRelationPresets(placed.deckSnapshot)[0], 'new-to-neighbor');
   return submitPendingSemanticMove(linked);
@@ -40,14 +44,30 @@ for (const count of [2, 3, 4]) {
     assert.deepEqual(game.scores, Array(count).fill(7), 'ties and every current score survive the ending');
     assert.equal(act(game, { type: 'passTurn' }), game);
   });
-  test(`${count} players: empty hands automatically pass and stop before the sole player gets another turn`, () => {
+  test(`${count} players: empty hands give the sole player one final turn`, () => {
     const game = exhausted(count);
     game.players.forEach((player, index) => { if (index < count - 1) player.cards = []; });
     const result = resolveEmptyHands(game);
-    assert.equal(result.gameOver, true);
-    assert.equal(result.consecutivePasses, count - 1);
-    assert.equal(result.currentPlayerIndex, count - 2);
-    assert.equal(result.log.length, count - 1);
+    assert.equal(result.gameOver, false);
+    assert.equal(result.consecutivePasses, 0);
+    assert.equal(result.currentPlayerIndex, count - 1);
+    assert.equal(getFinalTurnPlayerIndex(result), count - 1);
+    const accepted = confirmPendingCard(proposal(result));
+    assert.equal(accepted.gameOver, true);
+    assert.equal(accepted.endReason, 'final-turn');
+    assert.equal(accepted.players[count - 1].cards.length, result.players[count - 1].cards.length - 1);
+    assert.ok(accepted.players[count - 1].cards.length > 0, 'only one card is played, not the whole sole hand');
+    assert.equal(accepted.scores[count - 1], 1);
+  });
+  test(`${count} players: passing the final turn ends immediately`, () => {
+    const game = exhausted(count);
+    game.players.forEach((player, index) => { if (index < count - 1) player.cards = []; });
+    const ready = resolveEmptyHands(game);
+    const finished = act(ready, { type: 'passTurn' });
+    assert.equal(finished.gameOver, true);
+    assert.equal(finished.endReason, 'final-turn');
+    assert.deepEqual(finished.players, ready.players);
+    assert.deepEqual(finished.scores, ready.scores);
   });
   test(`${count} players: all empty finishes immediately without manufactured passes`, () => {
     const game = exhausted(count);
@@ -95,7 +115,7 @@ test('accepted move resets the pass streak; cancellation and rejection do not co
   assert.equal(accepted.scores[1], 1);
 });
 
-test('drawing the last shared card triggers automatic empty-hand passes after scoring', () => {
+test('drawing the last shared card gives the sole remaining hand one final turn after scoring', () => {
   const game = exhausted(3);
   game.sharedDeck = ['last-card'];
   game.players[1].cards = [];
@@ -104,20 +124,67 @@ test('drawing the last shared card triggers automatic empty-hand passes after sc
   assert.equal(accepted.sharedDeck?.length, 0);
   assert.ok(accepted.players[0].cards.includes('last-card'));
   assert.equal(accepted.scores[0], 1);
-  assert.equal(accepted.gameOver, true);
-  assert.equal(accepted.consecutivePasses, 2);
+  assert.equal(accepted.gameOver, false);
+  assert.equal(accepted.currentPlayerIndex, 0);
+  assert.equal(getFinalTurnPlayerIndex(accepted), 0);
+  assert.equal(accepted.consecutivePasses, 0);
+  const finalProposal = proposal(accepted);
+  const expectedTotal = accepted.scores[0] + finalProposal.pendingMove!.scorePreview!.total;
+  const finished = confirmPendingCard(finalProposal);
+  assert.equal(finished.gameOver, true);
+  assert.equal(finished.endReason, 'final-turn');
+  assert.equal(finished.scores[0], expectedTotal);
 });
 
-test('last accepted card ends before the sole nonempty hand can play, even across the turn-order boundary', () => {
+test('last accepted card preserves one final move for the sole hand across the turn-order boundary', () => {
   const game = exhausted(4);
   game.players[0].cards = game.players[0].cards.slice(0, 1);
   game.players[1].cards = [];
   game.players[2].cards = [];
   const accepted = confirmPendingCard(proposal(game));
-  assert.equal(accepted.gameOver, true);
+  assert.equal(accepted.gameOver, false);
   assert.equal(accepted.players.filter(player => player.cards.length).length, 1);
   assert.equal(accepted.scores[0], 1);
-  assert.equal(act(accepted, { type: 'placeCard', cardName: accepted.players[3].cards[0], coordinates: { x: 7, y: 8 } }), accepted);
+  assert.equal(accepted.currentPlayerIndex, 3);
+  const finished = confirmPendingCard(proposal(accepted));
+  assert.equal(finished.gameOver, true);
+  assert.equal(finished.endReason, 'final-turn');
+  assert.equal(finished.scores[3], 1);
+  assert.equal(act(finished, { type: 'placeCard', cardName: finished.players[3].cards[0], coordinates: { x: 7, y: 8 } }), finished);
+});
+
+test('two last cards: [1,1] becomes [0,1], then the final accepted card scores and ends with empty hands', () => {
+  const game = exhausted();
+  game.players.forEach(player => { player.cards = player.cards.slice(0, 1); });
+  const first = confirmPendingCard(proposal(game));
+  assert.deepEqual(first.players.map(player => player.cards.length), [0, 1]);
+  assert.equal(first.gameOver, false);
+  assert.equal(first.currentPlayerIndex, 1);
+  const pending = proposal(first);
+  assert.deepEqual(pending.players.map(player => player.cards.length), [0, 0]);
+  assert.equal(getFinalTurnPlayerIndex(pending), 1, 'the proposed card still belongs to its author until acceptance');
+  const restored = JSON.parse(JSON.stringify(pending)) as GameState;
+  const finished = confirmPendingCard(restored);
+  assert.equal(finished.gameOver, true);
+  assert.equal(finished.endReason, 'empty-hands');
+  assert.deepEqual(finished.scores, [1, 1]);
+});
+
+test('rejecting or cancelling a final attempt preserves the final turn after serialization', () => {
+  const game = exhausted();
+  game.players[0].cards = [];
+  game.players[1].cards = game.players[1].cards.slice(0, 1);
+  const ready = resolveEmptyHands(game);
+  for (const action of ['returnCard', 'cancelPendingMove'] as const) {
+    const pending = JSON.parse(JSON.stringify(proposal(ready))) as GameState;
+    const retry = act(pending, { type: action });
+    assert.equal(retry.gameOver, false, action);
+    assert.equal(retry.currentPlayerIndex, 1, action);
+    assert.equal(getFinalTurnPlayerIndex(retry), 1, action);
+    assert.equal(retry.players[1].cards.length, 1, action);
+    assert.deepEqual(retry.scores, [0, 0], action);
+    assert.equal(confirmPendingCard(proposal(retry)).gameOver, true, action);
+  }
 });
 
 test('finish request requires active seat, nonempty pile, no pending move; rejection resumes unchanged turn', () => {
@@ -190,6 +257,60 @@ test('online accepted move preserves shuffled order and skips empty seats exactl
   assert.equal(result.game_state.consecutivePasses, 1);
   assert.equal(result.game_state.currentPlayerIndex, 3);
   assert.equal(result.current_turn_index, 2);
+});
+
+test('online shuffled order keeps one final turn, empty-handed voters and authoritative final scoring', () => {
+  const game = exhausted(4);
+  game.players[0].cards = game.players[0].cards.slice(0, 1);
+  game.players[1].cards = [];
+  game.players[2].cards = [];
+  const pending = proposal(game);
+  const order = [0, 2, 3, 1];
+  let room = roomFor(pending, order);
+  const firstId = pending.pendingMove!.cardId;
+  room = serverAct(room, 'p1', { type: 'confirmCard' }, firstId);
+  room = serverAct(room, 'p2', { type: 'confirmCard' }, firstId);
+  assert.equal(room.game_state.gameOver, false);
+  assert.equal(room.game_state.currentPlayerIndex, 3);
+  assert.equal(room.current_turn_index, 2);
+  assert.deepEqual(room.turn_order, ['p0', 'p2', 'p3', 'p1']);
+  assert.equal(room.game_state.players.filter(player => player.cards.length).length, 1);
+  assert.throws(() => serverAct(room, 'p0', { type: 'passTurn' }), /Сейчас ход другого игрока/);
+  const finalProposal = proposal(room.game_state);
+  room = { ...room, game_state: finalProposal };
+  const finalId = finalProposal.pendingMove!.cardId;
+  assert.throws(() => serverAct(room, 'outsider', { type: 'confirmCard' }, finalId));
+  assert.throws(() => serverAct(room, 'p3', { type: 'confirmCard' }, finalId));
+  const oneVote = serverAct(room, 'p0', { type: 'confirmCard' }, finalId);
+  assert.equal(oneVote.game_state.gameOver, false, 'one of three other players is not a majority');
+  assert.equal(oneVote.game_state.scores[3], 0);
+  assert.throws(() => serverAct(oneVote, 'p0', { type: 'confirmCard' }, finalId));
+  const restored = JSON.parse(JSON.stringify(oneVote)) as Room;
+  const finished = serverAct(restored, 'p2', { type: 'confirmCard' }, finalId);
+  assert.equal(finished.game_state.gameOver, true);
+  assert.equal(finished.game_state.endReason, 'final-turn');
+  assert.equal(finished.game_state.scores[3], 1);
+  assert.ok(finished.game_state.players[3].cards.length > 0, 'the server permits one final move, not solo play until empty');
+  assert.throws(() => serverAct(finished, 'p1', { type: 'confirmCard' }, finalId));
+  assert.throws(() => serverAct(finished, 'p3', { type: 'passTurn' }));
+});
+
+test('online final turn can be declined and retried or ended by its own pass', () => {
+  const game = exhausted(3);
+  game.players[0].cards = [];
+  game.players[1].cards = [];
+  const ready = resolveEmptyHands(game, [1, 2, 0]);
+  const pending = proposal(ready);
+  let room = roomFor(pending, [1, 2, 0]);
+  room = serverAct(room, 'p0', { type: 'returnCard' }, pending.pendingMove!.cardId);
+  assert.equal(room.game_state.gameOver, false);
+  assert.equal(room.game_state.currentPlayerIndex, 2);
+  assert.equal(getFinalTurnPlayerIndex(room.game_state), 2);
+  assert.equal(room.game_state.scores[2], 0);
+  const finished = serverAct(room, 'p2', { type: 'passTurn', playerIndex: 0 });
+  assert.equal(finished.game_state.gameOver, true);
+  assert.equal(finished.game_state.endReason, 'final-turn');
+  assert.deepEqual(finished.game_state.scores, [0, 0, 0]);
 });
 
 test('online finish authorization ignores forged seat, rejects duplicate/stale votes and outsiders', () => {

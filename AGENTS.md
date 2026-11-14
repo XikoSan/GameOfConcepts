@@ -10,7 +10,7 @@
 - `game-rules.md` считается основным источником правил игры.
 - Перед изменением правил, подсчёта очков, текста окна "Правила" или игровых ограничений сверяться с `game-rules.md`.
 - Не менять игровую механику, список карт, подсчёт очков или правила размещения без прямого запроса.
-- Завершение партии: после исчерпания колоды N−1 последовательных пасов (включая пустые руки) останавливают игру, без дополнительного одиночного хода. Решение пользователя от 2026-11-05: `docs/decisions/2026-11-05-endgame.md`.
+- Завершение партии: после исчерпания колоды N−1 последовательных пасов останавливают игру. Исключение от 2026-11-13: единственный игрок с картами получает один завершающий ход; после принятия одной карты или его паса партия заканчивается. Отмена/отклонение его попытки сохраняет ход. Решения: `docs/decisions/2026-11-05-endgame.md`, `docs/decisions/2026-11-13-final-turn.md`.
 - Окончание по общему согласию требует единогласия; отказ не считается пасом. Полные правила — раздел 12 `game-rules.md`.
 - Physical adjacency does not create a semantic edge automatically.
 - A move requires at least one accepted semantic edge.
@@ -22,7 +22,7 @@
 - A foreign or neutral card cannot be an internal continuation vertex.
 - Path continuation requires head-to-tail semantic direction.
 - Same-source or same-target edges may form a node, not a path.
-- A node center may be owned, foreign, or neutral.
+- Node bonuses require the newly played card as the player's own center; outer cards may be owned, foreign, or neutral. Adding a spoke to an old center never awards a node bonus (user decision 2026-11-14, docs/decisions/2026-11-14-node-center.md).
 - Relation family and direction together define connectivity.
 - Pending edges are scored in creation order.
 

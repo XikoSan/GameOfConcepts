@@ -1,6 +1,7 @@
 .match-finish-tools { margin-right: auto; display: flex; align-items: flex-end; gap: 8px; max-width: calc(100% - 54px); }
 .match-finish-tools > button { white-space: normal; text-align: left; }
 .match-finish-error { color: #ffb8ad; overflow-wrap: anywhere; }
+.match-final-turn { padding: 6px 10px; border: 1px solid #a68e55; border-radius: 6px; color: #efdaa4; background: #292e2feb; font-size: 13px; }
 .match-finish-tools .match-finish-error { pointer-events: auto; max-width: 280px; margin: 0; padding: 7px; border-radius: 6px; background: #292d2ef2; font-size: 12px; }
 .modal-window:has(.match-finish-dialog) { width: min(500px, 100%); }
 .match-finish-dialog { text-align: left; }

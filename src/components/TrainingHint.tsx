@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { suggestedTrainingMove, type TrainingState, type TrainingAction } from '../tutorial/trainingGame';
+import { suggestedTrainingMove, TRAINING_NODE_CARD, type TrainingState, type TrainingAction } from '../tutorial/trainingGame';
 import type { Dispatch } from 'react';
 
 interface Props {
@@ -12,6 +12,7 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
   const { phase, feedback, game } = state;
   const docked = Boolean(actionDock && (phase === 'explain' || phase === 'opponent'));
   const ready = Boolean(game.pendingMove?.semanticEdges?.length);
+  const learningNode = phase === 'relation' && game.pendingMove?.cardName === TRAINING_NODE_CARD && !state.sawNode;
   const suggestion = useMemo(() => phase === 'place' ? suggestedTrainingMove(state) : undefined, [state, phase]);
   const suggestedName = suggestion?.name;
   useEffect(() => {
@@ -49,8 +50,13 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
         text = actionDock ? 'Кнопка «Памятка» открывает типы связей и правила подсчёта очков. К ней можно обращаться в любой момент игры.' : 'Здесь собраны типы связей и правила подсчёта очков. К памятке можно обращаться в любой момент игры.';
       } else if (phase === 'place') {
         target = find('.training-session .card', state.selected || suggestion?.name);
-        const goal = !state.moves ? 'Начните с любой карты и разместите её рядом с нейтральной картой.' : !state.sawNode ? 'Узел объединяет ваши карты связями одного типа и направления с общим центром. Перетащите ещё одну эмоцию к «Эмоции» и выберите «Вид». Новая связь даст 1 очко за связь и ещё 1 за участие в узле.' : !state.sawPath ? 'Путь — последовательность связей одного типа, направленных одна за другой через ваши карты. Продолжите её: разновидность → ваша эмоция → «Эмоция». Новая связь даст 1 очко за связь и ещё 1 за участие в пути.' : 'Продолжите свой ход.';
-        text = `${goal} ${suggestion ? `Например, соедините «${suggestion.name}» → «${suggestion.neighbor}» типом «Вид».` : ''} Перетащите карту из руки на свободную клетку рядом с уже выложенной картой.`;
+        const goal = !state.moves ? 'Начните с любой карты и разместите её рядом с нейтральной картой.' : !state.sawPath ? 'Попробуем путь: связи одного типа идут последовательно через ваши карты. Продолжите цепочку: разновидность → ваша эмоция → «Эмоция». За новую связь будет 1 очко и ещё 1 за путь.' : !state.sawNode ? 'Теперь попробуем узел: его центр — ваша новая карта, связанная одним типом как минимум с двумя соседями. Соседи могут быть любыми. Первая связь даёт 1 очко, вторая — ещё 1 за связь и 1 за узел.' : 'Продолжите свой ход.';
+        const example = suggestion?.connections.map(connection => connection.direction === 'new-to-neighbor'
+          ? `«${suggestion.name}» → «${connection.neighbor}»` : `«${connection.neighbor}» → «${suggestion.name}»`).join(' и ');
+        text = `${goal} ${example ? `Например, ${example} типом «Вид».` : ''} Перетащите карту из руки на свободную клетку рядом с уже выложенной картой.`;
+      } else if (learningNode) {
+        target = find('.training-session .card-in-cell', TRAINING_NODE_CARD);
+        text = 'Сделайте «Состояние» центром узла: соседние понятия — виды состояний. Добавьте как минимум две связи типом «Вид», обе направьте к «Состоянию». За вторую связь начислится дополнительное очко узла. Если нужные соседи не рядом, отмените размещение и выберите другую клетку.';
       } else if (phase === 'relation' && editor) {
         const chosen = find('.semantic-popover-chips button[aria-pressed="true"]');
         const source = find('.semantic-popover-source button[aria-pressed="true"]');
@@ -125,9 +131,9 @@ export function TrainingHint({ state, dragging, dispatch, onClose, actionDock }:
     };
     frame = requestAnimationFrame(update);
     return () => cancelAnimationFrame(frame);
-  }, [phase, ready, dragging, state, game, feedback, suggestion, docked, actionDock]);
+  }, [phase, ready, dragging, state, game, feedback, suggestion, docked, actionDock, learningNode]);
 
-  if (phase === 'voting' || (phase === 'relation' && state.moves > 0)) return null;
+  if (phase === 'voting' || (phase === 'relation' && state.moves > 0 && (!learningNode || ready && !feedback))) return null;
 
   return createPortal(<>
     <div ref={ring} className="training-target-ring" aria-hidden="true" hidden={docked} />

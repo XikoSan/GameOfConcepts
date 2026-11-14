@@ -286,7 +286,7 @@ export const Cell: React.FC<CellProps> = ({
       summary: null,
     });
 
-    void getConceptSummary(cardName)
+    void getConceptSummary(cardName, placedCard?.definitionId)
       .then((summary) => {
         if (popoverRequestIdRef.current !== requestId) return;
 

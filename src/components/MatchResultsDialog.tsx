@@ -183,7 +183,8 @@ export function MatchResultsDialog({ game, players, open, onClose, onMenu, onNew
             : leaders.length > 1 ? `Ничья: ${leaders.map(player => player.nickname).join(', ')}` : 'Итоговый счёт недоступен'}</h3>
           <p className="match-results-meta">{deckName} · Принятых ходов: {statistics.moveCount} · Связей: {metric(statistics.edgeCount)}</p>
           <p className="match-results-meta">{game.endReason === 'agreement' ? 'Все игроки согласились завершить партию.'
-            : game.endReason === 'empty-hands' ? 'В колоде и на руках не осталось карт.'
+            : game.endReason === 'final-turn' ? 'Завершающий ход последнего игрока окончен.'
+              : game.endReason === 'empty-hands' ? 'В колоде и на руках не осталось карт.'
               : game.endReason === 'consecutive-passes' ? 'Колода закончилась. Остальные игроки спасовали или остались без карт.'
                 : 'Партия завершена.'}</p>
           <ol className="match-results-scores" aria-label="Итоговый счёт">

@@ -69,6 +69,15 @@ function nextSeat(game: GameState, turnOrder: number[]): number {
   return turnOrder[(turnOrder.indexOf(game.currentPlayerIndex) + 1) % turnOrder.length];
 }
 
+/** The pending card still belongs to its author until voting finishes, even off-hand. */
+export function getFinalTurnPlayerIndex(game: GameState): number | null {
+  if (game.gameOver || !isDrawPileExhausted(game)) return null;
+  const pendingAuthor = game.pendingMove ? getPendingMovePlayerIndex(game.pendingMove) : null;
+  const remaining = game.players.flatMap((player, seat) =>
+    player.cards.length > 0 || seat === pendingAuthor ? [seat] : []);
+  return remaining.length === 1 ? remaining[0] : null;
+}
+
 export function getPassAvailability(game: GameState, playerIndex: number): { canPass: boolean; reason: string } {
   if (game.gameOver) return { canPass: false, reason: 'Партия завершена.' };
   if (game.pendingFinish) return { canPass: false, reason: 'Дождитесь решения о завершении партии.' };
@@ -82,7 +91,7 @@ function recordPass(game: GameState, turnOrder: number[], automatic = false): Ga
   const consecutivePasses = (game.consecutivePasses ?? 0) + 1;
   const next = { ...game, consecutivePasses,
     log: [...game.log, `${getPlayerLabel(game.currentPlayerIndex)}: пас${automatic ? ' (пустая рука)' : ''}.`] };
-  // Stop before advancing: the sole remaining player never receives an extra turn.
+  // Ordinary pass streaks stop before advancing; a sole remaining hand is handled separately.
   if (consecutivePasses >= turnOrder.length - 1) return finishGame(next, 'consecutive-passes');
   return { ...next, currentPlayerIndex: nextSeat(next, turnOrder) };
 }
@@ -91,14 +100,12 @@ function recordPass(game: GameState, turnOrder: number[], automatic = false): Ga
 export function resolveEmptyHands(game: GameState, turnOrder = game.players.map((_, index) => index)): GameState {
   if (game.gameOver || game.pendingMove || game.pendingCross || game.pendingFinish || !isDrawPileExhausted(game)) return game;
   if (turnOrder.every(seat => game.players[seat].cards.length === 0)) return finishGame(game, 'empty-hands');
+  // Grant the sole remaining hand one final move before empty-seat passes can end play.
+  const finalSeat = getFinalTurnPlayerIndex(game);
+  if (finalSeat !== null) return { ...game, currentPlayerIndex: finalSeat, consecutivePasses: 0 };
   let next = game;
   while (!next.gameOver && next.players[next.currentPlayerIndex].cards.length === 0) {
     next = recordPass(next, turnOrder, true);
-  }
-  // Empty hands cannot rejoin play after exhaustion, even when the sole hand is
-  // encountered before every empty seat in the cyclic order.
-  if (!next.gameOver && turnOrder.filter(seat => next.players[seat].cards.length > 0).length === 1) {
-    return finishGame(next, 'consecutive-passes');
   }
   return next;
 }
@@ -107,6 +114,9 @@ export function passTurn(game: GameState, playerIndex = game.currentPlayerIndex,
   turnOrder = game.players.map((_, index) => index)): GameState {
   if (!getPassAvailability(game, playerIndex).canPass) return game;
   if (turnOrder.every(seat => game.players[seat].cards.length === 0)) return finishGame(game, 'empty-hands');
+  if (getFinalTurnPlayerIndex(game) === playerIndex) {
+    return finishGame({ ...game, log: [...game.log, `${getPlayerLabel(playerIndex)}: пас.`] }, 'final-turn');
+  }
   return resolveEmptyHands(recordPass(game, turnOrder), turnOrder);
 }
 
@@ -737,7 +747,7 @@ export function confirmPendingCard(gameState: GameState, turnOrder = gameState.p
     nextScores[playerIndex]
   );
 
-  return resolveEmptyHands({
+  const accepted: GameState = {
     ...gameState,
     board: newBoard,
     players: newPlayers,
@@ -763,7 +773,11 @@ export function confirmPendingCard(gameState: GameState, turnOrder = gameState.p
         )),
       },
     },
-  }, turnOrder);
+  };
+  if (getFinalTurnPlayerIndex(gameState) === playerIndex) {
+    return finishGame(accepted, newPlayers.every(player => player.cards.length === 0) ? 'empty-hands' : 'final-turn');
+  }
+  return resolveEmptyHands(accepted, turnOrder);
 }
 
 export function returnPendingCard(gameState: GameState): GameState {

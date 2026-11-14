@@ -2,7 +2,7 @@
 import type { ReactNode } from 'react';
 import { TableReminder } from './TableReminder';
 import { useEffect, useReducer, useRef, useState } from 'react';
-import { createTrainingState, suggestedTrainingMove, trainingReducer, type TrainingState } from '../tutorial/trainingGame';
+import { restoreTrainingState, suggestedTrainingMove, trainingReducer, type TrainingState } from '../tutorial/trainingGame';
 import { GameBoard } from './GameBoard';
 import { PlayerHand } from './PlayerHand';
 import { DragPreviewLayer } from './DragPreviewLayer';
@@ -21,7 +21,7 @@ interface TrainingGameProps {
 }
 
 export function TrainingGame({ onClose, controls, onOpenRules, onOpenSettings, onOpenDictionary, paused = false, playerName = 'Вы', initialState, onStateChange }: TrainingGameProps) {
-  const [state, dispatch] = useReducer(trainingReducer, initialState, saved => saved ?? createTrainingState());
+  const [state, dispatch] = useReducer(trainingReducer, initialState, restoreTrainingState);
   useEffect(() => { onStateChange?.(state); }, [state, onStateChange]);
   const [camera, setCamera] = useState(0);
   const compact = useCompactTable();

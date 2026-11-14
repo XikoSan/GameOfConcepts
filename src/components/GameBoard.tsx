@@ -24,10 +24,11 @@ import type {
   SemanticEdge,
   SemanticRelation,
 } from '../game';
-import { formatSemanticRelation, formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
+import { createSemanticEdgeFromPending, formatSemanticRelation, formatRelationForCard, getRelationPresets, isSymmetricRelation } from '../scoring/semanticRelations';
 import { Cell } from './Cell';
 import { SemanticRelationPopover } from './SemanticRelationPopover';
 import { ScoreHelpButton } from './ScoreDetails';
+import { PendingRelationReview } from './PendingRelationReview';
 import { previewSemanticEdgeScore } from './previewSemanticEdgeScore';
 import {
   calculateBoardOverlayPosition,
@@ -942,7 +943,10 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             <button type="button" onClick={handleCancelSemanticMove}>Отменить</button>
           </footer>
         </> : <>
-          <ul className="mobile-vote-relations">{pendingSemanticEdges.map(edge => <li key={edge.id}>{formatSemanticRelation({
+          <ul className="mobile-vote-relations">{pendingSemanticEdges.map(edge => <li key={edge.id}>{pendingMove.semanticStatus === 'voting' ? <PendingRelationReview
+            edge={createSemanticEdgeFromPending(pendingMove, edge, pendingCard)} namesById={new Map(boardCards.map(card => [card.id, card.cardName]))} className="pending-relation-label">
+              {formatSemanticRelation(createSemanticEdgeFromPending(pendingMove, edge, pendingCard), new Map(boardCards.map(card => [card.id, card.cardName])))}
+            </PendingRelationReview> : formatSemanticRelation({
             relation: edge.relation,
             fromCardInstanceId: edge.direction === 'new-to-neighbor' ? pendingCard.id : edge.neighborCardInstanceId,
             toCardInstanceId: edge.direction === 'new-to-neighbor' ? edge.neighborCardInstanceId : pendingCard.id,
@@ -1086,17 +1090,18 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               - (pendingCard.coordinates.y === neighbor.coordinates.y ? CELL_SIZE * 0.3 : 0);
 
             return (
-              <span
-                className={`semantic-board-link defined readonly ${getRelationOverlayClassName(
+              <PendingRelationReview
+                className={`semantic-board-link defined reviewable ${getRelationOverlayClassName(
                   pendingCard,
                   neighbor
                 )}`}
                 key={neighbor.id}
+                edge={createSemanticEdgeFromPending(pendingMove, selectedEdge, pendingCard)}
+                namesById={new Map(boardCards.map(card => [card.id, card.cardName]))}
                 style={{ left: `${left}px`, top: `${top}px` }}
-                title="Связь на голосовании"
               >
                 {getRelationIndicator(pendingCard, neighbor, selectedEdge)}
-              </span>
+              </PendingRelationReview>
             );
           })}
       </div>
