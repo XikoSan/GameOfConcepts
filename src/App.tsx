@@ -197,7 +197,7 @@ interface DragPreview {
   pointerType?: string;
 }
 
-type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'privacy' | 'tutorial' | 'leave-game' | null;
+type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'privacy' | 'menu-updates' | 'tutorial' | 'leave-game' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -1105,26 +1105,31 @@ function App() {
           <ul id="main-menu-updates-list" className="main-menu-updates-list" hidden={!showMenuUpdates}>
             {MENU_RELEASE_NOTES.map(({ label, text }) => <li key={text}><strong>{label}:</strong> {text}</li>)}
           </ul>
+          <button className="main-menu-updates-history" type="button" onClick={() => setActiveModal('menu-updates')}>
+            Вся история
+          </button>
         </aside>
-        <h1>Игра понятий</h1>
-        <nav className="main-menu-actions" aria-label="Главное меню">
-          <div className="main-menu-row">
-            <button type="button" onClick={() => { setLocalNameDrafts(['', '', '', '']); setActiveModal('local-game'); }}>Локальная игра</button>
-            <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
-          </div>
-          <div className="main-menu-row main-menu-learning">
-            <button className="main-menu-training" type="button" onClick={() => { setTrainingSetup(true); setMaxPlayers(2); setLocalDeckId(DEFAULT_DECK.id); setLocalNameDrafts(['', 'Учебный соперник', '', '']); setActiveModal('local-game'); }}>Обучение</button>
-            {savedSession && <button type="button" onClick={resumeSavedGame}>{savedSession.kind === 'training' ? 'Продолжить обучение' : 'Продолжить игру'}</button>}
-          </div>
-          <div className="main-menu-row">
-            <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
-            <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
-          </div>
-        </nav>
-        <footer className="main-menu-footer">
-          <button className="feedback-link" type="button" onClick={() => setActiveModal('feedback')}>Обратная связь</button>
-          <span>Версия {packageInfo.version}</span>
-        </footer>
+        <div className="main-menu-content">
+          <h1>Игра понятий</h1>
+          <nav className="main-menu-actions" aria-label="Главное меню">
+            <div className="main-menu-row">
+              <button type="button" onClick={() => { setLocalNameDrafts(['', '', '', '']); setActiveModal('local-game'); }}>Локальная игра</button>
+              <button type="button" onClick={handleOpenNewGameModal}>Онлайн игра</button>
+            </div>
+            <div className="main-menu-row main-menu-learning">
+              <button className="main-menu-training" type="button" onClick={() => { setTrainingSetup(true); setMaxPlayers(2); setLocalDeckId(DEFAULT_DECK.id); setLocalNameDrafts(['', 'Учебный соперник', '', '']); setActiveModal('local-game'); }}>Обучение</button>
+              {savedSession && <button type="button" onClick={resumeSavedGame}>{savedSession.kind === 'training' ? 'Продолжить обучение' : 'Продолжить игру'}</button>}
+            </div>
+            <div className="main-menu-row">
+              <button type="button" onClick={() => setActiveModal('rules')}>Правила</button>
+              <button type="button" onClick={() => setActiveModal('settings')}>Настройки</button>
+            </div>
+          </nav>
+          <footer className="main-menu-footer">
+            <button className="feedback-link" type="button" onClick={() => setActiveModal('feedback')}>Обратная связь</button>
+            <span>Версия {packageInfo.version}</span>
+          </footer>
+        </div>
       </main>}
       {dragPreview && (
         <DragPreviewLayer
@@ -1136,6 +1141,13 @@ function App() {
         />
       )}
       {activeModal === 'feedback' && <Modal title="Обратная связь" onClose={() => setActiveModal(null)}><FeedbackForm /></Modal>}
+      {activeModal === 'menu-updates' && (
+        <Modal title="Что нового" onClose={() => setActiveModal(null)}>
+          <ul className="menu-updates-history-list">
+            {MENU_RELEASE_NOTES.map(({ label, text }) => <li key={text}><strong>{label}:</strong> {text}</li>)}
+          </ul>
+        </Modal>
+      )}
       {activeModal === 'local-game' && (
         <>
           {trainingSetup && <aside className="training-local-annotation-window" aria-label="Пояснение к обучению"><h2>Добро пожаловать в обучение</h2><p>Для того чтобы начать локальную игру, нужно выбрать количество игроков, тему игральной колоды и ввести никнеймы.</p><div className="training-local-callout">В обучении параметры заданы заранее. Введите свой никнейм и начните партию.</div></aside>}
