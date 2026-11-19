@@ -125,7 +125,7 @@
 
 .menu-board-stage {
   position: absolute;
-  inset: 0 0 0 50%;
+  inset: 0 50% 0 0;
   overflow: hidden;
   isolation: isolate;
 }

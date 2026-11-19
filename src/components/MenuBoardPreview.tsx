@@ -8,13 +8,13 @@ import './MenuBoardPreview.css';
  */
 const tiles = [
   { name: 'Эмоция', x: 50, y: 30, owner: 'neutral' },
-  { name: 'Радость', x: 32, y: 50, owner: 'blue' },
-  { name: 'Улыбка', x: 50, y: 50, owner: 'orange' },
-  { name: 'Веселье', x: 32, y: 70, owner: 'green' },
-  { name: 'Симпатия', x: 50, y: 70, owner: 'blue' },
+  { name: 'Радость', x: 32, y: 48, owner: 'blue' },
+  { name: 'Улыбка', x: 50, y: 48, owner: 'orange' },
+  { name: 'Веселье', x: 32, y: 66, owner: 'green' },
+  { name: 'Симпатия', x: 50, y: 66, owner: 'blue' },
   { name: 'Надежда', x: 68, y: 30, owner: 'purple' },
-  { name: 'Доверие', x: 68, y: 50, owner: 'green' },
-  { name: 'Общество', x: 68, y: 70, owner: 'orange' },
+  { name: 'Доверие', x: 68, y: 48, owner: 'green' },
+  { name: 'Общество', x: 68, y: 66, owner: 'orange' },
 ];
 
 export const MenuBoardPreview: React.FC = () => (
@@ -23,7 +23,7 @@ export const MenuBoardPreview: React.FC = () => (
     <div className="menu-board-stage">
       <div className="menu-board-grid" />
       <svg className="menu-board-links" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M32 40 L50 40 M32 60 L32 70 M50 40 L68 40 M50 60 L50 70 M68 40 L68 50 M50 70 L68 70" />
+        <path d="M32 48 L50 48 M32 48 L32 66 M50 48 L68 48 M50 48 L50 66 M68 30 L68 48 M50 66 L68 66 M50 30 L50 48" />
       </svg>
       {tiles.map((tile) => (
         <span
