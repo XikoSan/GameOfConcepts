@@ -1,16 +1,42 @@
-/* Paper and graphite table: shared visual layer for local and online play. */
+/* Shared palette for the table and the menu's preview of it. */
+:root {
+  --goc-field: #f1dcc1;
+  --goc-grid: #d2ac93;
+  --goc-paper: #fff4e3;
+  --goc-panel: #f8eadd;
+  --goc-ink: #392b2a;
+  --goc-wine: #633b3e;
+  --goc-wine-deep: #4d2e33;
+  --goc-wine-light: #74494a;
+  --goc-text-on-wine: #fff5ec;
+  --goc-line-on-wine: #a67570;
+  --goc-line-on-paper: #b28772;
+  --goc-muted-on-wine: #efd8ca;
+  --goc-seat-1: #a74f3e;
+  --goc-seat-2: #526c46;
+  --goc-seat-3: #426b83;
+  --goc-seat-4: #85547b;
+  --goc-neutral: #842f42;
+  --goc-neutral-paper: #f1c8b7;
+  --goc-tile-edge: #b78a75;
+  --goc-tile-shadow: inset 0 -4px 0 var(--goc-tile-edge), 0 1px 2px #633b3e32;
+  --goc-highlight: #e8b79e;
+  --goc-highlight-dark: #803f3e;
+}
+
+/* The visual layer leaves the board geometry and touch targets intact. */
 .app-container {
   --table-sidebar-width: 300px;
-  --table-paper: #eee7d5;
-  --table-panel: #292d2e;
-  --table-line: #45494a;
-  --table-gold: #b7a06c;
-  background: #202425;
-  color: #eeeede;
+  --table-paper: var(--goc-field);
+  --table-panel: var(--goc-wine);
+  --table-line: var(--goc-line-on-wine);
+  --table-gold: var(--goc-highlight);
+  background: var(--goc-wine-deep);
+  color: var(--goc-text-on-wine);
 }
 .app-container .game-table {
   width: 100%; height: 100svh; padding: 12px; border: 0; border-radius: 0;
-  background: #202425; box-shadow: none;
+  background: var(--goc-panel); box-shadow: none;
 }
 .app-container .play-area { gap: 12px; }
 .table-status-bar { display: grid; grid-template-columns: minmax(0, 1fr) var(--table-sidebar-width); align-items: center; gap: 12px; min-height: 46px; }
@@ -41,24 +67,20 @@
 .app-container .cards-container { flex-wrap: nowrap; overflow-x: auto; justify-content: safe center; padding: 4px 2px 8px; }
 .app-container .card { flex: 1 1 0; width: 0; min-width: 0; container-type: inline-size; height: 76px; min-height: 76px; padding: 12px 10px; font-size: 15px; font-weight: 600; text-shadow: none; border-radius: 6px; box-shadow: 0 2px 5px #0003; }
 .app-container .card::before, .app-container .card::after { display: none; }
-.app-container .card.player-blue, .app-container .card-in-cell.player-0 { background: #386b95; border-color: #6083a1; }
-.app-container .card.player-orange, .app-container .card-in-cell.player-1 { background: #98713e; border-color: #b59060; }
-.app-container .card.player-green, .app-container .card-in-cell.player-2 { background: #49765b; border-color: #78a486; }
-.app-container .card.player-purple, .app-container .card-in-cell.player-3 { background: #75648e; border-color: #a28db9; }
-.app-container .card.selected { outline: 2px solid #d0b474; outline-offset: 1px; }
+.app-container .card.selected { outline: 2px solid var(--goc-highlight-dark); outline-offset: 1px; }
 .app-container .deck-card-back { background: #40474a; border-color: #626b6d; box-shadow: 3px 3px 0 #202728, 5px 5px 0 #454b4d; }
 .hand-actions { position: relative; flex: 0 0 auto; }
 .hand-actions .control-redraw-confirm { position: absolute; bottom: calc(100% + 12px); right: 0; width: 240px; z-index: 100; padding: 14px; background: #292d2e; border: 1px solid #aa925d; box-shadow: 0 6px 20px #0005; }
 .app-container .game-board-container { padding: 0; background: var(--table-paper); border: 1px solid #c6bba3; border-radius: 7px; box-shadow: none; }
 .app-container .game-board-container::before, .app-container .game-board-container::after { display: none; }
-.app-container .game-board { background: #eee7d5; }
-.app-container .cell { border: 0; border-right: 1px solid #b9ad902e; border-bottom: 1px solid #b9ad902e; background: transparent; }
+.app-container .game-board { background: var(--goc-field); }
+.app-container .cell { border: 0; border-right: 1px solid var(--goc-grid); border-bottom: 1px solid var(--goc-grid); background: transparent; }
 .app-container .cell.empty:hover { background: #ffffff40; }
-.app-container .cell.playable { background: #d4e0ca; box-shadow: inset 0 0 0 1px #829475; }
-.app-container .cell.pending, .app-container .cell.relation-highlighted { box-shadow: inset 0 0 0 2px #bc9b55; }
+.app-container .cell.playable { background: #ead7ae; box-shadow: inset 0 0 0 1px var(--goc-line-on-paper); }
+.app-container .cell.playable:hover { background: #ead2a2; }
+.app-container .cell.pending, .app-container .cell.relation-highlighted { box-shadow: inset 0 0 0 2px var(--goc-highlight-dark); }
 .app-container .cell.neutral { border-color: transparent; box-shadow: none; }
 .app-container .card-in-cell { border-radius: 5px; width: calc(100% - 2px); height: calc(100% - 2px); box-shadow: 0 2px 3px #0002; text-shadow: none; }
-.app-container .card-in-cell.player-neutral { background: #4b4c47; color: #f5f0df; border-color: #676960; }
 .app-container .semantic-move-panel { margin: 0; padding: 12px; background: #323738; border: 1px solid #484f4f; border-radius: 6px; box-shadow: none; }
 .app-container .control-panel { width: auto; background: #292d2e; box-shadow: none; border: 0; }
 .app-container .control-panel .control-title-section { display: none; }
@@ -85,7 +107,7 @@
   .app-container .card { min-height: 60px; }
 }
 
-.app-container .modal-window { background: #292d2e; border-color: #505553; box-shadow: 0 16px 48px #0006; }
+.app-container .modal-window { background: var(--goc-wine-deep); border-color: var(--goc-line-on-wine); box-shadow: 0 16px 48px #2e1a2060; }
 .app-container .score-row > span::before { box-shadow: none; }
 
 .app-container .turn-sidebar .control-panel { height: auto; flex: 0 0 auto; padding: 0; overflow: visible; border-radius: 0; }
@@ -165,53 +187,49 @@
   .app-container .table-hand-tray .hidden-hand-card { flex: 1 1 80px; }
 }
 
-/* Matte graphite and brushed edges from the visual reference; layout stays above. */
+/* Matte surfaces use the same warm palette across the table and its controls. */
 .app-container {
-  --table-panel: #282c2d;
-  --table-line: #505657;
-  --table-gold: #b5a06c;
-  --table-surface: linear-gradient(145deg, #ffffff04, #00000008), #282c2d;
-  --table-button: linear-gradient(180deg, #414749, #343a3c);
-  --table-button-shadow: inset 0 1px 0 #ffffff12, 0 2px 3px #0003;
+  --table-surface: var(--goc-wine);
+  --table-button: var(--goc-wine-deep);
+  --table-button-shadow: 0 2px 0 #2e1a203d;
 }
-.app-container .game-table { background: radial-gradient(ellipse at 35% 0, #303536, #232728 75%); }
 .app-container .turn-sidebar {
-  background: var(--table-surface); border-color: #484e4f;
-  box-shadow: inset 0 1px 0 #ffffff08, 0 2px 5px #0002;
+  background: var(--table-surface); border-color: var(--goc-line-on-wine);
+  box-shadow: 0 2px 5px #633b3e25;
 }
 .app-container .turn-sidebar .control-panel { background: transparent; }
 .app-container .table-hand-tray {
-  background: linear-gradient(180deg, #343e45, #293239);
-  border-color: #515c63; box-shadow: inset 0 1px 0 #ffffff0c, 0 2px 6px #0002;
+  background: var(--goc-panel); color: var(--goc-ink);
+  border-color: var(--goc-line-on-paper); box-shadow: 0 2px 6px #633b3e20;
 }
 .app-container .table-players .score-row {
-  background: var(--table-surface); border-color: #495051;
-  box-shadow: inset 0 1px 0 #ffffff08;
+  background: var(--table-surface); border-color: var(--goc-line-on-wine);
+  color: var(--goc-text-on-wine); box-shadow: none;
 }
-.app-container .table-players .active-score { background: linear-gradient(180deg, #3c4140, #313635); border-color: #93825a; }
+.app-container .table-players .active-score { background: var(--goc-wine-light); border-color: var(--goc-highlight-dark); }
 .app-container .score-row small {
-  background: linear-gradient(#b39b60, #897443); border-color: #bea56b; color: #252922;
-  box-shadow: inset 0 1px 0 #ffffff26;
+  background: var(--goc-highlight); border-color: var(--goc-highlight); color: var(--goc-ink);
+  box-shadow: none;
 }
 .app-container .control-panel .action-button,
 .app-container .table-menu button,
 .app-container .board-tools button,
 .app-container .control-panel .max-players-picker button {
-  background: var(--table-button); border-color: #5b6265; border-radius: 6px;
-  color: #e8e9e6; font-weight: 500; text-shadow: 0 1px 1px #0004;
+  background: var(--table-button); border-color: var(--goc-line-on-wine); border-radius: 6px;
+  color: var(--goc-text-on-wine); font-weight: 500; text-shadow: none;
   box-shadow: var(--table-button-shadow);
   transition: border-color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 .app-container .control-panel .action-button-primary,
 .app-container .control-panel .max-players-picker button.active {
-  background: linear-gradient(180deg, #9b8654, #7b6b45); border-color: #b7a06c;
-  color: #faf5e8; box-shadow: inset 0 1px 0 #ffffff26, 0 2px 3px #0003;
+  background: var(--goc-highlight); border-color: var(--goc-line-on-paper);
+  color: var(--goc-ink); box-shadow: var(--table-button-shadow);
 }
 .app-container .control-panel button:not(:disabled):hover,
 .app-container .table-menu button:not(:disabled):hover,
 .app-container .board-tools button:not(:disabled):hover {
-  border-color: #a1a69e; filter: none;
-  box-shadow: inset 0 1px 0 #ffffff20, 0 2px 4px #0004;
+  border-color: var(--goc-highlight); filter: none;
+  box-shadow: 0 2px 3px #2e1a2040;
 }
 .app-container .control-panel button:not(:disabled):active,
 .app-container .table-menu button:not(:disabled):active,
@@ -221,53 +239,31 @@
 .app-container .table-menu > .table-menu-tutorial {
   white-space: normal; line-height: 1.2; padding-block: 6px; min-height: 46px;
 }
-.app-container .table-menu > button {
-  --menu-top: #416e8b; --menu-bottom: #31556e; --menu-border: #81a6bd;
-  --menu-text: #faf7ed; --menu-text-shadow: 0 1px 1px #0005;
-  background: linear-gradient(180deg, var(--menu-top), var(--menu-bottom));
-  border-color: var(--menu-border);
-  color: var(--menu-text, #faf7ed);
-  font-weight: 600;
-  text-shadow: var(--menu-text-shadow, 0 1px 1px #0005);
-  box-shadow: inset 0 1px 0 #ffffff2b, 0 2px 3px #0005;
-}
-.app-container .table-menu > button:not(:disabled):hover {
-  background: linear-gradient(180deg, color-mix(in srgb, var(--menu-top), white 10%), var(--menu-bottom));
-  border-color: color-mix(in srgb, var(--menu-border), white 25%);
-  box-shadow: inset 0 1px 0 #ffffff40, 0 3px 6px #0005;
-}
-.app-container .table-menu > button:not(:disabled):active {
-  background: linear-gradient(180deg, var(--menu-bottom), var(--menu-top));
-  box-shadow: inset 0 2px 4px #0005;
-}
+.app-container .table-menu > button { font-weight: 600; }
+.app-container .table-menu button:not(:disabled):hover,
+.app-container .board-tools button:not(:disabled):hover { background: var(--goc-wine-light); }
 .app-container .control-panel .deck-select-field select {
-  background: linear-gradient(180deg, #222627, #2b3031); border-color: #61686a;
-  color: #e8e9e6; box-shadow: inset 0 1px 3px #0003; font-weight: 400;
+  background: var(--goc-wine); border-color: var(--goc-line-on-wine);
+  color: var(--goc-text-on-wine); box-shadow: none; font-weight: 400;
 }
-.app-container .control-panel select option { background: #292e30; color: #e8e9e6; }
-.app-container .control-panel .action-group h2 { color: #bfc2bd; font-weight: 500; letter-spacing: .04em; }
+.app-container .control-panel select option { background: var(--goc-wine); color: var(--goc-text-on-wine); }
+.app-container .control-panel .action-group h2 { color: var(--goc-muted-on-wine); font-weight: 500; letter-spacing: .04em; }
 .app-container .control-panel .deck-select-field,
-.app-container .control-panel .max-players-picker { color: #d1d3ce; font-weight: 400; }
+.app-container .control-panel .max-players-picker { color: var(--goc-muted-on-wine); font-weight: 400; }
 .app-container .turn-sidebar .sidebar-log,
 .app-container .table-reminder,
 .app-container .table-reminder .reminder-score,
 .app-container .table-reminder .reminder-score-total {
   border-top-color: var(--table-line); box-shadow: inset 0 1px 0 #ffffff04;
 }
-.app-container .sidebar-log .match-log li { border-bottom-color: #454b4c; }
+.app-container .sidebar-log .match-log li { border-bottom-color: var(--table-line); }
 .app-container .table-reminder > h3,
-.app-container .sidebar-log h3 { color: #e3e5df; font-weight: 500; }
-.app-container .card,
-.app-container .card-in-cell {
-  background-image: linear-gradient(145deg, #ffffff0b, #0000000b);
-  box-shadow: inset 0 1px 0 #ffffff14, 0 2px 4px #0004;
-}
+.app-container .sidebar-log h3 { color: var(--goc-text-on-wine); font-weight: 500; }
 .app-container .deck-card-back {
-  background: linear-gradient(145deg, #454c4e, #333a3d); border-color: #626b6e;
-  box-shadow: inset 0 1px 0 #ffffff14, 3px 3px 0 #202728, 5px 5px 0 #454b4d;
+  background: var(--goc-wine); border-color: var(--goc-line-on-wine);
+  color: var(--goc-text-on-wine); box-shadow: 2px 3px 0 var(--goc-tile-edge);
 }
-.app-container .game-board-container { border-color: #b8aa89; box-shadow: inset 0 0 0 1px #fff3, 0 2px 5px #0002; }
-.app-container .game-board { background: #eee6d0; }
+.app-container .game-board-container { border-color: var(--goc-line-on-paper); box-shadow: 0 1px 4px #633b3e1c; }
 @media (prefers-reduced-motion: reduce) {
   .app-container .control-panel button,
   .app-container .table-menu button,
@@ -302,11 +298,8 @@
 .local-player-names { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 0; padding: 16px 0 0; border: 0; border-top: 1px solid var(--table-line); min-width: 0; }
 .local-player-names legend { padding: 0 10px 0 0; color: #d1d3ce; font-size: 13px; }
 .local-player-name { display: grid; gap: 7px; min-width: 0; text-align: left; font-size: 12px; color: #c5c7c3; }
-.local-player-name > span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: #6083a1; }
-.local-player-name-1 > span::before { background: #b59060; }
-.local-player-name-2 > span::before { background: #78a486; }
-.local-player-name-3 > span::before { background: #a28db9; }
-.local-player-name input { box-sizing: border-box; width: 100%; min-width: 0; height: 42px; padding: 0 12px; border: 1px solid #61686a; border-radius: 6px; background: #222728; color: #e8e9e6; font: inherit; font-size: 14px; }
+.local-player-name > span::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; background: color-mix(in srgb, var(--goc-owner, var(--goc-seat-1)) 50%, var(--goc-paper)); }
+.local-player-name input { box-sizing: border-box; width: 100%; min-width: 0; height: 42px; padding: 0 12px; border: 1px solid var(--goc-line-on-wine); border-radius: 6px; background: var(--goc-wine); color: var(--goc-text-on-wine); font: inherit; font-size: 14px; }
 .local-player-name input:focus-visible { outline: 2px solid var(--table-gold); outline-offset: 2px; }
 .app-container .local-game-setup > .action-button { width: 100%; min-height: 44px; }
 @media (max-width: 420px) { .local-game-options, .local-player-names { grid-template-columns: 1fr; gap: 14px; } }
@@ -331,11 +324,10 @@
 .log-move-entry { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr) auto; align-items: baseline; gap: 8px; width: 100%; padding: 2px 0; border: 0; background: transparent; color: #e3e5df; font: inherit; text-align: left; cursor: pointer; }
 .log-move-entry:hover { background: #ffffff08; }
 .log-player, .log-card { overflow-wrap: anywhere; min-width: 0; }
-.log-player { color: #b4cce0; }
-.log-player-1 { color: #dec391; }.log-player-2 { color: #acd3b7; }.log-player-3 { color: #d2bde7; }
+.log-player { color: color-mix(in srgb, var(--goc-owner, var(--goc-seat-1)) 26%, var(--goc-paper)); }
 .log-move-entry strong, .log-detail-popover footer strong, .log-edge-detail b { color: #dbc184; white-space: nowrap; }
 .log-service-entry { color: #aeb4b1; font-size: 12px; }
-.log-detail-popover { position: fixed; z-index: 3100; box-sizing: border-box; width: min(340px, calc(100vw - 24px)); max-height: min(420px, 65vh); overflow-y: auto; padding: 14px; border: 1px solid #62675f; border-radius: 8px; background: #292e2f; box-shadow: 0 8px 24px #0006; color: #e3e5df; font-size: 13px; line-height: 1.5; }
+.log-detail-popover { position: fixed; z-index: 3100; box-sizing: border-box; width: min(340px, calc(100vw - 24px)); max-height: min(420px, 65vh); overflow-y: auto; padding: 14px; border: 1px solid var(--goc-line-on-wine); border-radius: 8px; background: var(--goc-wine-deep); box-shadow: 0 8px 24px #2e1a2060; color: var(--goc-text-on-wine); font-size: 13px; line-height: 1.5; }
 .log-detail-popover header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
 .log-detail-popover header strong { overflow-wrap: anywhere; }
 .log-detail-popover button { border: 0; background: transparent; color: #ddd; font-size: 20px; cursor: pointer; }
@@ -371,7 +363,7 @@
 .training-local-annotation h3 { margin:0 0 10px; color:#f6efe2; font-size:22px; font-weight:500; }
 .training-local-annotation p { margin:0 auto 12px; max-width:520px; color:#d8d0c4; font-size:15px; line-height:1.45; }
 .training-local-callout { max-width:520px; margin:0 auto; padding:11px 14px; border:1px solid rgba(214,174,118,.35); border-radius:7px; background:rgba(214,174,118,.1); color:#ead8b7; font-size:14px; line-height:1.4; }
-.training-local-annotation-window { position: fixed; z-index: 3100; top: 50%; left: max(18px, calc(50% - 520px)); transform: translateY(-50%); width: 280px; padding: 20px; box-sizing: border-box; border: 1px solid rgba(214,174,118,.3); border-radius: 10px; background: #292d2e; color: #e9e2d8; box-shadow: 0 16px 48px #0007; }
+.training-local-annotation-window { position: fixed; z-index: 3100; top: 50%; left: max(18px, calc(50% - 520px)); transform: translateY(-50%); width: 280px; padding: 20px; box-sizing: border-box; border: 1px solid var(--goc-line-on-wine); border-radius: 10px; background: var(--goc-wine); color: var(--goc-text-on-wine); box-shadow: 0 16px 48px #2e1a2060; }
 .training-local-annotation-window h2 { margin:0 0 12px; text-align:center; font-size:20px; font-weight:500; }
 .training-local-annotation-window p { margin:0 0 14px; color:#d8d0c4; font-size:14px; line-height:1.45; text-align:center; }
 .training-local-annotation-window .training-local-callout { margin:0; }
@@ -389,3 +381,114 @@
 .app-container .local-player-name input { display: block; box-sizing: border-box; width: 100%; }
 .app-container .modal-content:has(.local-game-setup) { width: 100%; box-sizing: border-box; }
 .app-container .local-game-setup { align-self: stretch; justify-self: stretch; min-width: 0; }
+
+/* The numbered seats share color across the board, hand, log and setup. */
+:is(.player-blue, .player-0, .player-score-blue, .local-player-name-0, .log-player-0) { --goc-owner: var(--goc-seat-1); }
+:is(.player-orange, .player-1, .player-score-orange, .local-player-name-1, .log-player-1) { --goc-owner: var(--goc-seat-2); }
+:is(.player-green, .player-2, .player-score-green, .local-player-name-2, .log-player-2) { --goc-owner: var(--goc-seat-3); }
+:is(.player-purple, .player-3, .player-score-purple, .local-player-name-3, .log-player-3) { --goc-owner: var(--goc-seat-4); }
+.player-neutral { --goc-owner: var(--goc-neutral); }
+.app-container .table-players .player-score-name::before {
+  color: inherit; background: color-mix(in srgb, var(--goc-owner) 48%, var(--goc-paper));
+}
+.app-container .table-players .active-score { border-color: var(--goc-highlight); }
+
+/* Use an inset side face so the relief never reduces the gaps or hit areas. */
+.app-container :is(.card, .card-in-cell)[class*="player-"],
+.drag-card-preview .drag-card-preview-card {
+  background: var(--goc-paper);
+  color: var(--goc-ink);
+  border-color: var(--goc-owner, var(--goc-line-on-paper));
+  box-shadow: var(--goc-tile-shadow);
+}
+.app-container .card-in-cell.player-neutral { background: var(--goc-neutral-paper); }
+.app-container .card-in-cell.pending {
+  border-color: var(--goc-highlight-dark);
+  box-shadow: var(--goc-tile-shadow), 0 0 0 1px var(--goc-highlight-dark);
+  opacity: 1;
+}
+.app-container .cell.relation-highlighted { outline-color: var(--goc-highlight-dark); }
+.app-container .cell.last-placed { outline-color: var(--goc-seat-2); }
+.app-container .cell.relation-highlighted .card-in-cell,
+.app-container .card[data-draggable="true"]:hover { filter: none; }
+.app-container .card[data-draggable="true"]:hover { background: color-mix(in srgb, var(--goc-paper) 86%, var(--goc-highlight)); }
+.app-container .deck-stack p { color: var(--goc-ink); }
+
+/* Some overlays are portals, so they need the palette even outside .app-container. */
+.semantic-board-link {
+  background: var(--goc-wine-deep); color: var(--goc-text-on-wine);
+  border-color: var(--goc-line-on-wine); box-shadow: var(--table-button-shadow);
+}
+.semantic-board-link.defined {
+  background: var(--goc-wine); color: var(--goc-text-on-wine); border-color: var(--goc-highlight);
+}
+.semantic-board-link:hover:not(:disabled) { color: white; border-color: var(--goc-text-on-wine); }
+.semantic-relation-popover,
+.semantic-submit-popover,
+.training-guide,
+.pending-card-actions,
+.app-container .hand-actions .control-redraw-confirm,
+.modal-window:has(.score-explanation-dialog, .pending-relation-review),
+.log-detail-popover:has(.score-details) > header {
+  background: var(--goc-wine-deep); color: var(--goc-text-on-wine);
+  border-color: var(--goc-line-on-wine);
+}
+.training-guide-arrow { background: var(--goc-wine-deep); }
+.training-guide[data-side] .training-guide-arrow { border-color: var(--goc-line-on-wine); }
+.training-target-ring { border-color: var(--goc-highlight); box-shadow: 0 0 0 2px var(--goc-highlight-dark); }
+.training-guide .training-close { color: var(--goc-muted-on-wine); }
+.training-guide .training-feedback,
+.semantic-relation-popover section > span,
+.semantic-popover-preview small,
+.semantic-submit-popover strong { color: var(--goc-highlight); }
+.semantic-relation-popover button,
+.semantic-submit-popover button,
+.app-container .game-table .mobile-move-actions button,
+.app-container .modal-window :is(.modal-actions, .settings-row) button {
+  color: var(--goc-text-on-wine); background: var(--goc-wine); border-color: var(--goc-line-on-wine);
+}
+.semantic-relation-popover button:hover:not(:disabled),
+.semantic-relation-popover button.active,
+.semantic-submit-popover button:first-of-type,
+.training-guide .training-primary,
+.app-container .game-table .mobile-move-actions .mobile-primary,
+.app-container .modal-window .modal-actions button:first-child {
+  color: var(--goc-ink); background: var(--goc-highlight); border-color: var(--goc-line-on-paper);
+}
+.semantic-popover-primary {
+  color: var(--goc-ink) !important;
+  background: var(--goc-highlight) !important;
+  border-color: var(--goc-line-on-paper) !important;
+}
+.word-reorder-preview[class*="player-"] { --reorder-accent: var(--goc-owner); color: var(--goc-ink); }
+
+.app-container .table-menu.is-open .table-menu-items,
+.app-container .game-table .mobile-sidebar,
+.app-container .game-table .mobile-sidebar-tabs button,
+.app-container .game-table .mobile-sidebar-heading button,
+.app-container .hand-actions > .hand-redraw-button.hand-redraw-text {
+  background: var(--goc-wine); color: var(--goc-text-on-wine); border-color: var(--goc-line-on-wine);
+}
+.app-container .game-table .mobile-sidebar-tabs button[aria-expanded="true"] { background: var(--goc-wine-light); border-color: var(--goc-highlight); }
+.app-container .game-table .table-hand-tray.has-mobile-actions { background: var(--goc-wine-deep); color: var(--goc-text-on-wine); border-color: var(--goc-line-on-wine); }
+.app-container .mobile-action-dock .semantic-relation-popover footer,
+.app-container .mobile-move-actions footer { background: var(--goc-wine-deep); }
+.app-container .game-table .mobile-move-actions p { color: var(--goc-muted-on-wine); }
+
+@media (max-width: 900px) and (orientation: portrait) {
+  .app-container .game-table .table-hand-tray:not(.has-mobile-actions) { background: none; box-shadow: none; }
+  .app-container .game-table .table-hand-tray:not(.has-mobile-actions)::after { background: var(--goc-wine); border-color: var(--goc-line-on-wine); }
+  .app-container .game-table .table-hand-tray .cards-container.fan-hand {
+    background: var(--goc-panel); border-color: var(--goc-line-on-paper);
+    box-shadow: 0 -2px 12px #633b3e1c;
+  }
+  .app-container .game-table .word-hand .card[class*="player-"] { --word-accent: var(--goc-owner); background: none; box-shadow: none; }
+  .app-container .game-table .word-hand .card .card-title {
+    color: var(--goc-ink); background: var(--goc-paper); border-color: var(--word-accent);
+    box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--word-accent) 40%, var(--goc-paper)), 0 1px 2px #633b3e25;
+  }
+  .app-container .game-table .word-hand .card.is-inspected .card-title { background: color-mix(in srgb, var(--word-accent) 14%, var(--goc-paper)); }
+  .app-container .game-table .table-hand-tray .deck-stack p { color: var(--goc-text-on-wine); }
+  .app-container .game-table .table-hand-tray .deck-card-back { color: var(--goc-text-on-wine); border-color: var(--goc-line-on-wine); }
+  .app-container .hand-actions > .hand-redraw-button.hand-redraw-text { background: none; box-shadow: none; }
+}

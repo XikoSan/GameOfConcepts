@@ -79,6 +79,49 @@
 
 .main-menu-footer .feedback-link { border: 0; padding: 0; background: none; color: inherit; font: inherit; cursor: pointer; text-decoration: underline; }
 
+/* The menu shares the board surface with a quiet readable veil over the demo field. */
+.app-container .main-menu {
+  isolation: isolate;
+  overflow: hidden;
+  gap: 22px;
+  background: #252a2b;
+}
+.app-container .main-menu::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(35, 40, 41, .52), rgba(35, 40, 41, .28) 42%, rgba(35, 40, 41, .7)),
+    radial-gradient(circle at 50% 48%, rgba(255, 244, 222, .08), transparent 34%);
+}
+.app-container .main-menu > h1,
+.app-container .main-menu > .main-menu-actions,
+.app-container .main-menu > .main-menu-footer {
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 2px 8px rgba(36, 25, 21, .55);
+}
+.app-container .main-menu > h1 { color: #fff5e8; letter-spacing: .01em; }
+.app-container .main-menu-actions button {
+  border-color: rgba(255, 237, 207, .62);
+  background: rgba(79, 105, 113, .94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 4px 10px rgba(39, 23, 19, .28);
+}
+.app-container .main-menu-actions button:hover { background: rgba(100, 124, 127, .98); }
+.app-container .main-menu-actions .main-menu-training {
+  background: rgba(76, 115, 84, .97);
+  border-color: rgba(211, 235, 192, .72);
+}
+.app-container .main-menu-actions .main-menu-training:hover { background: rgba(93, 135, 99, .99); }
+.app-container .main-menu-updates {
+  z-index: 4;
+  background: rgba(28, 35, 35, .86);
+  border-color: rgba(246, 222, 183, .28);
+  box-shadow: 0 8px 24px rgba(31, 18, 15, .28), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
 @media (max-width: 900px), (max-height: 500px) {
   .main-menu-updates {
     left: 10px;

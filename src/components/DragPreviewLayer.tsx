@@ -4,6 +4,7 @@ import { incrementCounter } from '../debug/performanceDiagnostics';
 import type { RegularCardName } from '../game';
 import './DragPreviewLayer.css';
 import { usePortraitHand } from '../hooks/usePortraitHand';
+import { useFitCardTitle } from '../hooks/useFitCardTitle';
 import { getCardDragLift, getDragBoardCellSize } from './cardDragPosition';
 
 interface DragPreviewLayerProps {
@@ -23,6 +24,7 @@ export function DragPreviewLayer({
 }: DragPreviewLayerProps) {
   const portrait = usePortraitHand();
   const previewRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
   const latestPositionRef = useRef({ x: initialX, y: initialY });
   const pointerTypeRef = useRef(pointerType);
@@ -54,25 +56,15 @@ export function DragPreviewLayer({
   useLayoutEffect(() => {
     applyPreviewTransform();
   }, [applyPreviewTransform]);
+  useFitCardTitle(cardRef, titleRef, cardName);
   useLayoutEffect(() => {
-    const title = titleRef.current, card = title?.parentElement;
-    if (!title || !card || !portrait) return;
-    const fit = () => {
-      title.style.fontSize = '';
-      const style = getComputedStyle(card);
-      const available = card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
-      if (available > 0 && title.scrollWidth > available) {
-        title.style.fontSize = `${parseFloat(getComputedStyle(title).fontSize) * available / title.scrollWidth * .98}px`;
-      }
-    };
-    const observer = new ResizeObserver(fit);
-    observer.observe(card);
-    fit();
+    const card = cardRef.current;
+    if (!card || !portrait) return;
     // A short fade avoids stretching a long label into a square while keeping the drop target exact.
     const animation = matchMedia('(prefers-reduced-motion: reduce)').matches ? undefined : card.animate([
       { opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'scale(1)' },
     ], { duration: 120, easing: 'ease-out' });
-    return () => { observer.disconnect(); animation?.cancel(); };
+    return () => animation?.cancel();
   }, [cardName, portrait]);
 
   useEffect(() => {
@@ -109,8 +101,8 @@ export function DragPreviewLayer({
 
   return createPortal(
     <div ref={previewRef} className={`drag-card-preview ${portrait ? 'portrait-drag-preview' : ''}`}>
-      <div className={`drag-card-preview-card player-${playerColor}`}>
-        <span ref={titleRef}>{cardName}</span>
+      <div ref={cardRef} className={`drag-card-preview-card player-${playerColor}`}>
+        <span ref={titleRef}><span className="card-title-text">{cardName}</span></span>
       </div>
     </div>,
     document.body

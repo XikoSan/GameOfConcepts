@@ -1,5 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { incrementCounter } from '../debug/performanceDiagnostics';
+import { useFitCardTitle } from '../hooks/useFitCardTitle';
 import './Card.css';
 
 interface CardProps {
@@ -32,40 +33,7 @@ export const Card: React.FC<CardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
 
-  useLayoutEffect(() => {
-    const card = cardRef.current;
-    const title = titleRef.current;
-    if (!card || !title) return;
-    const measure = card.ownerDocument.createElement('canvas').getContext('2d');
-    const fitTitle = () => {
-      title.style.fontSize = '';
-      const style = getComputedStyle(card);
-      const titleStyle = getComputedStyle(title);
-      const vertical = titleStyle.writingMode.startsWith('vertical');
-      // Reserve enough room for the tilted backing inside each hand slot.
-      const available = wordLayout
-        ? Math.min(196, (card.parentElement?.clientWidth ?? 0) - 6) - parseFloat(titleStyle.paddingLeft) - parseFloat(titleStyle.paddingRight) - 5
-        : vertical
-        ? title.clientHeight - 3
-        : card.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight) - 3;
-      const baseSize = parseFloat(titleStyle.fontSize);
-      // Measure glyphs rather than a stretched flex label, including when centred text overflows both ends.
-      if (measure) measure.font = `${titleStyle.fontWeight} ${baseSize}px ${titleStyle.fontFamily}`;
-      const extent = measure
-        ? measure.measureText(cardName).width + (parseFloat(titleStyle.letterSpacing) || 0) * Math.max(0, cardName.length - 1)
-        : vertical ? title.scrollHeight : title.scrollWidth;
-      if (available > 0 && extent > available) {
-        title.style.fontSize = `${baseSize * available / extent * 0.98}px`;
-      }
-    };
-    const observer = new ResizeObserver(fitTitle);
-    observer.observe(card);
-    if (wordLayout && card.parentElement) observer.observe(card.parentElement);
-    fitTitle();
-    void document.fonts.ready.then(() => { if (card.isConnected) fitTitle(); });
-    return () => observer.disconnect();
-  }, [cardName, inspected, managedPointer, wordLayout]);
-
+  useFitCardTitle(cardRef, titleRef, cardName, wordLayout);
 
   const pointer = useRef<{ id: number; x: number; y: number; dragging: boolean } | null>(null);
   const endDrag = useRef(onDragEnd);
@@ -141,7 +109,9 @@ export const Card: React.FC<CardProps> = ({
       onLostPointerCapture={managedPointer ? undefined : handlePointerCancel}
       onContextMenu={event => event.preventDefault()}
     >
-      <span ref={titleRef} className="card-title">{cardName}</span>
+      <span ref={titleRef} className="card-title">
+        <span className="card-title-text">{cardName}</span>
+      </span>
     </div>
   );
 };

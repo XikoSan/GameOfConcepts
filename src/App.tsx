@@ -18,8 +18,10 @@ import { useCompactTable } from './hooks/useCompactTable';
 import { useActionDockHeight } from './hooks/useActionDockHeight';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { TableReminder } from './components/TableReminder';
+import { MenuBoardPreview } from './components/MenuBoardPreview';
 import packageInfo from '../package.json';
 import { MENU_RELEASE_NOTES } from './data/releaseNotes';
 import './MainMenu.css';
@@ -33,7 +35,6 @@ import { useGameState } from './hooks/useGameState';
 import { usePlayerIdentity } from './hooks/usePlayerIdentity';
 import {
   createRoom,
-  deleteRoom,
   getAvailableRooms,
   getRoomById,
   joinRoom,
@@ -196,7 +197,7 @@ interface DragPreview {
   pointerType?: string;
 }
 
-type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'tutorial' | 'leave-game' | null;
+type ActiveModal = 'feedback' | 'local-game' | 'new-game' | 'rules' | 'settings' | 'privacy' | 'tutorial' | 'leave-game' | null;
 
 const defaultInterfaceSettings = {
   showPlayableHighlights: true,
@@ -633,40 +634,6 @@ function App() {
     });
   };
 
-  const handleManualSyncRoom = () => {
-    void syncOnlineRoom('manual sync');
-  };
-
-  const handleDeleteOnlineRoom = async (targetRoom?: Room) => {
-    const room = targetRoom ?? onlineRoom;
-    if (!room || !isRoomHost(room, playerId)) return;
-
-    const shouldDelete = window.confirm(
-      'Удалить комнату? Все игроки потеряют доступ к партии.'
-    );
-    if (!shouldDelete) return;
-
-    setIsOnlineLoading(true);
-    setOnlineError(null);
-
-    try {
-      await deleteRoom(room.id, playerId);
-      if (onlineRoomRef.current?.id === room.id) {
-        setOnlineRoom(null);
-      }
-      void loadAvailableRooms();
-    } catch (error) {
-      console.error('[delete online room error]', error);
-      setOnlineError(
-        error instanceof Error
-          ? `Не удалось удалить комнату: ${error.message}`
-          : 'Не удалось удалить комнату.'
-      );
-    } finally {
-      setIsOnlineLoading(false);
-    }
-  };
-
   const handleCreateOnlineRoom = async () => {
     const nickname = getValidatedOnlineNickname();
     if (!nickname) return;
@@ -967,35 +934,6 @@ function App() {
 
   </div>);
 
-  const renderControlPanel = () => onlineRoom ? (
-    <aside className="side-panel control-panel" aria-label="Панель управления">
-      <nav className="panel-actions" aria-label="Действия">
-        {onlineRoom && <section className="action-group" aria-label="Инструменты">
-          <h2>Инструменты</h2>
-          {onlineRoom && (
-            <button className="action-button action-button-subtle" type="button" onClick={handleManualSyncRoom}>
-              Синхронизировать
-            </button>
-          )}
-          {onlineRoom && isOnlineHost && (
-            <button
-              className="action-button action-button-quiet"
-              disabled={isOnlineLoading}
-              type="button"
-              onClick={() => void handleDeleteOnlineRoom()}
-            >
-              Удалить комнату
-            </button>
-          )}
-        </section>}
-
-
-      </nav>
-
-
-    </aside>
-  ) : null;
-
   const renderPlayerHand = (
     playerIndex: number,
     className?: string,
@@ -1145,7 +1083,7 @@ function App() {
               </div>
               {isOnlineTable && onlinePlayers.length < 2 && <p className="online-waiting-note">Ожидание второго игрока</p>}
             </div>
-            <TableSidebar controls={renderControlPanel()} log={<section className="sidebar-log" aria-label="Лог партии">
+            <TableSidebar log={<section className="sidebar-log" aria-label="Лог партии">
                 <h3>Лог партии</h3>
                 {moveLog.length > 0 ? (
                   <ol className="match-log" ref={matchLogRef}>
@@ -1159,6 +1097,7 @@ function App() {
       {showMainMenu && activeModal !== 'tutorial' && <main className="main-menu" aria-label="Главное меню" inert={activeModal !== null}
         onPointerDownCapture={event => { if (event.button === 0) startMenuMusic(); }}
         onKeyDownCapture={event => { if (event.key === 'Enter' || event.key === ' ') startMenuMusic(); }}>
+        <MenuBoardPreview />
         <aside className="main-menu-updates" aria-label="Обновления игры">
           <button className="main-menu-updates-toggle" type="button" aria-expanded={showMenuUpdates} aria-controls="main-menu-updates-list" onClick={() => setShowMenuUpdates((visible) => !visible)}>
             <span>Что нового</span><span aria-hidden="true">{showMenuUpdates ? '−' : '+'}</span>
@@ -1314,16 +1253,6 @@ function App() {
                   ) : (
                     <p>Ожидание запуска игры хостом</p>
                   )}
-                  {isOnlineHost && (
-                    <button
-                      className="action-button action-button-quiet"
-                      disabled={isOnlineLoading}
-                      type="button"
-                      onClick={() => void handleDeleteOnlineRoom()}
-                    >
-                      Удалить комнату
-                    </button>
-                  )}
                 </div>
               </section>
             ) : (
@@ -1404,7 +1333,6 @@ function App() {
                       (player) => player.id === playerId
                     );
                     const listedMaxPlayers = room.max_players ?? 2;
-                    const canDeleteListedRoom = isRoomHost(room, playerId);
                     const isWaitingForPlayers = room.status === 'waiting';
                     const canJoinRoom =
                       isWaitingForPlayers &&
@@ -1444,15 +1372,6 @@ function App() {
                             onClick={() => void handleJoinListedRoom(room)}
                           >
                             Подключиться
-                          </button>
-                        )}
-                        {canDeleteListedRoom && (
-                          <button
-                            disabled={isOnlineLoading}
-                            type="button"
-                            onClick={() => void handleDeleteOnlineRoom(room)}
-                          >
-                            Удалить
                           </button>
                         )}
                       </div>
@@ -1534,6 +1453,13 @@ function App() {
             />
           </div>
           <MusicSettings music={music} />
+          <div className="settings-row settings-link-row">
+            <div>
+              <strong>Данные и конфиденциальность</strong>
+              <p>Как работают гостевые онлайн-сессии и диагностический архив.</p>
+            </div>
+            <button type="button" onClick={() => setActiveModal('privacy')}>Открыть</button>
+          </div>
           <div className="modal-actions">
             <button type="button" onClick={handleResetSettings}>
               Сбросить настройки
@@ -1542,6 +1468,11 @@ function App() {
               Закрыть
             </button>
           </div>
+        </Modal>
+      )}
+      {activeModal === 'privacy' && (
+        <Modal title="Данные и конфиденциальность" onClose={() => setActiveModal('settings')} trapFocus>
+          <PrivacyPolicy />
         </Modal>
       )}
       {isDictionaryOpen && dictionaryTerm && (

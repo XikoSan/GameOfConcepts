@@ -137,9 +137,7 @@
   display: block;
   width: 100%;
   min-width: 0;
-  text-overflow: ellipsis;
   max-width: 100%;
-  overflow: hidden;
   text-align: center;
   white-space: nowrap;
   overflow-wrap: normal;

@@ -33,9 +33,7 @@
   pointer-events: none;
   display: block;
   max-width: 100%;
-  overflow: hidden;
   white-space: nowrap;
-  text-overflow: ellipsis;
   line-height: 1.1;
 }
 

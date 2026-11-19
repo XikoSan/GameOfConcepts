@@ -13,6 +13,7 @@ import {
   type ConceptSummary,
 } from '../services/conceptDescriptionService';
 import { getWiktionarySearchUrl } from '../services/dictionaryService';
+import { useFitCardTitle } from '../hooks/useFitCardTitle';
 import {
   CardInfoPopover,
   type CardInfoPopoverMode,
@@ -58,7 +59,6 @@ interface CellProps {
 }
 
 const CARD_TITLE_MAX_SIZE = 18;
-const CARD_TITLE_MIN_SIZE = 10;
 
 const getOwnerLabel = (playerId: PlacedCard['playerId']) => {
   if (playerId !== null) return `Игрок ${playerId + 1}`;
@@ -182,29 +182,7 @@ export const Cell: React.FC<CellProps> = ({
     useState<PendingOverlayPosition | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLSpanElement>(null);
-  const cardName = placedCard?.cardName;
-  useLayoutEffect(() => {
-    const card = cardRef.current;
-    const title = titleRef.current;
-    if (!card || !title) return;
-    const fitTitle = () => {
-      let size = CARD_TITLE_MAX_SIZE;
-      title.style.fontSize = `${size}px`;
-      const range = document.createRange();
-      range.selectNodeContents(title);
-      const availableWidth = title.getBoundingClientRect().width * 0.96;
-      while (range.getBoundingClientRect().width > availableWidth && size > CARD_TITLE_MIN_SIZE) {
-        size = Math.max(CARD_TITLE_MIN_SIZE, size - 0.25);
-        title.style.fontSize = `${size}px`;
-      }
-    };
-    const observer = new ResizeObserver(fitTitle);
-    observer.observe(card);
-    fitTitle();
-    let active = true;
-    void document.fonts.ready.then(() => { if (active) fitTitle(); });
-    return () => { active = false; observer.disconnect(); };
-  }, [cardName]);
+  useFitCardTitle(cardRef, titleRef, placedCard?.cardName);
   const popoverOpenTimeoutRef = useRef<number | null>(null);
   const popoverCloseTimeoutRef = useRef<number | null>(null);
   const popoverRequestIdRef = useRef(0);
@@ -733,7 +711,7 @@ export const Cell: React.FC<CellProps> = ({
           style={{ fontSize: `${CARD_TITLE_MAX_SIZE}px` }}
         >
           <span ref={titleRef} className="card-title" lang="ru">
-            {placedCard.cardName}
+            <span className="card-title-text">{placedCard.cardName}</span>
           </span>
           {shouldShowTooltip &&
             activePopoverMode &&
