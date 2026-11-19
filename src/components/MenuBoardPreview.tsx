@@ -7,14 +7,14 @@ import './MenuBoardPreview.css';
  * показывать знакомую поверхность игры, не создавая второй игровой стол.
  */
 const tiles = [
-  { name: 'Эмоция', x: 50, y: 16, owner: 'neutral' },
-  { name: 'Радость', x: 24, y: 42, owner: 'blue' },
-  { name: 'Улыбка', x: 50, y: 42, owner: 'orange' },
-  { name: 'Веселье', x: 24, y: 68, owner: 'green' },
-  { name: 'Симпатия', x: 50, y: 68, owner: 'blue' },
-  { name: 'Надежда', x: 76, y: 16, owner: 'purple' },
-  { name: 'Доверие', x: 76, y: 42, owner: 'green' },
-  { name: 'Общество', x: 76, y: 68, owner: 'orange' },
+  { name: 'Эмоция', owner: 'neutral' },
+  { name: 'Радость', owner: 'blue' },
+  { name: 'Улыбка', owner: 'orange' },
+  { name: 'Веселье', owner: 'green' },
+  { name: 'Симпатия', owner: 'blue' },
+  { name: 'Надежда', owner: 'purple' },
+  { name: 'Доверие', owner: 'green' },
+  { name: 'Общество', owner: 'orange' },
 ];
 
 export const MenuBoardPreview: React.FC = () => (
@@ -23,13 +23,13 @@ export const MenuBoardPreview: React.FC = () => (
     <div className="menu-board-stage">
       <div className="menu-board-grid" />
       <svg className="menu-board-links" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path className="menu-board-link-mobile" d="M50 18 L50 48 M25 48 L50 48 M50 48 L75 48 M50 48 L50 78" />
+        <path className="menu-board-link-mobile" d="M50 18 V82 M18 50 H82" />
         <path className="menu-board-link-desktop" d="M36 48 L50 48 M36 48 L36 66 M50 48 L64 48 M50 48 L50 66 M64 30 L64 48 M50 66 L64 66 M50 30 L50 48" />
       </svg>
       {tiles.map((tile, index) => (
         <span
           className={`menu-board-tile menu-board-tile-${tile.owner} menu-board-tile-position-${index + 1}`}
-          key={`${tile.name}-${tile.x}-${tile.y}`}
+          key={tile.name}
         >
           <span>{tile.name}</span>
         </span>

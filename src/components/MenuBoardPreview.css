@@ -32,6 +32,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  transform: translateY(var(--menu-board-offset-y));
   opacity: .56;
   overflow: visible;
 }
@@ -44,7 +45,7 @@
   stroke-dasharray: 2.2 1.4;
 }
 
-.menu-board-link-desktop { display: none; }
+.menu-board-link-mobile { display: none; }
 
 .menu-board-tile {
   position: absolute;
@@ -54,7 +55,7 @@
   width: clamp(74px, 10vw, 142px);
   aspect-ratio: 1;
   left: var(--menu-tile-x);
-  top: var(--menu-tile-y);
+  top: calc(var(--menu-tile-y) + var(--menu-board-offset-y));
   transform: translate(-50%, -50%);
   box-sizing: border-box;
   padding: clamp(4px, .6vw, 10px);
@@ -87,24 +88,6 @@
 .menu-board-tile-green { background: #52785e; }
 .menu-board-tile-purple { background: #785e79; }
 .menu-board-tile-neutral { background: #6d6458; color: #fff2dc; }
-
-/* Mobile keeps the wider showcase composition; desktop overrides these with
-   a tighter rhythm below. Keeping coordinates in CSS lets both link paths and
-   tiles switch together at the breakpoint. */
-.menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 16%; }
-.menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 24%; --menu-tile-y: 42%; }
-.menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 42%; }
-.menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 24%; --menu-tile-y: 68%; }
-.menu-board-stage .menu-board-tile-position-5 { --menu-tile-x: 50%; --menu-tile-y: 68%; }
-.menu-board-stage .menu-board-tile-position-6 { --menu-tile-x: 76%; --menu-tile-y: 16%; }
-.menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 76%; --menu-tile-y: 42%; }
-.menu-board-stage .menu-board-tile-position-8 { --menu-tile-x: 76%; --menu-tile-y: 68%; }
-
-@media (max-width: 700px) {
-  .menu-board-preview { opacity: .7; }
-  .menu-board-tile { width: clamp(58px, 18vw, 94px); font-size: clamp(8px, 2.5vw, 12px); }
-  .menu-board-grid { background-size: 58px 58px; }
-}
 
 @media (prefers-reduced-motion: no-preference) {
   .menu-board-tile:nth-of-type(3n) { animation: menu-board-float 7s ease-in-out infinite; }
@@ -140,6 +123,7 @@
 }
 
 .menu-board-stage {
+  --menu-board-offset-y: -11%;
   position: absolute;
   inset: 0 50% 0 0;
   overflow: hidden;
@@ -173,29 +157,35 @@
 .menu-board-stage .menu-board-tile-purple { border-color: #9a7aa1; }
 .menu-board-stage .menu-board-tile-neutral { border-color: #8e8577; }
 
-/* On a desktop menu the preview stays compact, matching the earlier board
-   rhythm while leaving the controls clear on the right. */
-@media (min-width: 701px) {
-  .menu-board-link-mobile { display: none; }
-  .menu-board-link-desktop { display: block; }
-  .menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 36%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 36%; --menu-tile-y: 66%; }
-  .menu-board-stage .menu-board-tile-position-5 { --menu-tile-x: 50%; --menu-tile-y: 66%; }
-  .menu-board-stage .menu-board-tile-position-6 { --menu-tile-x: 64%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 64%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile-position-8 { --menu-tile-x: 64%; --menu-tile-y: 66%; }
-}
+.menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 30%; }
+.menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 36%; --menu-tile-y: 48%; }
+.menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 48%; }
+.menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 36%; --menu-tile-y: 66%; }
+.menu-board-stage .menu-board-tile-position-5 { --menu-tile-x: 50%; --menu-tile-y: 66%; }
+.menu-board-stage .menu-board-tile-position-6 { --menu-tile-x: 64%; --menu-tile-y: 30%; }
+.menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 64%; --menu-tile-y: 48%; }
+.menu-board-stage .menu-board-tile-position-8 { --menu-tile-x: 64%; --menu-tile-y: 66%; }
 
-@media (max-width: 700px) {
+/* Match the portrait menu breakpoint in MainMenu.css. A square stage keeps
+   link lengths consistent and fits above the menu on short viewports. */
+@media (max-width: 900px) and (orientation: portrait) {
   .menu-board-stage {
-    inset: 8% 0 60% 0;
+    --menu-board-offset-y: 0%;
+    inset: 8% 0 auto;
+    width: min(86%, 310px, 37dvh);
+    aspect-ratio: 1;
+    margin-inline: auto;
+    container-type: inline-size;
   }
 
+  .menu-board-link-mobile { display: block; }
+  .menu-board-link-desktop { display: none; }
+
   .menu-board-stage .menu-board-tile {
-    width: clamp(46px, 14vw, 58px);
-    font-size: clamp(8px, 2.5vw, 12px);
+    width: min(26cqw, 72px);
+    padding: 3px;
+    font-size: clamp(8px, 4.6cqw, 13px);
+    animation: none;
   }
 
   /* The phone gets a small, readable teaching motif instead of the full
@@ -204,10 +194,10 @@
   .menu-board-stage .menu-board-tile-position-6,
   .menu-board-stage .menu-board-tile-position-8 { display: none; }
   .menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 18%; }
-  .menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 25%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 50%; --menu-tile-y: 78%; }
-  .menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 75%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 18%; --menu-tile-y: 50%; }
+  .menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 50%; }
+  .menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 50%; --menu-tile-y: 82%; }
+  .menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 82%; --menu-tile-y: 50%; }
 
   .menu-board-stage .menu-board-grid { background-size: 58px 58px; }
 }
