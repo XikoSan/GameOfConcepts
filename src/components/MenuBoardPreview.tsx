@@ -23,7 +23,8 @@ export const MenuBoardPreview: React.FC = () => (
     <div className="menu-board-stage">
       <div className="menu-board-grid" />
       <svg className="menu-board-links" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d="M24 42 L50 42 M24 42 L24 68 M50 42 L76 42 M50 42 L50 68 M76 16 L76 42 M50 68 L76 68 M50 16 L50 42" />
+        <path className="menu-board-link-mobile" d="M24 42 L50 42 M24 42 L24 68 M50 42 L76 42 M50 42 L50 68 M76 16 L76 42 M50 68 L76 68 M50 16 L50 42" />
+        <path className="menu-board-link-desktop" d="M36 48 L50 48 M36 48 L36 66 M50 48 L64 48 M50 48 L50 66 M64 30 L64 48 M50 66 L64 66 M50 30 L50 48" />
       </svg>
       {tiles.map((tile) => (
         <span

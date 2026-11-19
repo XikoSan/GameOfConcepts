@@ -41,8 +41,10 @@
   stroke: #8e6250;
   stroke-width: .52;
   stroke-linecap: round;
-  stroke-dasharray: 1.6 1.1;
+  stroke-dasharray: 2.2 1.4;
 }
+
+.menu-board-link-desktop { display: none; }
 
 .menu-board-tile {
   position: absolute;
@@ -162,14 +164,16 @@
 /* On a desktop menu the preview stays compact, matching the earlier board
    rhythm while leaving the controls clear on the right. */
 @media (min-width: 701px) {
+  .menu-board-link-mobile { display: none; }
+  .menu-board-link-desktop { display: block; }
   .menu-board-stage .menu-board-tile:nth-of-type(1) { --menu-tile-x: 50%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(2) { --menu-tile-x: 32%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(2) { --menu-tile-x: 36%; --menu-tile-y: 48%; }
   .menu-board-stage .menu-board-tile:nth-of-type(3) { --menu-tile-x: 50%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(4) { --menu-tile-x: 32%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(4) { --menu-tile-x: 36%; --menu-tile-y: 66%; }
   .menu-board-stage .menu-board-tile:nth-of-type(5) { --menu-tile-x: 50%; --menu-tile-y: 66%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(6) { --menu-tile-x: 68%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(7) { --menu-tile-x: 68%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(8) { --menu-tile-x: 68%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(6) { --menu-tile-x: 64%; --menu-tile-y: 30%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(7) { --menu-tile-x: 64%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(8) { --menu-tile-x: 64%; --menu-tile-y: 66%; }
 }
 
 @media (max-width: 700px) {
