@@ -88,6 +88,18 @@
 .menu-board-tile-purple { background: #785e79; }
 .menu-board-tile-neutral { background: #6d6458; color: #fff2dc; }
 
+/* Mobile keeps the wider showcase composition; desktop overrides these with
+   a tighter rhythm below. Keeping coordinates in CSS lets both link paths and
+   tiles switch together at the breakpoint. */
+.menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 16%; }
+.menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 24%; --menu-tile-y: 42%; }
+.menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 42%; }
+.menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 24%; --menu-tile-y: 68%; }
+.menu-board-stage .menu-board-tile-position-5 { --menu-tile-x: 50%; --menu-tile-y: 68%; }
+.menu-board-stage .menu-board-tile-position-6 { --menu-tile-x: 76%; --menu-tile-y: 16%; }
+.menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 76%; --menu-tile-y: 42%; }
+.menu-board-stage .menu-board-tile-position-8 { --menu-tile-x: 76%; --menu-tile-y: 68%; }
+
 @media (max-width: 700px) {
   .menu-board-preview { opacity: .7; }
   .menu-board-tile { width: clamp(58px, 18vw, 94px); font-size: clamp(8px, 2.5vw, 12px); }
@@ -166,14 +178,14 @@
 @media (min-width: 701px) {
   .menu-board-link-mobile { display: none; }
   .menu-board-link-desktop { display: block; }
-  .menu-board-stage .menu-board-tile:nth-of-type(1) { --menu-tile-x: 50%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(2) { --menu-tile-x: 36%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(3) { --menu-tile-x: 50%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(4) { --menu-tile-x: 36%; --menu-tile-y: 66%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(5) { --menu-tile-x: 50%; --menu-tile-y: 66%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(6) { --menu-tile-x: 64%; --menu-tile-y: 30%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(7) { --menu-tile-x: 64%; --menu-tile-y: 48%; }
-  .menu-board-stage .menu-board-tile:nth-of-type(8) { --menu-tile-x: 64%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 30%; }
+  .menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 36%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 36%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile-position-5 { --menu-tile-x: 50%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile-position-6 { --menu-tile-x: 64%; --menu-tile-y: 30%; }
+  .menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 64%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-8 { --menu-tile-x: 64%; --menu-tile-y: 66%; }
 }
 
 @media (max-width: 700px) {
