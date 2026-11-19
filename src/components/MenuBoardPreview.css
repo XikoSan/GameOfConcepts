@@ -198,5 +198,16 @@
     font-size: clamp(8px, 2.5vw, 12px);
   }
 
+  /* The phone gets a small, readable teaching motif instead of the full
+     desktop showcase. Keep only the five concepts that form one clear shape. */
+  .menu-board-stage .menu-board-tile-position-5,
+  .menu-board-stage .menu-board-tile-position-6,
+  .menu-board-stage .menu-board-tile-position-8 { display: none; }
+  .menu-board-stage .menu-board-tile-position-1 { --menu-tile-x: 50%; --menu-tile-y: 18%; }
+  .menu-board-stage .menu-board-tile-position-2 { --menu-tile-x: 25%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-3 { --menu-tile-x: 50%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile-position-4 { --menu-tile-x: 50%; --menu-tile-y: 78%; }
+  .menu-board-stage .menu-board-tile-position-7 { --menu-tile-x: 75%; --menu-tile-y: 48%; }
+
   .menu-board-stage .menu-board-grid { background-size: 58px 58px; }
 }
