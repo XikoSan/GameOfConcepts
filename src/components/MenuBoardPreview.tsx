@@ -29,7 +29,7 @@ export const MenuBoardPreview: React.FC = () => (
         <span
           className={`menu-board-tile menu-board-tile-${tile.owner}`}
           key={`${tile.name}-${tile.x}-${tile.y}`}
-          style={{ left: `${tile.x}%`, top: `${tile.y}%` }}
+          style={{ '--menu-tile-x': `${tile.x}%`, '--menu-tile-y': `${tile.y}%` } as React.CSSProperties}
         >
           <span>{tile.name}</span>
         </span>

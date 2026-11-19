@@ -51,6 +51,8 @@
   place-items: center;
   width: clamp(74px, 10vw, 142px);
   aspect-ratio: 1;
+  left: var(--menu-tile-x);
+  top: var(--menu-tile-y);
   transform: translate(-50%, -50%);
   box-sizing: border-box;
   padding: clamp(4px, .6vw, 10px);
@@ -157,9 +159,22 @@
 .menu-board-stage .menu-board-tile-purple { border-color: #9a7aa1; }
 .menu-board-stage .menu-board-tile-neutral { border-color: #8e8577; }
 
+/* On a desktop menu the preview stays compact, matching the earlier board
+   rhythm while leaving the controls clear on the right. */
+@media (min-width: 701px) {
+  .menu-board-stage .menu-board-tile:nth-of-type(1) { --menu-tile-x: 50%; --menu-tile-y: 30%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(2) { --menu-tile-x: 32%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(3) { --menu-tile-x: 50%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(4) { --menu-tile-x: 32%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(5) { --menu-tile-x: 50%; --menu-tile-y: 66%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(6) { --menu-tile-x: 68%; --menu-tile-y: 30%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(7) { --menu-tile-x: 68%; --menu-tile-y: 48%; }
+  .menu-board-stage .menu-board-tile:nth-of-type(8) { --menu-tile-x: 68%; --menu-tile-y: 66%; }
+}
+
 @media (max-width: 700px) {
   .menu-board-stage {
-    inset: 0 0 70% 0;
+    inset: 8% 0 60% 0;
   }
 
   .menu-board-stage .menu-board-tile {
