@@ -54,8 +54,8 @@ interface CellProps {
   boardRect?: OverlayRect | null;
   occupiedOverlayRects?: OverlayRect[];
   onCardInfoRectChange?: (rect: OverlayRect | null) => void;
-  onRelationEnter?: (cardInstanceId: string) => void;
-  onRelationLeave?: () => void;
+  onRelationPreview?: (edgeId: string | null) => void;
+  isVotingCard?: boolean;
 }
 
 const CARD_TITLE_MAX_SIZE = 18;
@@ -168,8 +168,8 @@ export const Cell: React.FC<CellProps> = ({
   boardRect,
   occupiedOverlayRects = [],
   onCardInfoRectChange,
-  onRelationEnter,
-  onRelationLeave,
+  onRelationPreview,
+  isVotingCard,
 }) => {
   incrementCounter('render:Cell');
   const [popoverMode, setPopoverMode] = useState<PopoverStateMode>('hidden');
@@ -685,7 +685,7 @@ export const Cell: React.FC<CellProps> = ({
         isCrossPending ? 'cross-pending-card' : ''
       } ${
         isCrossPendingCenter ? 'cross-pending-center' : ''
-      } ${placedCard?.playerId === null ? 'neutral' : ''} ${
+      } ${isVotingCard ? 'voting' : ''} ${placedCard?.playerId === null ? 'neutral' : ''} ${
         placedCard?.status === 'pending' ? 'pending' : ''
       } ${
         isRelationHighlighted ? 'relation-highlighted' : ''
@@ -726,8 +726,7 @@ export const Cell: React.FC<CellProps> = ({
                 onClose={closePopover}
                 onMeasuredRect={handleCardInfoMeasured}
                 onPointerEnter={handlePopoverPointerEnter}
-                onRelationEnter={onRelationEnter}
-                onRelationLeave={onRelationLeave}
+                onRelationPreview={onRelationPreview}
                 onToggleExpanded={handleTogglePopoverExpanded}
                 ownerLabel={getOwnerLabel(placedCard.playerId)}
                 position={popoverPosition}

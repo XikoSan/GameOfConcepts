@@ -128,17 +128,17 @@ const getRelationIndicator = (
   edge?: PendingSemanticEdge
 ) => {
   if (!edge) return '+';
-  if (isSymmetricRelation(edge.relation)) return '↔';
-
   const fromPending = edge.direction === 'new-to-neighbor';
-  const deltaX = neighbor.coordinates.x - pendingCard.coordinates.x;
-  const deltaY = neighbor.coordinates.y - pendingCard.coordinates.y;
-
-  if (deltaX > 0) return fromPending ? '→' : '←';
-  if (deltaX < 0) return fromPending ? '←' : '→';
-  if (deltaY > 0) return fromPending ? '↓' : '↑';
-  return fromPending ? '↑' : '↓';
+  const [from, to] = fromPending ? [pendingCard, neighbor] : [neighbor, pendingCard];
+  return getDirectionIndicator(from.coordinates, to.coordinates, edge.relation);
 };
+
+function getDirectionIndicator(from: Coordinates, to: Coordinates, relation: SemanticRelation) {
+  if (isSymmetricRelation(relation)) return '↔';
+  if (to.x > from.x) return '→';
+  if (to.x < from.x) return '←';
+  return to.y > from.y ? '↓' : '↑';
+}
 
 const getRelationOverlayClassName = (
   pendingCard: PlacedCard,
@@ -304,8 +304,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     moveId: string;
     neighborCardInstanceId: string;
   } | null>(null);
-  const [highlightedRelationCardId, setHighlightedRelationCardId] =
-    useState<string | null>(null);
+  const [previewedEdgeId, setPreviewedEdgeId] = useState<string | null>(null);
   const [boardViewportRect, setBoardViewportRect] = useState<OverlayRect | null>(null);
   const [overlayRects, setOverlayRects] = useState<
     Partial<Record<BoardOverlayId, OverlayRect>>
@@ -391,7 +390,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   }, [selectedCard, gameState, getDropCoordinates, onPlaceCard, onFinishDrag]);
 
   const handleBoardClick = useCallback(() => {
-    setHighlightedRelationCardId(null);
+    setPreviewedEdgeId(null);
     window.dispatchEvent(new CustomEvent('card-info-close-pinned'));
   }, []);
 
@@ -606,6 +605,22 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   );
   const pendingSemanticEdges = pendingMove?.semanticEdges ?? [];
   const pendingSemanticScore = pendingMove?.scorePreview;
+  const previewedAcceptedEdge = gameState.semanticEdges?.find(edge => edge.id === previewedEdgeId);
+  const previewedPendingEdge = pendingMove?.semanticStatus === 'voting'
+    ? pendingSemanticEdges.find(edge => edge.id === previewedEdgeId)
+    : undefined;
+  const previewedEdge = previewedAcceptedEdge ?? (
+    pendingMove && pendingCard && previewedPendingEdge
+      ? createSemanticEdgeFromPending(pendingMove, previewedPendingEdge, pendingCard)
+      : undefined
+  );
+  const previousAcceptedScore = Object.values(gameState.logDetails ?? {}).at(-1)?.score;
+  const lastAcceptedCard = boardCards.find(card =>
+    card.id === gameState.lastPlacedCardId && card.status === 'confirmed' && card.playerId !== null
+  ) ?? boardCards.find(card =>
+    card.status === 'confirmed' && card.playerId === previousAcceptedScore?.playerId
+    && card.cardName === previousAcceptedScore?.cardName
+  );
   const relationLabelsByCardId = useMemo(
     () => {
       const startTime = startMeasure();
@@ -685,14 +700,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     },
     [setBoardOverlayRect]
   );
-
-  const handleRelationEnter = useCallback((cardInstanceId: string) => {
-    setHighlightedRelationCardId(cardInstanceId);
-  }, []);
-
-  const handleRelationLeave = useCallback(() => {
-    setHighlightedRelationCardId(null);
-  }, []);
 
   const handleRelationEditorMeasured = useCallback(
     (rect: DOMRect) => {
@@ -1011,7 +1018,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               onCellClick={() => handleCellClick(x, y)}
               isHighlighted={showPlayableHighlights && selectedCard !== null}
               isPlayable={isPlayable}
-              isLastPlaced={placedCard?.id === gameState.lastPlacedCardId}
+              isLastPlaced={placedCard.id === lastAcceptedCard?.id}
+              isVotingCard={placedCard.id === pendingCard?.id && pendingMove?.semanticStatus === 'voting'}
               showTooltip={showTooltips}
               showPendingActions={
                 !actionDock && placedCard?.status === 'pending' && canReviewPendingMove
@@ -1033,15 +1041,27 @@ export const GameBoard: React.FC<GameBoardProps> = ({
               semanticRelationLabels={
                 placedCard ? relationLabelsByCardId.get(placedCard.id) ?? [] : []
               }
-              isRelationHighlighted={placedCard?.id === highlightedRelationCardId}
+              isRelationHighlighted={placedCard.id === previewedEdge?.fromCardInstanceId
+                || placedCard.id === previewedEdge?.toCardInstanceId}
               boardRect={boardViewportRect}
               occupiedOverlayRects={cardInfoOccupiedRects}
               onCardInfoRectChange={handleCardInfoRectChange}
-              onRelationEnter={handleRelationEnter}
-              onRelationLeave={handleRelationLeave}
+              onRelationPreview={setPreviewedEdgeId}
             />
           );
         })}
+        {previewedAcceptedEdge && (() => {
+          const { fromPosition, toPosition, relation } = previewedAcceptedEdge;
+          const from = getCellCenter(fromPosition);
+          const to = getCellCenter(toPosition);
+          return <span
+            aria-hidden="true"
+            className="semantic-board-link relation-preview"
+            style={{ left: (from.x + to.x) / 2, top: (from.y + to.y) / 2 }}
+          >
+            {getDirectionIndicator(fromPosition, toPosition, relation)}
+          </span>;
+        })()}
         {pendingCard &&
           pendingMove?.semanticStatus === 'defining-relations' &&
           semanticNeighbors.map((neighbor) => {
@@ -1098,6 +1118,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                 key={neighbor.id}
                 edge={createSemanticEdgeFromPending(pendingMove, selectedEdge, pendingCard)}
                 namesById={new Map(boardCards.map(card => [card.id, card.cardName]))}
+                onPreviewChange={setPreviewedEdgeId}
                 style={{ left: `${left}px`, top: `${top}px` }}
               >
                 {getRelationIndicator(pendingCard, neighbor, selectedEdge)}

@@ -21,8 +21,7 @@ interface CardInfoPopoverProps {
   onClose: () => void;
   onPointerEnter?: () => void;
   onMeasuredRect?: (rect: DOMRect) => void;
-  onRelationEnter?: (cardInstanceId: string) => void;
-  onRelationLeave?: () => void;
+  onRelationPreview?: (edgeId: string | null) => void;
   onToggleExpanded: () => void;
   ownerLabel: string;
   position: {
@@ -65,8 +64,7 @@ export function CardInfoPopover({
   onClose,
   onMeasuredRect,
   onPointerEnter,
-  onRelationEnter,
-  onRelationLeave,
+  onRelationPreview,
   onToggleExpanded,
   ownerLabel,
   position,
@@ -77,6 +75,9 @@ export function CardInfoPopover({
 }: CardInfoPopoverProps) {
   incrementCounter('render:CardInfoPopover');
   const [relationsExpanded, setRelationsExpanded] = useState(false);
+  const [selectedRelationId, setSelectedRelationId] = useState<string | null>(null);
+  const [hoveredRelationId, setHoveredRelationId] = useState<string | null>(null);
+  const [focusedRelationId, setFocusedRelationId] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const onMeasuredRectRef = useRef(onMeasuredRect);
   const countedHiddenMountRef = useRef(false);
@@ -89,10 +90,22 @@ export function CardInfoPopover({
     top: `${position.top}px`,
   } satisfies CSSProperties;
   const relationCountText = formatRelationCount(semanticRelations.length);
+  const previewId = hoveredRelationId ?? focusedRelationId ?? selectedRelationId;
+  const activeRelationId = relationsExpanded && semanticRelations.some(({ edgeId }) => edgeId === previewId)
+    ? previewId : null;
+
+  useEffect(() => {
+    if (!activeRelationId || !onRelationPreview) return;
+    onRelationPreview(activeRelationId);
+    return () => onRelationPreview(null);
+  }, [activeRelationId, onRelationPreview]);
 
   const handleToggleRelations = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     setRelationsExpanded((current) => !current);
+    setSelectedRelationId(null);
+    setHoveredRelationId(null);
+    setFocusedRelationId(null);
   };
 
   useEffect(() => {
@@ -180,12 +193,17 @@ export function CardInfoPopover({
                 <button
                   type="button"
                   title={relationLabel.fullText}
-                  onPointerEnter={() =>
-                    onRelationEnter?.(relationLabel.otherCardInstanceId)
-                  }
-                  onPointerLeave={() => onRelationLeave?.()}
-                  onFocus={() => onRelationEnter?.(relationLabel.otherCardInstanceId)}
-                  onBlur={() => onRelationLeave?.()}
+                  aria-pressed={selectedRelationId === relationLabel.edgeId}
+                  onPointerEnter={event => {
+                    if (event.pointerType !== 'touch') setHoveredRelationId(relationLabel.edgeId);
+                  }}
+                  onPointerLeave={() => setHoveredRelationId(null)}
+                  onFocus={event => {
+                    if (event.currentTarget.matches(':focus-visible')) setFocusedRelationId(relationLabel.edgeId);
+                  }}
+                  onBlur={() => setFocusedRelationId(null)}
+                  onClick={() => setSelectedRelationId(current =>
+                    current === relationLabel.edgeId ? null : relationLabel.edgeId)}
                 >
                   {relationLabel.fullText}
                 </button>
