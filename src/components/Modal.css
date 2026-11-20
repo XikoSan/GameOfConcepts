@@ -542,6 +542,20 @@
   accent-color: #d6ae76;
 }
 
+.google-account-panel {
+  display: grid;
+  gap: 8px;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+  overflow-wrap: anywhere;
+}
+
+.google-account-panel p { margin: 3px 0 0; }
+.google-account-panel a { color: inherit; justify-self: start; }
+.google-account-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.google-account-actions:empty { display: none; }
+.google-account-actions button { min-height: 36px; padding: 6px 12px; }
+
 .online-room-modal,
 .new-game-modal {
   display: grid;

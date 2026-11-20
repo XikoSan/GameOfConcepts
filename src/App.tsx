@@ -19,6 +19,8 @@ import { useActionDockHeight } from './hooks/useActionDockHeight';
 import { RulesContent } from './components/RulesContent';
 import { MusicControls, MusicSettings } from './components/MusicSettings';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { GoogleAccountPanel } from './components/GoogleAccountPanel';
+import { useGoogleAccount } from './hooks/useGoogleAccount';
 import { useBackgroundMusic } from './hooks/useBackgroundMusic';
 import { TableReminder } from './components/TableReminder';
 import { MenuBoardPreview } from './components/MenuBoardPreview';
@@ -209,9 +211,7 @@ function App() {
   const menuMusicStarted = useRef(Capacitor.isNativePlatform());
   const music = useBackgroundMusic(musicAudioRef);
   incrementCounter('render:App');
-  // TEMP(MVP): Комнаты работают без авторизации, игрок определяется через
-  // Identity comes from the authenticated guest session.
-  const { playerId, nickname: savedNickname, saveNickname } = usePlayerIdentity();
+  const { playerId, user: onlineUser, nickname: savedNickname, saveNickname } = usePlayerIdentity();
   const [selectedCard, setSelectedCard] = useState<RegularCardName | null>(null);
   const compactTable = useCompactTable();
   const [actionDock, setActionDock] = useState<HTMLDivElement | null>(null);
@@ -248,6 +248,29 @@ function App() {
   );
   const roomSubscriptionRef = useRef<RoomSubscription | null>(null);
   const onlineRoomRef = useRef<Room | null>(null);
+  const roomListRequest = useRef(0);
+  const handleAccountReturn = useCallback((changedAccount: boolean, showOnline: boolean) => {
+    const wasInRoom = onlineRoomRef.current !== null;
+    if (changedAccount) {
+      roomSubscriptionRef.current?.unsubscribe();
+      roomSubscriptionRef.current = null;
+      onlineRoomRef.current = null;
+      roomListRequest.current += 1;
+      setAvailableRooms([]);
+      setIsRoomListLoading(false);
+      setOnlineRoom(null);
+      setOnlineError(null);
+      if (wasInRoom) {
+        setShowMainMenu(true);
+        setSelectedCard(null);
+        setDragPreview(null);
+      }
+    }
+    if ((showOnline && (!wasInRoom || changedAccount)) || (changedAccount && wasInRoom)) {
+      setActiveModal('new-game');
+    }
+  }, []);
+  const googleAccount = useGoogleAccount(handleAccountReturn);
   const activeCardDragRef = useRef(false);
   const matchLogRef = useRef<HTMLOListElement>(null);
   const {
@@ -530,24 +553,38 @@ function App() {
   };
 
   const loadAvailableRooms = useCallback(async () => {
+    const request = ++roomListRequest.current;
     setIsRoomListLoading(true);
     setOnlineError(null);
 
     try {
       const rooms = await getAvailableRooms(playerId);
-      setAvailableRooms(rooms);
+      if (request === roomListRequest.current) setAvailableRooms(rooms);
     } catch (error) {
-      setOnlineError(
+      if (request === roomListRequest.current) setOnlineError(
         error instanceof Error ? error.message : 'Не удалось загрузить комнаты.'
       );
     } finally {
-      setIsRoomListLoading(false);
+      if (request === roomListRequest.current) setIsRoomListLoading(false);
     }
   }, [playerId]);
 
+  useEffect(() => {
+    if (activeModal !== 'new-game' || !googleAccount.ready) return;
+    const timer = window.setTimeout(() => { void loadAvailableRooms(); }, 0);
+    return () => window.clearTimeout(timer);
+  }, [activeModal, googleAccount.ready, loadAvailableRooms]);
+
+  useEffect(() => {
+    if (!onlineRoom || onlineUser === undefined ||
+        getRoomPlayersForDisplay(onlineRoom).some((player) => player.id === playerId)) return;
+    // The session can also change in another browser tab.
+    const timer = window.setTimeout(() => handleAccountReturn(true, false), 0);
+    return () => window.clearTimeout(timer);
+  }, [onlineRoom, onlineUser, playerId, handleAccountReturn]);
+
   const handleOpenNewGameModal = () => {
     setActiveModal('new-game');
-    void loadAvailableRooms();
   };
 
   const closeOnlineModal = () => {
@@ -566,6 +603,7 @@ function App() {
 
     try {
       const fetchedRoom = await getRoomById(currentRoom.id);
+      if (onlineRoomRef.current?.id !== currentRoom.id) return;
       if (import.meta.env.DEV) console.log('[manual sync room]', { reason, room: fetchedRoom });
 
       if (!fetchedRoom) {
@@ -602,6 +640,7 @@ function App() {
 
   const handleRoomConnected = (room: Room) => {
     roomSubscriptionRef.current?.unsubscribe();
+    onlineRoomRef.current = room;
     setOnlineRoom(room);
     setOnlineError(null);
     if (room.status === 'playing' || room.game_state.gameOver) {
@@ -685,16 +724,13 @@ function App() {
   };
 
   const handleReturnToRoom = async (roomId: string) => {
-    const nickname = getValidatedOnlineNickname();
-    if (!nickname) return;
-
     setIsOnlineLoading(true);
     setOnlineError(null);
 
     try {
       const room = await getRoomById(roomId);
-      if (!room) {
-        setOnlineError('Комната не найдена.');
+      if (!room || !getRoomPlayersForDisplay(room).some((player) => player.id === playerId)) {
+        setOnlineError('Комната недоступна для вашей сессии.');
         return;
       }
 
@@ -1210,6 +1246,7 @@ function App() {
       {activeModal === 'new-game' && (
         <Modal onClose={closeOnlineModal} title="Онлайн игра">
           <div className="new-game-modal">
+            <GoogleAccountPanel user={onlineUser} account={googleAccount} />
             {onlineRoom?.status === 'waiting' ? (
               <section className="online-lobby">
                 <div className="online-lobby-header">
@@ -1313,7 +1350,7 @@ function App() {
                   </select>
                 </label>
                 <button
-                  disabled={isOnlineLoading}
+                  disabled={isOnlineLoading || !googleAccount.ready}
                   type="button"
                   onClick={handleCreateOnlineRoom}
                 >
@@ -1324,7 +1361,7 @@ function App() {
               <div className="available-rooms-header">
                 <h3>Доступные комнаты</h3>
                 <button
-                  disabled={isRoomListLoading}
+                  disabled={isRoomListLoading || !googleAccount.ready}
                   type="button"
                   onClick={loadAvailableRooms}
                 >
@@ -1371,7 +1408,7 @@ function App() {
                           </button>
                         ) : isParticipant ? (
                           <button
-                            disabled={isOnlineLoading}
+                            disabled={isOnlineLoading || !googleAccount.ready}
                             type="button"
                             onClick={() => void handleReturnToRoom(room.id)}
                           >
@@ -1379,7 +1416,7 @@ function App() {
                           </button>
                         ) : (
                           <button
-                            disabled={isOnlineLoading || !canJoinRoom}
+                            disabled={isOnlineLoading || !googleAccount.ready || !canJoinRoom}
                             type="button"
                             onClick={() => void handleJoinListedRoom(room)}
                           >
@@ -1434,6 +1471,9 @@ function App() {
       )}
       {activeModal === 'settings' && (
         <Modal onClose={() => setActiveModal(null)} title="Настройки" headerActions={<MusicControls music={music} />}>
+          {(showMainMenu || onlineRoom) && (
+            <GoogleAccountPanel user={onlineUser} account={googleAccount} settings />
+          )}
           <div className="settings-row">
             <label htmlFor="show-playable-highlights">
               Показывать подсветку допустимых клеток
@@ -1468,7 +1508,7 @@ function App() {
           <div className="settings-row settings-link-row">
             <div>
               <strong>Данные и конфиденциальность</strong>
-              <p>Как работают гостевые онлайн-сессии и диагностический архив.</p>
+              <p>Как работают онлайн-сессии и диагностический архив.</p>
             </div>
             <button type="button" onClick={() => setActiveModal('privacy')}>Открыть</button>
           </div>

@@ -17,5 +17,7 @@ export function getSupabaseClient() {
     );
   }
 
-  return client ??= createClient(supabaseUrl, supabaseAnonKey);
+  return client ??= createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { flowType: 'pkce', detectSessionInUrl: false },
+  });
 }
