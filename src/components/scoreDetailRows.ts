@@ -32,10 +32,11 @@ export function getScoreDetailRows(scores: readonly SemanticEdgeScore[], relatio
       }
       if (kind === 'Узел' && score.nodeBonus) {
         const node = evidence?.node;
+        const arrows = node?.direction === 'toward-center' ? ['→', '←'] : node?.direction === 'from-center' ? ['←', '→'] : ['↔', '↔'];
         rows.push({ id, kind, points: score.nodeBonus, family,
           ...(node && node.outerCards.length >= 2
-            ? { cards: [node.outerCards[0], node.center, node.outerCards[1]],
-                arrows: node.direction === 'toward-center' ? ['→', '←'] : node.direction === 'from-center' ? ['←', '→'] : ['↔', '↔'] }
+            ? { cards: [node.outerCards[0], node.center, ...node.outerCards.slice(1)],
+                arrows: [...arrows, ...node.outerCards.slice(2).map(() => '·')] }
             : { fallback: 'Подробности узла не сохранились' }) });
       }
     });

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getAcceptedRelationSamples } from '../services/acceptedRelations';
 import { enqueueAcceptedRelations, flushAcceptedRelations } from '../services/relationCollection';
 import { applyGameAction } from '../gameActions';
-import { initializeGame, resolveEmptyHands } from '../game';
+import { createShuffleSeed, getPendingScorePreview, initializeGame, resolveEmptyHands } from '../game';
 import { getDeckDefinitionById, DEFAULT_DECK } from '../data/deckDefinitions';
 import type {
   Coordinates,
@@ -237,10 +237,12 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
   }, [voteOnPendingMove]);
 
   const handleRedrawHand = useCallback(() => {
+    const shuffleSeed = createShuffleSeed();
     setGameState((prev) =>
       applyGameAction(prev, {
         type: 'redrawHand',
         playerIndex: prev.currentPlayerIndex,
+        shuffleSeed,
       })
     );
   }, [setGameState]);
@@ -269,7 +271,11 @@ export function useLocalGameState(): GameController & { restoreLocalGame: (state
 
   return {
     restoreLocalGame: (saved) => {
-      setGameState(resolveEmptyHands(saved), 'resume');
+      const pendingMove = saved.pendingMove;
+      const restored = pendingMove
+        ? { ...saved, pendingMove: { ...pendingMove, scorePreview: getPendingScorePreview(saved, pendingMove) } }
+        : saved;
+      setGameState(resolveEmptyHands(restored), 'resume');
       setLocalPlayerCount(saved.players.length);
     },
     gameState,

@@ -1,3 +1,4 @@
+import { createShuffleSeed } from '../game';
 import { applyGameAction, type GameAction } from '../gameActions';
 import type { Room } from '../types/room';
 import { getRelationPresets, isRelationAllowed } from '../scoring/semanticRelations';
@@ -49,7 +50,7 @@ export function applyAuthenticatedAction(room: Room, actor: string, action: Game
       if (!c || !Number.isSafeInteger(c.x) || !Number.isSafeInteger(c.y) || Math.abs(c.x) > 10000 || Math.abs(c.y) > 10000 || typeof action.cardName !== 'string' || !game.players[member.seatIndex].cards.includes(action.cardName)) throw Error('Недопустимая карта или клетка.');
       if (pending) throw Error('Сначала завершите текущий ход.');
     } else if (action.type === 'redrawHand') {
-      action = { type: 'redrawHand', playerIndex: member.seatIndex };
+      action = { type: 'redrawHand', playerIndex: member.seatIndex, shuffleSeed: createShuffleSeed() };
     } else if (action.type === 'passTurn' || action.type === 'requestFinish') {
       action = { type: action.type, playerIndex: member.seatIndex };
     } else {

@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | Правила | game-rules.md | Нормативная механика, сверять перед изменением правил |
 | Модель и действия | src/types.ts, src/gameActions.ts, src/game.ts | Карты, доска, общая колода, принятие/отклонение хода |
-| Очки | src/scoring/* | Типы, направления, пути и узлы; важен порядок новых связей |
+| Очки | src/scoring/* | Типы, направления и пути. [Узел](decisions/2026-11-20-node-bonus.md) приносит одно очко за ход |
 | Каталоги | src/data/*, src/decks/deckBuilder.ts | Definition ID стабилен, instance ID уникален для карты партии; snapshot фиксирует состав |
 | Локальная партия | src/hooks/useLocalGameState.ts | Локальное состояние и очередь сбора принятых связей |
 | Онлайн | src/services/roomService.ts, src/hooks/useMultiplayerGameState.ts, src/types/room.ts | rooms.game_state, стабильные места, голосование, version и Realtime |

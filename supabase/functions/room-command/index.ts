@@ -750,8 +750,16 @@ const DISCUSSION_PLAY_CARDS = [
 		name: "Данные"
 	},
 	{
+		id: "discussion-information",
+		name: "Информация"
+	},
+	{
 		id: "discussion-objectivity",
 		name: "Объективность"
+	},
+	{
+		id: "discussion-subjectivity",
+		name: "Субъективность"
 	},
 	{
 		id: "discussion-interpretation",
@@ -1202,30 +1210,28 @@ const getOtherCardId = (edge, cardId) => {
 	return null;
 };
 const getCardOwner$1 = (board, cardId) => Object.values(board).find((card) => card.id === cardId)?.playerId;
-function checkSemanticNodeContinuation(board, edge, graphEdges, activeSeatIndex, newCardId) {
-	const none = {
-		continuesNode: false,
-		outerCardIds: [],
-		matchedEdgeIds: []
-	};
-	const centerCardId = newCardId;
-	if (getCardOwner$1(board, centerCardId) !== activeSeatIndex) return none;
-	const outerCardId = getOtherCardId(edge, centerCardId);
-	if (!outerCardId || getCardOwner$1(board, outerCardId) === void 0) return none;
-	const signature = getNodeConnectivitySignature(edge, centerCardId);
-	if (!signature) return none;
-	for (const graphEdge of graphEdges) {
-		if (graphEdge.createdAtMoveId !== edge.createdAtMoveId) continue;
-		const graphOuterCardId = getOtherCardId(graphEdge, centerCardId);
-		if (!graphOuterCardId || graphOuterCardId === outerCardId || getCardOwner$1(board, graphOuterCardId) === void 0) continue;
-		if (getNodeConnectivitySignature(graphEdge, centerCardId) === signature) return {
-			continuesNode: true,
+function findSemanticMoveNode(board, moveEdges, activeSeatIndex, centerCardId) {
+	if (getCardOwner$1(board, centerCardId) !== activeSeatIndex) return;
+	const groups = /* @__PURE__ */ new Map();
+	let node;
+	for (const edge of moveEdges) {
+		const outerCardId = getOtherCardId(edge, centerCardId);
+		const signature = getNodeConnectivitySignature(edge, centerCardId);
+		if (!signature || !outerCardId || getCardOwner$1(board, outerCardId) === void 0) continue;
+		const spokes = groups.get(signature) ?? [];
+		if (spokes.some((spoke) => spoke.outerCardId === outerCardId)) continue;
+		spokes.push({
+			edge,
+			outerCardId
+		});
+		groups.set(signature, spokes);
+		if (!node && spokes.length === 2) node = {
 			centerCardId,
-			outerCardIds: [graphOuterCardId, outerCardId],
-			matchedEdgeIds: [graphEdge.id]
+			awardEdgeId: edge.id,
+			spokes
 		};
 	}
-	return none;
+	return node;
 }
 //#endregion
 //#region src/scoring/semanticPaths.ts
@@ -1282,7 +1288,7 @@ function isSemanticEdgeGeometryValid(board, edge) {
 }
 //#endregion
 //#region src/scoring/scoreEvidence.ts
-function createScoreExplanation(board, edge, graphEdges, pathCheck, nodeCheck) {
+function createScoreExplanation(board, edge, graphEdges, pathCheck, node) {
 	const cards = new Map(Object.values(board).map((card) => [card.id, card]));
 	const names = new Map([...cards].map(([id, card]) => [id, card.cardName]));
 	const card = (id) => {
@@ -1346,19 +1352,15 @@ function createScoreExplanation(board, edge, graphEdges, pathCheck, nodeCheck) {
 			sharedCardId: shared
 		};
 	}
-	const nodeEdge = graphEdges.find((item) => item.id === nodeCheck.matchedEdgeIds[0]);
-	if (nodeCheck.continuesNode && nodeCheck.centerCardId && nodeEdge) {
-		const center = card(nodeCheck.centerCardId);
-		const outerCards = nodeCheck.outerCardIds.flatMap((id) => {
-			const value = card(id);
-			return value ? [value] : [];
-		});
-		const previous = evidence(nodeEdge);
-		if (center && previous && outerCards.length === 2) explanation.node = {
+	if (node) {
+		const center = card(node.centerCardId);
+		const outerCards = node.spokes.map((spoke) => card(spoke.outerCardId));
+		const edges = node.spokes.map((spoke) => evidence(spoke.edge));
+		if (center && outerCards.every((value) => value !== void 0) && edges.every((value) => value !== void 0)) explanation.node = {
 			center,
 			outerCards,
 			direction: isSymmetricRelation(edge.relation) ? "symmetric" : edge.toCardInstanceId === center.id ? "toward-center" : "from-center",
-			edges: [previous, newEdge]
+			edges
 		};
 	}
 	return explanation;
@@ -1372,7 +1374,7 @@ function calculateSemanticMoveScore({ board, existingEdges, pendingMove, activeS
 		total: 0
 	};
 	const graphEdges = [...existingEdges];
-	const scores = [...pendingMove.semanticEdges].sort((a, b) => a.createdOrder - b.createdOrder).map((pendingEdge) => {
+	const moveEdges = [...pendingMove.semanticEdges].sort((a, b) => a.createdOrder - b.createdOrder).map((pendingEdge) => {
 		const semanticEdge = createSemanticEdgeFromPending({
 			moveId: pendingMove.moveId,
 			cardId: pendingMove.cardId,
@@ -1383,23 +1385,26 @@ function calculateSemanticMoveScore({ board, existingEdges, pendingMove, activeS
 			position: pendingMove.position,
 			semanticEdges: pendingMove.semanticEdges
 		}, pendingEdge, placedCard);
-		const isValidGeometry = isSemanticEdgeGeometryValid(board, semanticEdge);
+		return {
+			pendingEdge,
+			semanticEdge,
+			isValidGeometry: isSemanticEdgeGeometryValid(board, semanticEdge)
+		};
+	});
+	const node = findSemanticMoveNode(board, moveEdges.filter((item) => item.isValidGeometry).map((item) => item.semanticEdge), activeSeatIndex, pendingMove.cardId);
+	const scores = moveEdges.map(({ pendingEdge, semanticEdge, isValidGeometry }) => {
 		const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex) : {
 			continuesPath: false,
 			reason: "no-compatible-edge",
 			matchedEdgeIds: []
 		};
-		const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex, pendingMove.cardId) : {
-			continuesNode: false,
-			outerCardIds: [],
-			matchedEdgeIds: []
-		};
 		const continuesPath = pathCheck.continuesPath;
-		const continuesNode = nodeCheck.continuesNode;
+		const nodeAward = node?.awardEdgeId === semanticEdge.id ? node : void 0;
+		const continuesNode = Boolean(nodeAward);
 		const pathBonus = continuesPath ? 1 : 0;
 		const nodeBonus = continuesNode ? 1 : 0;
 		const total = 1 + pathBonus + nodeBonus;
-		const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeCheck) : void 0;
+		const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeAward) : void 0;
 		if (isValidGeometry) graphEdges.push(semanticEdge);
 		return {
 			pendingEdgeId: pendingEdge.id,
@@ -1544,13 +1549,26 @@ function getRandomStartingPlayerIndex(playerCount, randomSource = Math.random) {
 	const normalizedPlayerCount = Math.max(1, Math.floor(playerCount));
 	return Math.min(normalizedPlayerCount - 1, Math.floor(randomSource() * normalizedPlayerCount));
 }
-function shuffleCards(cards) {
+function shuffleCards(cards, randomSource = Math.random) {
 	const result = [...cards];
 	for (let i = result.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
+		const j = Math.floor(randomSource() * (i + 1));
 		[result[i], result[j]] = [result[j], result[i]];
 	}
 	return result;
+}
+const UINT32_RANGE = 4294967296;
+function createShuffleSeed() {
+	return Math.floor(Math.random() * UINT32_RANGE);
+}
+function seededShuffleRandom(seed) {
+	let state = seed | 0 || 1;
+	return () => {
+		state ^= state << 13;
+		state ^= state >>> 17;
+		state ^= state << 5;
+		return (state >>> 0) / UINT32_RANGE;
+	};
 }
 function getSnapshotCards(snapshot, fallbackCatalog = CARD_CATALOG) {
 	const cardsById = new Map((snapshot.cards ?? fallbackCatalog).map((card) => [card.id, card]));
@@ -1712,22 +1730,22 @@ function getHandRedrawAvailability(gameState, playerIndex) {
 	};
 	return { canRedraw: true };
 }
-function redrawPlayerHand(gameState, playerIndex) {
+function redrawPlayerHand(gameState, playerIndex, shuffleSeed) {
 	if (!getHandRedrawAvailability(gameState, playerIndex).canRedraw) return gameState;
 	const oldHand = gameState.players[playerIndex].cards;
 	const handSize = oldHand.length;
 	const currentDeck = gameState.sharedDeck ?? gameState.deck[playerIndex];
 	const newHand = currentDeck.slice(-handSize);
 	const remainingDeck = currentDeck.slice(0, -handSize);
-	const nextDeckForPlayer = [...oldHand, ...remainingDeck];
+	const nextDeck = shuffleCards([...oldHand, ...remainingDeck], seededShuffleRandom(shuffleSeed ?? createShuffleSeed()));
 	return {
 		...gameState,
 		players: gameState.players.map((player, index) => index === playerIndex ? {
 			...player,
 			cards: newHand
 		} : player),
-		sharedDeck: gameState.sharedDeck !== void 0 ? nextDeckForPlayer : void 0,
-		deck: gameState.sharedDeck !== void 0 ? gameState.deck : gameState.deck.map((deck, index) => index === playerIndex ? nextDeckForPlayer : deck),
+		sharedDeck: gameState.sharedDeck !== void 0 ? nextDeck : void 0,
+		deck: gameState.sharedDeck !== void 0 ? gameState.deck : gameState.deck.map((deck, index) => index === playerIndex ? nextDeck : deck),
 		handRedrawUsedByPlayerId: {
 			...gameState.handRedrawUsedByPlayerId ?? {},
 			[playerIndex]: true
@@ -2025,7 +2043,7 @@ function applyGameAction(gameState, action, turnOrder) {
 		case "requestFinish": return requestFinish(gameState, action.playerIndex);
 		case "voteFinish": return action.playerIndex === void 0 ? gameState : voteFinish(gameState, action.playerIndex, action.accept, action.finishId);
 		case "returnCard": return returnPendingCard(gameState);
-		case "redrawHand": return redrawPlayerHand(gameState, action.playerIndex ?? gameState.currentPlayerIndex);
+		case "redrawHand": return redrawPlayerHand(gameState, action.playerIndex ?? gameState.currentPlayerIndex, action.shuffleSeed);
 		case "upsertSemanticEdge": return upsertPendingSemanticEdge(gameState, action.neighborCardInstanceId, action.relation, action.direction);
 		case "removeSemanticEdge": return removePendingSemanticEdge(gameState, action.neighborCardInstanceId);
 		case "submitSemanticMove": return submitPendingSemanticMove(gameState);
@@ -2106,7 +2124,8 @@ function applyAuthenticatedAction(room, actor, action, expectedMoveId) {
 			if (pending) throw Error("Сначала завершите текущий ход.");
 		} else if (action.type === "redrawHand") action = {
 			type: "redrawHand",
-			playerIndex: member.seatIndex
+			playerIndex: member.seatIndex,
+			shuffleSeed: createShuffleSeed()
 		};
 		else if (action.type === "passTurn" || action.type === "requestFinish") action = {
 			type: action.type,

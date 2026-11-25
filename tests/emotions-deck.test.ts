@@ -144,15 +144,20 @@ test('classic families keep path ownership and never reward adding a spoke to an
   assert.ok(isSymmetricRelation(opposite));
 });
 
-test('shared redraw conserves cards, returns the old hand to the bottom, and is once per player', () => {
+test('shared redraw draws new cards first, then shuffles the remaining pile with the old hand', () => {
   const game = initializeGame(4, EMOTIONS_DECK, 0);
   const old = [...game.players[0].cards];
   const pile = [...game.sharedDeck!];
-  const next = redrawPlayerHand(game, 0);
+  const unshuffledPile = [...old, ...pile.slice(0, -5)];
+  const next = redrawPlayerHand(game, 0, 42);
   assert.deepEqual(next.players[0].cards, pile.slice(-5));
-  assert.deepEqual(next.sharedDeck, [...old, ...pile.slice(0, -5)]);
+  assert.notDeepEqual(next.sharedDeck, unshuffledPile);
+  assert.deepEqual([...next.sharedDeck!].sort(), [...unshuffledPile].sort());
+  assert.deepEqual(next, redrawPlayerHand(game, 0, 42), 'replaying a local update uses the same shuffle');
+  assert.notDeepEqual(next.sharedDeck, redrawPlayerHand(game, 0, 123).sharedDeck);
   assert.deepEqual(next.players.slice(1), game.players.slice(1));
   assert.deepEqual([...next.players.flatMap(p => p.cards), ...next.sharedDeck!].sort(), playingNames);
+  assert.equal(next.currentPlayerIndex, 0);
   assert.equal(redrawPlayerHand(next, 0), next);
   assert.deepEqual(game.sharedDeck, pile);
   assert.equal(getHandRedrawAvailability({ ...game, sharedDeck: pile.slice(0, 4) }, 0).canRedraw, false);

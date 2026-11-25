@@ -22,7 +22,7 @@
 - A foreign or neutral card cannot be an internal continuation vertex.
 - Path continuation requires head-to-tail semantic direction.
 - Same-source or same-target edges may form a node, not a path.
-- Node bonuses require the newly played card as the player's own center; outer cards may be owned, foreign, or neutral. Adding a spoke to an old center never awards a node bonus (user decision 2026-11-14, docs/decisions/2026-11-14-node-center.md).
+- The node awards +1 per move, at the first compatible pair around the player's newly played center. Further spokes may join that node without another award. Outer cards may be owned, foreign, or neutral. Old centers never earn a node bonus (docs/decisions/2026-11-20-node-bonus.md).
 - Relation family and direction together define connectivity.
 - Pending edges are scored in creation order.
 

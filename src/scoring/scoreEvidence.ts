@@ -1,7 +1,7 @@
 import type { SemanticEdge, SemanticScoreCard, SemanticScoreEvidenceEdge, SemanticScoreExplanation } from '../types';
 import type { BoardState } from './types';
 import type { PathContinuationCheck } from './semanticPaths';
-import type { NodeContinuationCheck } from './semanticNodes';
+import type { SemanticMoveNode } from './semanticNodes';
 import { formatSemanticRelation, isSymmetricRelation } from './semanticRelations';
 
 export function createScoreExplanation(
@@ -9,7 +9,7 @@ export function createScoreExplanation(
   edge: SemanticEdge,
   graphEdges: readonly SemanticEdge[],
   pathCheck: PathContinuationCheck,
-  nodeCheck: NodeContinuationCheck,
+  node?: SemanticMoveNode,
 ): SemanticScoreExplanation | undefined {
   const cards = new Map(Object.values(board).map(card => [card.id, card]));
   const names = new Map([...cards].map(([id, card]) => [id, card.cardName]));
@@ -43,16 +43,15 @@ export function createScoreExplanation(
       }
     }
   }
-  const nodeEdge = graphEdges.find(item => item.id === nodeCheck.matchedEdgeIds[0]);
-  if (nodeCheck.continuesNode && nodeCheck.centerCardId && nodeEdge) {
-    const center = card(nodeCheck.centerCardId);
-    const outerCards = nodeCheck.outerCardIds.flatMap(id => { const value = card(id); return value ? [value] : []; });
-    const previous = evidence(nodeEdge);
-    if (center && previous && outerCards.length === 2) explanation.node = {
+  if (node) {
+    const center = card(node.centerCardId);
+    const outerCards = node.spokes.map(spoke => card(spoke.outerCardId));
+    const edges = node.spokes.map(spoke => evidence(spoke.edge));
+    if (center && outerCards.every(value => value !== undefined) && edges.every(value => value !== undefined)) explanation.node = {
       center, outerCards,
       direction: isSymmetricRelation(edge.relation) ? 'symmetric'
         : edge.toCardInstanceId === center.id ? 'toward-center' : 'from-center',
-      edges: [previous, newEdge],
+      edges,
     };
   }
   return explanation;

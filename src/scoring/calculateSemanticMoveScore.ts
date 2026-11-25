@@ -1,7 +1,7 @@
-// Semantic scoring entry point. Accepted edge order matters for incremental node/path bonuses; physical adjacency alone never scores.
+// Path evidence and the first qualifying node pair follow the order of the new edges.
 import type { SemanticEdge, SemanticEdgeScore } from '../types';
 import { endMeasure, startMeasure } from '../debug/performanceDiagnostics';
-import { checkSemanticNodeContinuation } from './semanticNodes';
+import { findSemanticMoveNode } from './semanticNodes';
 import { checkSemanticPathContinuation, isSemanticEdgeGeometryValid } from './semanticPaths';
 import { createScoreExplanation } from './scoreEvidence';
 import { createSemanticEdgeFromPending } from './semanticRelations';
@@ -21,9 +21,9 @@ export function calculateSemanticMoveScore({
   }
 
   const graphEdges: SemanticEdge[] = [...existingEdges];
-  const scores = [...pendingMove.semanticEdges]
+  const moveEdges = [...pendingMove.semanticEdges]
     .sort((a, b) => a.createdOrder - b.createdOrder)
-    .map<SemanticEdgeScore>((pendingEdge) => {
+    .map(pendingEdge => {
       const semanticEdge = createSemanticEdgeFromPending(
         {
           moveId: pendingMove.moveId,
@@ -38,33 +38,36 @@ export function calculateSemanticMoveScore({
         pendingEdge,
         placedCard
       );
-      const isValidGeometry = isSemanticEdgeGeometryValid(board, semanticEdge);
-      const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
-        : { continuesPath: false, reason: 'no-compatible-edge' as const, matchedEdgeIds: [] };
-      const nodeCheck = isValidGeometry ? checkSemanticNodeContinuation(board, semanticEdge, graphEdges, activeSeatIndex, pendingMove.cardId)
-        : { continuesNode: false, outerCardIds: [], matchedEdgeIds: [] };
-      const continuesPath = pathCheck.continuesPath;
-      const continuesNode = nodeCheck.continuesNode;
-      const pathBonus = continuesPath ? 1 : 0;
-      const nodeBonus = continuesNode ? 1 : 0;
-      const total = (1 + pathBonus + nodeBonus) as 1 | 2 | 3;
-      const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeCheck) : undefined;
-
-      if (isValidGeometry) {
-        graphEdges.push(semanticEdge);
-      }
-
-      return {
-        pendingEdgeId: pendingEdge.id,
-        baseScore: 1,
-        pathBonus,
-        nodeBonus,
-        total,
-        continuesPath,
-        continuesNode,
-        ...(explanation ? { explanation } : {}),
-      };
+      return { pendingEdge, semanticEdge, isValidGeometry: isSemanticEdgeGeometryValid(board, semanticEdge) };
     });
+  const node = findSemanticMoveNode(board, moveEdges.filter(item => item.isValidGeometry).map(item => item.semanticEdge),
+    activeSeatIndex, pendingMove.cardId);
+  const scores = moveEdges.map<SemanticEdgeScore>(({ pendingEdge, semanticEdge, isValidGeometry }) => {
+    const pathCheck = isValidGeometry ? checkSemanticPathContinuation(board, semanticEdge, graphEdges, activeSeatIndex)
+      : { continuesPath: false, reason: 'no-compatible-edge' as const, matchedEdgeIds: [] };
+    const continuesPath = pathCheck.continuesPath;
+    const nodeAward = node?.awardEdgeId === semanticEdge.id ? node : undefined;
+    const continuesNode = Boolean(nodeAward);
+    const pathBonus = continuesPath ? 1 : 0;
+    const nodeBonus = continuesNode ? 1 : 0;
+    const total = (1 + pathBonus + nodeBonus) as 1 | 2 | 3;
+    const explanation = isValidGeometry ? createScoreExplanation(board, semanticEdge, graphEdges, pathCheck, nodeAward) : undefined;
+
+    if (isValidGeometry) {
+      graphEdges.push(semanticEdge);
+    }
+
+    return {
+      pendingEdgeId: pendingEdge.id,
+      baseScore: 1,
+      pathBonus,
+      nodeBonus,
+      total,
+      continuesPath,
+      continuesNode,
+      ...(explanation ? { explanation } : {}),
+    };
+  });
 
   const result = {
     edges: scores,

@@ -5,6 +5,7 @@ import { initializeGame } from '../src/game';
 import { applyAuthenticatedAction } from '../src/server/secureRoomActions';
 import type { PlacedCard, SemanticEdge, SemanticRelation } from '../src/types';
 import type { Room } from '../src/types/room';
+import { getScoreDetailRows } from '../src/components/scoreDetailRows';
 
 const cause: SemanticRelation = { family: 'cause', fromRole: 'cause', toRole: 'effect' };
 const card = (name: string, x: number, y: number): PlacedCard => ({
@@ -78,21 +79,54 @@ function star(owners: (number | null)[], direction: 'new-to-neighbor' | 'neighbo
         neighborPosition: neighbor.coordinates, relation: { ...relation }, direction, createdOrder })) } };
 }
 
-test('new center awards each additional compatible spoke with any outer-card owners', () => {
+test('two to four compatible spokes award exactly one node regardless of their owners', () => {
   for (const direction of ['new-to-neighbor', 'neighbor-to-new'] as const) {
-    for (const owners of [[0, 0, 0, 0], [1, 2, null, 0], [null, 1, 2, 3]]) {
+    for (const owners of [[0, 0], [1, 2, null], [null, 1, 2, 3]]) {
       const input = star(owners, direction);
       const score = calculateSemanticMoveScore(input);
-      assert.deepEqual(score.edges.map(edge => [edge.baseScore, edge.pathBonus, edge.nodeBonus]),
-        [[1, 0, 0], [1, 0, 1], [1, 0, 1], [1, 0, 1]]);
-      assert.equal(score.total, 7);
-      for (const edge of score.edges.slice(1)) {
-        assert.equal(edge.explanation!.node!.center.id, 'center');
-        assert.equal(edge.explanation!.node!.center.ownerSeatIndex, 0);
-        assert.equal(edge.explanation!.node!.direction, direction === 'new-to-neighbor' ? 'from-center' : 'toward-center');
-      }
+      assert.deepEqual(score.edges.map(edge => edge.nodeBonus), owners.map((_, i) => Number(i === 1)));
+      assert.equal(score.total, owners.length + 1);
+      const node = score.edges[1].explanation?.node;
+      assert.equal(node?.center.id, 'center');
+      assert.equal(node?.center.ownerSeatIndex, 0);
+      assert.equal(node?.direction, direction === 'new-to-neighbor' ? 'from-center' : 'toward-center');
+      assert.equal(node?.outerCards.length, owners.length);
     }
   }
+});
+
+test('two qualifying pairs of different types share one bonus around the new center', () => {
+  const input = star([1, 2, null, 3]);
+  for (const edge of input.pendingMove.semanticEdges.slice(2)) {
+    edge.relation = { family: 'kind', fromRole: 'kind', toRole: 'general' };
+  }
+  assert.deepEqual(calculateSemanticMoveScore(input).edges.map(edge => edge.nodeBonus), [0, 1, 0, 0]);
+});
+
+test('reported Communication move displays one node and gets six points including two paths', () => {
+  const part: SemanticRelation = { family: 'part', fromRole: 'part', toRole: 'whole' };
+  const input = star([0, 0, 0], 'new-to-neighbor', part);
+  const names = ['Традиция', 'Политика', 'Сотрудничество'];
+  input.board['0,0'].cardName = 'Общение';
+  const society = card('Общество', 1, 1);
+  input.board['1,1'] = society;
+  input.pendingMove.semanticEdges.forEach((edge, index) => {
+    const neighbor = input.board[`${edge.neighborPosition.x},${edge.neighborPosition.y}`];
+    neighbor.cardName = names[index];
+    if (index < 2) input.existingEdges.push({
+      id: `old-${index}`, fromCardInstanceId: neighbor.id, toCardInstanceId: society.id,
+      fromPosition: neighbor.coordinates, toPosition: society.coordinates, relation: part,
+      createdBySeatIndex: 0, createdAtMoveId: `previous-${index}`, createdOrder: 0,
+    });
+  });
+  const score = calculateSemanticMoveScore(input);
+  const rows = getScoreDetailRows(score.edges);
+  assert.equal(score.total, 6);
+  assert.equal(rows.filter(row => row.kind === 'Путь').length, 2);
+  const nodeRows = rows.filter(row => row.kind === 'Узел');
+  assert.equal(nodeRows.length, 1);
+  assert.equal(nodeRows[0].points, 1);
+  assert.deepEqual(nodeRows[0].cards?.map(entry => entry.name), ['Традиция', 'Общение', 'Политика', 'Сотрудничество']);
 });
 
 test('new-center nodes require matching relation family and direction', () => {

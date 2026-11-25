@@ -8,7 +8,7 @@ import { initializeGame } from '../src/game';
 
 const playingNames = [
   'Политика', 'Протест', 'Справедливость', 'Равенство', 'Неравенство', 'Легитимность',
-  'Данные', 'Объективность', 'Интерпретация', 'Исследование', 'Экспертиза', 'Технология', 'Приватность',
+  'Данные', 'Информация', 'Объективность', 'Субъективность', 'Интерпретация', 'Исследование', 'Экспертиза', 'Технология', 'Приватность',
   'Искусство', 'Традиция', 'Мировоззрение', 'Прогресс', 'Реформа', 'Устойчивость',
   'Идентичность', 'Цель', 'Привычка', 'Убеждение', 'Свобода', 'Зависимость',
   'Общение', 'Доверие', 'Солидарность', 'Сотрудничество', 'Договор', 'Сообщество', 'Дискриминация',
@@ -18,7 +18,7 @@ const neutralNames = [
   'Решение', 'Знание', 'Отношения', 'Культура', 'Изменение', 'Власть', 'Ценность', 'Общество',
 ].sort();
 
-test('discussion deck exposes exactly the curated 38 playing cards and 8 separate neutral cards', () => {
+test('discussion deck exposes exactly the curated 40 playing cards and 8 separate neutral cards', () => {
   assert.ok(USER_SELECTABLE_DECKS.some((deck) => deck.id === DISCUSSION_DECK.id));
   assert.equal(getDeckDefinitionById('discussion'), DISCUSSION_DECK);
   assert.equal(DISCUSSION_DECK.name, 'Человек и общество');
@@ -33,7 +33,7 @@ test('discussion deck exposes exactly the curated 38 playing cards and 8 separat
 
 test('discussion games use the shared deck and preserve their own card snapshot', () => {
   const game = initializeGame(4, DISCUSSION_DECK, 0);
-  assert.equal(game.sharedDeck?.length, 18);
+  assert.equal(game.sharedDeck?.length, 20);
   assert.deepEqual([...game.players.flatMap((player) => player.cards), ...game.sharedDeck!].sort(), playingNames);
   assert.ok(neutralNames.includes(game.startCard.cardName));
   assert.equal(game.startCard.playerId, null);
@@ -45,4 +45,20 @@ test('discussion games use the shared deck and preserve their own card snapshot'
   assert.equal(restored.deckSnapshot?.sourceDeckId, 'discussion');
   assert.ok(neutralNames.includes(restored.startCard.cardName));
   assert.deepEqual([...restored.players.flatMap((player) => player.cards), ...restored.sharedDeck!].sort(), playingNames);
+});
+
+test('an existing discussion snapshot keeps its 38 playing cards after the catalog expands', () => {
+  const originalCards = DISCUSSION_PLAY_CARDS.filter(({ id }) =>
+    id !== 'discussion-information' && id !== 'discussion-subjectivity');
+  const savedSnapshot = JSON.parse(JSON.stringify({
+    sourceDeckId: DISCUSSION_DECK.id,
+    cardDefinitionIds: originalCards.map(({ id }) => id),
+    cards: originalCards,
+    neutralCards: DISCUSSION_NEUTRAL_CARDS,
+  }));
+
+  const restored = initializeGame(2, DISCUSSION_DECK, 0, savedSnapshot);
+  assert.deepEqual(restored.deckSnapshot?.cardDefinitionIds, originalCards.map(({ id }) => id));
+  assert.deepEqual([...restored.players.flatMap((player) => player.cards), ...restored.sharedDeck!].sort(),
+    playingNames.filter((name) => name !== 'Информация' && name !== 'Субъективность'));
 });

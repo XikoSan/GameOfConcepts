@@ -31,7 +31,7 @@ export type GameAction =
     }
   | { type: 'confirmCard' }
   | { type: 'returnCard' }
-  | { type: 'redrawHand'; playerIndex?: number }
+  | { type: 'redrawHand'; playerIndex?: number; shuffleSeed?: number }
   | { type: 'passTurn'; playerIndex?: number }
   | { type: 'requestFinish'; playerIndex?: number }
   | { type: 'voteFinish'; playerIndex?: number; accept: boolean; finishId?: string }
@@ -82,7 +82,8 @@ export function applyGameAction(
     case 'redrawHand':
       return redrawPlayerHand(
         gameState,
-        action.playerIndex ?? gameState.currentPlayerIndex
+        action.playerIndex ?? gameState.currentPlayerIndex,
+        action.shuffleSeed
       );
 
     case 'upsertSemanticEdge':

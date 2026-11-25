@@ -30,6 +30,19 @@ function roomFor(game: GameState, order = game.players.map((_, seat) => seat)): 
     current_turn_index: order.indexOf(game.currentPlayerIndex), game_state: game, version: 0, created_at: '', updated_at: '' };
 }
 
+test('online redraw shuffles with the server seed and keeps the active seat', t => {
+  const game = initializeGame(3, undefined, 2);
+  const room = roomFor(game, [1, 2, 0]);
+  const seed = 42;
+  t.mock.method(Math, 'random', () => seed / 0x100000000);
+  const updated = serverAct(room, 'p2', { type: 'redrawHand', playerIndex: 0, shuffleSeed: 123 });
+  assert.deepEqual(updated.game_state, redrawPlayerHand(game, 2, seed));
+  assert.notDeepEqual(updated.game_state.sharedDeck, redrawPlayerHand(game, 2, 123).sharedDeck);
+  assert.equal(updated.current_turn_index, room.current_turn_index);
+  assert.equal(updated.version, room.version + 1);
+  assert.throws(() => serverAct(updated, 'p2', { type: 'redrawHand' }));
+});
+
 for (const count of [2, 3, 4]) {
   test(`${count} players: N-1 consecutive passes end immediately without a solo turn`, () => {
     let game = exhausted(count);

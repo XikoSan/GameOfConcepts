@@ -39,12 +39,12 @@ function RulesExampleBlock({ id }: { id: RulesExampleId }) {
         <div className="rules-node-example">
           <div className="rules-node-crop">
             <img alt={example.alt} src={example.imageSrc} />
-            <span className="rules-node-mark rules-node-mark--left" aria-label="Безопасность — причина власти: 2 очка">+2</span>
-            <span className="rules-node-mark rules-node-mark--right" aria-label="Безопасность — причина языка: 2 очка">+2</span>
-            <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 2 очка">+2</span>
+            <span className="rules-node-mark rules-node-mark--left" aria-label="Безопасность — причина власти: 1 очко за связь">+1</span>
+            <span className="rules-node-mark rules-node-mark--right" aria-label="Безопасность — причина языка: 1 очко за связь">+1</span>
+            <span className="rules-node-mark rules-node-mark--bottom" aria-label="Безопасность — причина закона: 1 очко за связь">+1</span>
           </div>
           <div className="rules-node-annotations">
-            <p>Новая карта «Безопасность» — ваш центр узла.<br />Окружающие понятия — следствия; их карты могут принадлежать любому игроку.<br />Первая причинная связь даёт +1, каждая следующая от нового центра — +2 с бонусом узла.</p>
+            <p>Новая карта «Безопасность» — ваш центр узла.<br />Окружающие понятия — следствия, их карты могут принадлежать любому игроку.<br />Четыре связи дают 4 очка, весь узел — ещё 1. Итого 5 очков без учёта путей.</p>
           </div>
         </div>
       ) : example.imageSrc ? (

@@ -148,13 +148,30 @@ export function getRandomStartingPlayerIndex(
   );
 }
 
-function shuffleCards(cards: RegularCardName[]): RegularCardName[] {
+function shuffleCards(cards: RegularCardName[], randomSource = Math.random): RegularCardName[] {
   const result = [...cards];
   for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
+    const j = Math.floor(randomSource() * (i + 1));
     [result[i], result[j]] = [result[j], result[i]];
   }
   return result;
+}
+
+const UINT32_RANGE = 0x100000000;
+
+export function createShuffleSeed(): number {
+  return Math.floor(Math.random() * UINT32_RANGE);
+}
+
+function seededShuffleRandom(seed: number): () => number {
+  let state = (seed | 0) || 1;
+  // Xorshift32 lets a repeated local state update replay the same shuffle.
+  return () => {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    return (state >>> 0) / UINT32_RANGE;
+  };
 }
 
 function getSnapshotCards(
@@ -390,7 +407,8 @@ export function getHandRedrawAvailability(
 
 export function redrawPlayerHand(
   gameState: GameState,
-  playerIndex: number
+  playerIndex: number,
+  shuffleSeed?: number
 ): GameState {
   const availability = getHandRedrawAvailability(gameState, playerIndex);
   if (!availability.canRedraw) return gameState;
@@ -400,16 +418,17 @@ export function redrawPlayerHand(
   const currentDeck = gameState.sharedDeck ?? gameState.deck[playerIndex];
   const newHand = currentDeck.slice(-handSize);
   const remainingDeck = currentDeck.slice(0, -handSize);
-  const nextDeckForPlayer = [...oldHand, ...remainingDeck];
+  // Draw first so cards returned by the player cannot come straight back.
+  const nextDeck = shuffleCards([...oldHand, ...remainingDeck], seededShuffleRandom(shuffleSeed ?? createShuffleSeed()));
 
   return {
     ...gameState,
     players: gameState.players.map((player, index) =>
       index === playerIndex ? { ...player, cards: newHand } : player
     ),
-    sharedDeck: gameState.sharedDeck !== undefined ? nextDeckForPlayer : undefined,
+    sharedDeck: gameState.sharedDeck !== undefined ? nextDeck : undefined,
     deck: gameState.sharedDeck !== undefined ? gameState.deck : gameState.deck.map((deck, index) =>
-      index === playerIndex ? nextDeckForPlayer : deck
+      index === playerIndex ? nextDeck : deck
     ),
     handRedrawUsedByPlayerId: {
       ...(gameState.handRedrawUsedByPlayerId ?? {}),
@@ -457,7 +476,7 @@ export function getPhysicalSemanticNeighbors(
     .filter((card): card is PlacedCard => Boolean(card) && card.status === 'confirmed');
 }
 
-function getPendingScorePreview(
+export function getPendingScorePreview(
   gameState: GameState,
   pendingMove: PendingMove
 ) {
